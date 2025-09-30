@@ -72,7 +72,7 @@ export default function ProfileSetup() {
         description: "Your profile has been set up successfully.",
       });
 
-      navigate("/");
+      navigate("/", { replace: true });
     } catch (error: any) {
       toast({
         title: "Error",
