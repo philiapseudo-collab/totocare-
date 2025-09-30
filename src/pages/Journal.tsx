@@ -7,63 +7,56 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Search, Download, Plus } from "lucide-react";
+import { useJournalEntries } from "@/hooks/useJournalEntries";
+import { useAuth } from "@/hooks/useAuth";
+import { format } from "date-fns";
 
 const Journal = () => {
+  const { user } = useAuth();
+  const { entries, loading, addEntry } = useJournalEntries();
   const [filterTab, setFilterTab] = useState("All");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [quickAddData, setQuickAddData] = useState({
     type: "Note",
-    date: "Oct 20, 2025",
+    date: new Date().toISOString(),
     who: "Mother",
     tag: "Mood",
-    details: "Write your note..."
+    details: ""
   });
 
-  const tabs = ["All", "Mother", "Infant"];
-  const tags = ["Medication", "Symptom", "Feeding", "Mood"];
-
-  const journalEntries = [
-    {
-      title: "Prenatal vitamin taken",
-      description: "Mother • 400mcg folic acid",
-      content: "Felt slightly nauseous afterwards, resolved in 10 minutes.",
-      timestamp: "Today • 8:10 AM",
-      tags: ["Medication", "Morning"],
-      type: "medication"
-    },
-    {
-      title: "Bottle feed logged",
-      description: "Infant • 120 ml formula",
-      content: "No spit-up. Burped after 5 minutes.",
-      timestamp: "Today • 6:30 AM", 
-      tags: ["Feeding", "Infant"],
-      type: "feeding"
-    },
-    {
-      title: "Mood check-in",
-      description: "Mother • Feeling calm and rested",
-      content: "Slept 7 hours last night. Practiced breathing exercises.",
-      timestamp: "Yesterday • 9:45 PM",
-      tags: ["Mood", "Wellbeing"],
-      type: "mood"
-    },
-    {
-      title: "Low-grade fever noted",
-      description: "Infant • 37.8°C",
-      content: "Likely post-vaccine. Keeping hydrated and monitoring.",
-      timestamp: "Yesterday • 4:10 PM",
-      tags: ["Symptom", "Post-vaccine"],
-      type: "symptom"
-    },
-    {
-      title: "Kick count session",
-      description: "Mother • 12 kicks in 30 minutes",
-      content: "Active after lunch. Normal pattern.",
-      timestamp: "Oct 18 • 2:00 PM",
-      tags: ["Fetal movement", "Monitoring"],
-      type: "monitoring"
+  const handleAddEntry = async () => {
+    if (!quickAddData.details.trim()) return;
+    
+    try {
+      await addEntry({
+        entry_type: quickAddData.type,
+        title: `${quickAddData.type} entry`,
+        content: quickAddData.details,
+        who: quickAddData.who,
+        entry_date: quickAddData.date,
+        tags: [quickAddData.tag]
+      });
+      
+      setQuickAddData({
+        type: "Note",
+        date: new Date().toISOString(),
+        who: "Mother",
+        tag: "Mood",
+        details: ""
+      });
+    } catch (error) {
+      console.error('Failed to add entry:', error);
     }
-  ];
+  };
+
+  const tabs = ["All", "Mother", "Infant"];
+  const tags = ["Medication", "Symptom", "Feeding", "Mood", "Monitoring"];
+
+  const filteredEntries = entries.filter(entry => {
+    if (filterTab !== "All" && entry.who !== filterTab) return false;
+    if (selectedTags.length > 0 && !entry.tags.some(tag => selectedTags.includes(tag))) return false;
+    return true;
+  });
 
   const checklistItems = [
     { title: "Hydration", subtitle: "8 glasses of water", status: "0/8" },
@@ -77,16 +70,20 @@ const Journal = () => {
     { title: "Privacy overview", subtitle: "Your notes are private" }
   ];
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case "medication": return "bg-blue-100 text-blue-700";
-      case "feeding": return "bg-green-100 text-green-700";
-      case "mood": return "bg-purple-100 text-purple-700";
-      case "symptom": return "bg-orange-100 text-orange-700";
-      case "monitoring": return "bg-pink-100 text-pink-700";
-      default: return "bg-gray-100 text-gray-700";
-    }
-  };
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="w-96">
+          <CardHeader>
+            <CardTitle>Please Log In</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">You need to be logged in to access your journal.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -193,34 +190,44 @@ const Journal = () => {
 
             {/* Journal Entries */}
             <div className="space-y-4 mb-8">
-              {journalEntries.map((entry, index) => (
-                <Card key={index}>
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h3 className="font-semibold">{entry.title}</h3>
-                        <p className="text-sm text-muted-foreground">{entry.description}</p>
-                      </div>
-                      <span className="text-xs text-muted-foreground">{entry.timestamp}</span>
-                    </div>
-                    <p className="text-sm mb-3">{entry.content}</p>
-                    <div className="flex gap-2">
-                      {entry.tags.map((tag) => (
-                        <Badge
-                          key={tag}
-                          variant="secondary"
-                          className={getTypeColor(entry.type)}
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-              <div className="text-center py-6">
-                <p className="text-muted-foreground">End of results</p>
-              </div>
+              {loading ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">Loading entries...</p>
+                </div>
+              ) : filteredEntries.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">No journal entries yet. Add your first entry below!</p>
+                </div>
+              ) : (
+                <>
+                  {filteredEntries.map((entry) => (
+                    <Card key={entry.id}>
+                      <CardContent className="p-6">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <h3 className="font-semibold">{entry.title}</h3>
+                            <p className="text-sm text-muted-foreground">{entry.who} • {entry.entry_type}</p>
+                          </div>
+                          <span className="text-xs text-muted-foreground">
+                            {format(new Date(entry.entry_date), 'MMM d, yyyy • h:mm a')}
+                          </span>
+                        </div>
+                        <p className="text-sm mb-3">{entry.content}</p>
+                        <div className="flex gap-2">
+                          {entry.tags.map((tag) => (
+                            <Badge key={tag} variant="secondary">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  <div className="text-center py-6">
+                    <p className="text-muted-foreground">End of results</p>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Quick Add to Journal */}
@@ -249,8 +256,9 @@ const Journal = () => {
                     <Label htmlFor="date">Date</Label>
                     <Input
                       id="date"
-                      value={quickAddData.date}
-                      onChange={(e) => setQuickAddData(prev => ({ ...prev, date: e.target.value }))}
+                      type="datetime-local"
+                      value={format(new Date(quickAddData.date), "yyyy-MM-dd'T'HH:mm")}
+                      onChange={(e) => setQuickAddData(prev => ({ ...prev, date: new Date(e.target.value).toISOString() }))}
                     />
                   </div>
                   <div className="space-y-2">
@@ -291,8 +299,26 @@ const Journal = () => {
                   />
                 </div>
                 <div className="flex flex-col sm:flex-row justify-end gap-2">
-                  <Button variant="outline" className="w-full sm:w-auto">Save Draft</Button>
-                  <Button className="w-full sm:w-auto">Add Entry</Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full sm:w-auto"
+                    onClick={() => setQuickAddData({
+                      type: "Note",
+                      date: new Date().toISOString(),
+                      who: "Mother",
+                      tag: "Mood",
+                      details: ""
+                    })}
+                  >
+                    Clear
+                  </Button>
+                  <Button 
+                    className="w-full sm:w-auto"
+                    onClick={handleAddEntry}
+                    disabled={!quickAddData.details.trim()}
+                  >
+                    Add Entry
+                  </Button>
                 </div>
               </CardContent>
             </Card>
