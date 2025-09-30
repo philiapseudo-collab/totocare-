@@ -21,6 +21,7 @@ import About from "./pages/About";
 import ChecklistDetail from "./pages/ChecklistDetail";
 import NotFound from "./pages/NotFound";
 import ProfileSetup from "./pages/ProfileSetup";
+import Profile from "./pages/Profile";
 import { useProfile } from "./hooks/useProfile";
 
 const queryClient = new QueryClient();
@@ -53,6 +54,7 @@ const AuthenticatedApp = () => {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/profile-setup" element={<ProfileSetup />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/journal" element={<Journal />} />
           <Route path="/vaccinations" element={<Vaccinations />} />
           <Route path="/clinic-visits" element={<ClinicVisits />} />
