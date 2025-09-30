@@ -20,8 +20,19 @@ export default function ProfileSetup() {
     current_weight: "",
     role: "mother",
     gestational_weeks: "",
-    due_date: "",
   });
+
+  // Auto-calculate due date based on gestational weeks
+  const calculateDueDate = (currentWeek: string) => {
+    if (!currentWeek || isNaN(parseInt(currentWeek))) return "";
+    
+    const week = parseInt(currentWeek);
+    const weeksRemaining = 40 - week;
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + (weeksRemaining * 7));
+    
+    return dueDate.toISOString().split('T')[0];
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,13 +65,15 @@ export default function ProfileSetup() {
       if (profileError) throw profileError;
 
       // If pregnant mother, create pregnancy record
-      if (formData.role === "mother" && formData.gestational_weeks && formData.due_date) {
+      if (formData.role === "mother" && formData.gestational_weeks) {
+        const dueDate = calculateDueDate(formData.gestational_weeks);
+        
         const { error: pregnancyError } = await supabase
           .from("pregnancies")
           .insert({
             mother_id: profile.id,
             current_week: parseInt(formData.gestational_weeks),
-            due_date: formData.due_date,
+            due_date: dueDate,
             status: "pregnant",
           });
 
@@ -169,16 +182,13 @@ export default function ProfileSetup() {
                     onChange={(e) => setFormData({ ...formData, gestational_weeks: e.target.value })}
                     placeholder="e.g., 28"
                   />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="due_date">Expected Due Date</Label>
-                  <Input
-                    id="due_date"
-                    type="date"
-                    value={formData.due_date}
-                    onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                  />
+                  {formData.gestational_weeks && (
+                    <p className="text-sm text-muted-foreground">
+                      Calculated due date: {calculateDueDate(formData.gestational_weeks) 
+                        ? new Date(calculateDueDate(formData.gestational_weeks)).toLocaleDateString()
+                        : 'Invalid week'}
+                    </p>
+                  )}
                 </div>
               </>
             )}
