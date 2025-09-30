@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   DropdownMenu,
@@ -97,8 +98,12 @@ const resourceItems = [
 
 export function AppHeader() {
   const { user, signOut } = useAuth();
+  const { profile } = useProfile();
   const location = useLocation();
   const currentPath = location.pathname;
+  
+  const fullName = profile ? `${profile.first_name} ${profile.last_name}` : "User";
+  const userInitial = profile?.first_name?.charAt(0).toUpperCase() || "U";
 
   const isActive = (path: string) => currentPath === path;
 
@@ -248,14 +253,14 @@ export function AppHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                  A
+                  {userInitial}
                 </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">Ava Patel</p>
+                  <p className="text-sm font-medium leading-none">{fullName}</p>
                   <p className="text-xs leading-none text-muted-foreground">
                     Parent
                   </p>

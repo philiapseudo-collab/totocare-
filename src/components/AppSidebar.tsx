@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
 
 // Navigation items for different sections
 const overviewItems = [
@@ -100,9 +101,13 @@ const resourceItems = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const { user } = useAuth();
+  const { profile } = useProfile();
   const location = useLocation();
   const currentPath = location.pathname;
   const collapsed = state === "collapsed";
+  
+  const fullName = profile ? `${profile.first_name} ${profile.last_name}` : "User";
+  const userInitial = profile?.first_name?.charAt(0).toUpperCase() || "U";
 
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
@@ -192,11 +197,11 @@ export function AppSidebar() {
       <SidebarFooter>
         <div className="flex items-center gap-3 p-4 border-t border-sidebar-border">
           <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-semibold">
-            A
+            {userInitial}
           </div>
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-sidebar-foreground">Ava Patel</p>
+              <p className="text-sm font-medium text-sidebar-foreground">{fullName}</p>
               <p className="text-xs text-sidebar-foreground/70">Parent</p>
             </div>
           )}
