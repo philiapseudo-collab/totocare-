@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* NurtureCare Healthcare Design System */
+
+@layer base {
+  :root {
+    /* Core Lilac Colors */
+    --background: 0 0% 100%;
+    --foreground: 270 20% 25%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 270 20% 25%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 270 20% 25%;
+
+    /* Primary Lilac */
+    --primary: 270 50% 60%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Status Colors */
+    --success: 142 72% 29%;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 45 93% 47%;
+    --warning-foreground: 270 20% 25%;
+    
+    --error: 0 84% 60%;
+    --error-foreground: 0 0% 100%;
+
+    /* Soft Lilac Grays */
+    --secondary: 270 30% 96%;
+    --secondary-foreground: 270 20% 25%;
+
+    --muted: 270 30% 96%;
+    --muted-foreground: 270 15% 65%;
+
+    --accent: 270 50% 97%;
+    --accent-foreground: 270 50% 60%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 270 20% 91%;
+    --input: 270 20% 91%;
+    --ring: 270 50% 60%;
+
+    --radius: 0.75rem;
+
+    /* Status Indicators */
+    --status-due: 45 93% 47%;
+    --status-due-foreground: 270 20% 25%;
+    
+    --status-overdue: 0 84% 60%;
+    --status-overdue-foreground: 0 0% 100%;
+    
+    --status-completed: 142 72% 29%;
+    --status-completed-foreground: 0 0% 100%;
+    
+    --status-scheduled: 270 50% 60%;
+    --status-scheduled-foreground: 0 0% 100%;
+
+    /* Lilac Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(270 50% 60%), hsl(270 50% 70%));
+    --gradient-accent: linear-gradient(180deg, hsl(270 50% 97%), hsl(270 30% 95%));
+
+    /* Sidebar Lilac Theme */
+    --sidebar-background: 270 20% 25%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 270 50% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 270 15% 35%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 270 15% 35%;
+    --sidebar-ring: 270 50% 60%;
+  }
+
+  .dark {
+    --background: 270 20% 6%;
+    --foreground: 270 15% 95%;
+
+    --card: 270 20% 8%;
+    --card-foreground: 270 15% 95%;
+
+    --popover: 270 20% 8%;
+    --popover-foreground: 270 15% 95%;
+
+    --primary: 270 50% 65%;
+    --primary-foreground: 270 20% 8%;
+
+    --secondary: 270 15% 12%;
+    --secondary-foreground: 270 15% 90%;
+
+    --muted: 270 15% 12%;
+    --muted-foreground: 270 10% 60%;
+
+    --accent: 270 15% 14%;
+    --accent-foreground: 270 50% 65%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 270 15% 95%;
+
+    --border: 270 15% 15%;
+    --input: 270 15% 15%;
+    --ring: 270 50% 65%;
+    
+    /* Enhanced status colors for dark mode */
+    --status-due: 45 93% 55%;
+    --status-due-foreground: 270 20% 8%;
+    
+    --status-overdue: 0 84% 65%;
+    --status-overdue-foreground: 270 15% 95%;
+    
+    --status-completed: 142 72% 40%;
+    --status-completed-foreground: 270 15% 95%;
+    
+    --status-scheduled: 270 50% 65%;
+    --status-scheduled-foreground: 270 20% 8%;
+
+    /* Enhanced success, warning, error for dark mode */
+    --success: 142 72% 35%;
+    --success-foreground: 270 15% 95%;
+    
+    --warning: 45 93% 55%;
+    --warning-foreground: 270 20% 8%;
+    
+    --error: 0 84% 65%;
+    --error-foreground: 270 15% 95%;
+
+    /* Sidebar dark theme */
+    --sidebar-background: 270 20% 4%;
+    --sidebar-foreground: 270 15% 90%;
+    --sidebar-primary: 270 50% 65%;
+    --sidebar-primary-foreground: 270 20% 8%;
+    --sidebar-accent: 270 15% 10%;
+    --sidebar-accent-foreground: 270 15% 90%;
+    --sidebar-border: 270 15% 12%;
+    --sidebar-ring: 270 50% 65%;
+
+    /* Enhanced gradients for dark mode */
+    --gradient-primary: linear-gradient(135deg, hsl(270 50% 65%), hsl(270 50% 75%));
+    --gradient-accent: linear-gradient(180deg, hsl(270 15% 14%), hsl(270 15% 10%));
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}

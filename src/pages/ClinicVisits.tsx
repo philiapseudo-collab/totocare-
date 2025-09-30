@@ -1,0 +1,240 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/StatusBadge";
+import { Plus, Calendar, FileText, Clock } from "lucide-react";
+
+const ClinicVisits = () => {
+  const visits = [
+    {
+      date: "Oct 22, 2025",
+      type: "Vaccination",
+      subtype: "DTaP Dose 2",
+      clinic: "Happy Kids Clinic",
+      provider: "Dr. Noah Chen",
+      status: "upcoming" as const
+    },
+    {
+      date: "Sep 10, 2025", 
+      type: "Pediatric Checkup",
+      subtype: "",
+      clinic: "City Health Center",
+      provider: "Dr. Aisha Rao",
+      status: "completed" as const
+    },
+    {
+      date: "Aug 05, 2025",
+      type: "Postnatal Visit",
+      subtype: "",
+      clinic: "Harmony Women's Clinic", 
+      provider: "Dr. Elena Park",
+      status: "completed" as const
+    },
+    {
+      date: "Jul 20, 2025",
+      type: "Screening",
+      subtype: "Glucose",
+      clinic: "Harmony Women's Clinic",
+      provider: "Dr. Elena Park", 
+      status: "missed" as const
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="border-b border-border bg-card">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 gap-4">
+          <div>
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-1">
+              <span>Home</span>
+              <span>›</span>
+              <span>Dashboard</span>
+              <span>›</span>
+              <span className="text-foreground font-medium">Clinic Visits</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Clinic Visits</h1>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">
+              Export
+            </Button>
+            <Button size="sm" className="w-full sm:w-auto">
+              <Plus className="w-4 h-4 mr-2" />
+              New Visit
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-4 sm:p-6 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg font-semibold">Visit Log</CardTitle>
+                  <div className="flex space-x-2">
+                    <StatusBadge status="upcoming">Upcoming</StatusBadge>
+                    <StatusBadge status="completed">Completed</StatusBadge>
+                    <StatusBadge status="missed">Missed</StatusBadge>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between text-sm mb-2">
+                  <span className="text-muted-foreground mb-2 sm:mb-0">1 upcoming • 4 completed</span>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button variant="outline" size="sm" className="w-full sm:w-auto">Schedule</Button>
+                    <Button size="sm" className="w-full sm:w-auto">Send Reminder</Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {visits.map((visit, index) => (
+                    <div key={index} className="border border-border rounded-lg p-4">
+                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 flex-1">
+                          <div className="flex items-center gap-2">
+                            {visit.status === "upcoming" ? (
+                              <Calendar className="w-5 h-5 text-warning flex-shrink-0" />
+                            ) : visit.status === "completed" ? (
+                              <FileText className="w-5 h-5 text-success flex-shrink-0" />
+                            ) : (
+                              <Clock className="w-5 h-5 text-error flex-shrink-0" />
+                            )}
+                            <div className="min-w-0">
+                              <h3 className="font-medium">{visit.date}</h3>
+                              <p className="text-sm text-muted-foreground break-words">
+                                {visit.type} {visit.subtype && `• ${visit.subtype}`}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                          <div className="text-left sm:text-center">
+                            <p className="font-medium break-words">{visit.clinic}</p>
+                            <p className="text-sm text-muted-foreground">{visit.provider}</p>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <StatusBadge status={visit.status}>
+                              {visit.status}
+                            </StatusBadge>
+                            <div className="flex gap-2">
+                              {visit.status === "upcoming" ? (
+                                <Button variant="outline" size="sm" className="flex-1 sm:flex-none">Reschedule</Button>
+                              ) : visit.status === "completed" ? (
+                                <Button variant="outline" size="sm" className="flex-1 sm:flex-none">Notes</Button>
+                              ) : (
+                                <Button variant="outline" size="sm" className="flex-1 sm:flex-none">Rebook</Button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Filters */}
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">Filters</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-2 block">Clinic</label>
+                    <Button variant="outline" size="sm" className="w-full justify-start">
+                      Any
+                    </Button>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-2 block">Provider</label>
+                    <Button variant="outline" size="sm" className="w-full justify-start">
+                      Any
+                    </Button>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-2 block">Visit type</label>
+                    <Button variant="outline" size="sm" className="w-full justify-start">
+                      Vaccination
+                    </Button>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-2 block">Date range</label>
+                    <Button variant="outline" size="sm" className="w-full justify-start">
+                      Last 6 months
+                    </Button>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row justify-end gap-2 mt-4">
+                  <Button variant="outline" size="sm" className="w-full sm:w-auto">Clear</Button>
+                  <Button size="sm" className="w-full sm:w-auto">Apply</Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">Visit Summary</CardTitle>
+                <p className="text-sm text-muted-foreground">5 total</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h4 className="font-medium">Next visit</h4>
+                  <p className="text-sm font-medium">Oct 22, 2025 • DTaP Dose 2 • Happy Kids Clinic</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm text-muted-foreground">Primary provider</label>
+                    <p className="font-medium">Dr. Noah Chen</p>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground">Preferred clinic</label>
+                    <p className="font-medium">City Health Center</p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm text-muted-foreground">Reminders</label>
+                  <p className="font-medium">Enabled for 3 days before</p>
+                </div>
+                <div className="text-sm text-muted-foreground bg-accent p-3 rounded-lg">
+                  <strong>Tip:</strong> Keep all records in one place. Upload receipts or visit notes after each appointment.
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button variant="outline" size="sm" className="flex-1">Manage Providers</Button>
+                  <Button size="sm" className="flex-1">Add Document</Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">Recent Notes</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <h4 className="font-medium">Pediatric Checkup</h4>
+                  <p className="text-sm text-muted-foreground">Weight tracking normal, vaccination discussed.</p>
+                  <Button variant="outline" size="sm" className="mt-1">Open</Button>
+                </div>
+                <div>
+                  <h4 className="font-medium">Postnatal Visit</h4>
+                  <p className="text-sm text-muted-foreground">Healing on track, advised light activity.</p>
+                  <Button variant="outline" size="sm" className="mt-1">Open</Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ClinicVisits;
