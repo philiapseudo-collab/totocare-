@@ -89,7 +89,7 @@ const handler = async (req: Request): Promise<Response> => {
           status: 'success',
           message: 'Reminder sent successfully'
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error(`Error processing reminder for appointment ${appointment.id}:`, error);
         results.push({
           appointmentId: appointment.id,
