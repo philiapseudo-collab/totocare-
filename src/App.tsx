@@ -20,13 +20,16 @@ import FAQ from "./pages/FAQ";
 import About from "./pages/About";
 import ChecklistDetail from "./pages/ChecklistDetail";
 import NotFound from "./pages/NotFound";
+import ProfileSetup from "./pages/ProfileSetup";
+import { useProfile } from "./hooks/useProfile";
 
 const queryClient = new QueryClient();
 
 const AuthenticatedApp = () => {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { profile, loading: profileLoading } = useProfile();
 
-  if (loading) {
+  if (authLoading || profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -38,12 +41,18 @@ const AuthenticatedApp = () => {
     return <AuthForm onSuccess={() => window.location.reload()} />;
   }
 
+  // Redirect to profile setup if profile is not completed
+  if (profile && !profile.profile_completed && window.location.pathname !== '/profile-setup') {
+    return <ProfileSetup />;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <AppHeader />
       <main className="container mx-auto px-4 py-4 sm:py-6">
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/profile-setup" element={<ProfileSetup />} />
           <Route path="/journal" element={<Journal />} />
           <Route path="/vaccinations" element={<Vaccinations />} />
           <Route path="/clinic-visits" element={<ClinicVisits />} />

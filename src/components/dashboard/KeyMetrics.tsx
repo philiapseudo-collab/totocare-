@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useProfile } from "@/hooks/useProfile";
 
 interface Metric {
   id: string;
@@ -8,25 +9,44 @@ interface Metric {
 }
 
 export function KeyMetrics() {
+  const { profile, pregnancy } = useProfile();
+
+  const calculateAge = (dob: string) => {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   const metrics: Metric[] = [
-    {
+    ...(pregnancy ? [{
       id: "gestational-age",
-      value: "28",
+      value: pregnancy.current_week?.toString() || "-",
       unit: "w",
       label: "Gestational age"
-    },
-    {
-      id: "infant-weight", 
-      value: "6.8",
+    }] : []),
+    ...(profile?.current_weight ? [{
+      id: "current-weight", 
+      value: profile.current_weight.toFixed(1),
       unit: "kg",
-      label: "Infant weight"
-    },
-    {
-      id: "fasting-glucose",
-      value: "110",
-      unit: "mg/dL",
-      label: "Fasting glucose"
-    }
+      label: "Current weight"
+    }] : []),
+    ...(profile?.blood_group ? [{
+      id: "blood-group",
+      value: profile.blood_group,
+      unit: "",
+      label: "Blood group"
+    }] : []),
+    ...(profile?.date_of_birth ? [{
+      id: "age",
+      value: calculateAge(profile.date_of_birth).toString(),
+      unit: "years",
+      label: "Age"
+    }] : [])
   ];
 
   return (

@@ -396,7 +396,9 @@ export type Database = {
       }
       profiles: {
         Row: {
+          blood_group: string | null
           created_at: string
+          current_weight: number | null
           date_of_birth: string | null
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
@@ -405,12 +407,15 @@ export type Database = {
           id: string
           last_name: string
           phone: string | null
+          profile_completed: boolean | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string
           user_id: string
         }
         Insert: {
+          blood_group?: string | null
           created_at?: string
+          current_weight?: number | null
           date_of_birth?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
@@ -419,12 +424,15 @@ export type Database = {
           id?: string
           last_name: string
           phone?: string | null
+          profile_completed?: boolean | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
           user_id: string
         }
         Update: {
+          blood_group?: string | null
           created_at?: string
+          current_weight?: number | null
           date_of_birth?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
@@ -433,6 +441,7 @@ export type Database = {
           id?: string
           last_name?: string
           phone?: string | null
+          profile_completed?: boolean | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
           user_id?: string
