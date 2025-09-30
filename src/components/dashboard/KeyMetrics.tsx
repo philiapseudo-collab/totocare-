@@ -55,7 +55,7 @@ export function KeyMetrics() {
         <CardTitle className="text-lg font-semibold">Key Metrics</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           {metrics.map((metric) => (
             <div key={metric.id} className="text-center p-4 bg-secondary/50 rounded-lg">
               <div className="text-2xl font-bold text-foreground">
