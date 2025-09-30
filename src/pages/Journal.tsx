@@ -6,16 +6,20 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Search, Download, Plus } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Search, Download, Plus, CalendarIcon } from "lucide-react";
 import { useJournalEntries } from "@/hooks/useJournalEntries";
 import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 const Journal = () => {
   const { user } = useAuth();
   const { entries, loading, addEntry } = useJournalEntries();
   const [filterTab, setFilterTab] = useState("All");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [calendarNote, setCalendarNote] = useState("");
   const [quickAddData, setQuickAddData] = useState({
     type: "Note",
     date: new Date().toISOString(),
@@ -23,6 +27,29 @@ const Journal = () => {
     tag: "Mood",
     details: ""
   });
+
+  const handleAddCalendarNote = async () => {
+    if (!calendarNote.trim() || !selectedDate) {
+      toast.error("Please write something before saving");
+      return;
+    }
+    
+    try {
+      await addEntry({
+        entry_type: "Daily Note",
+        title: `Daily Story - ${format(selectedDate, 'MMM d, yyyy')}`,
+        content: calendarNote,
+        who: "Mother",
+        entry_date: selectedDate.toISOString(),
+        tags: ["Daily Story"]
+      });
+      
+      setCalendarNote("");
+      toast.success("Your story has been saved!");
+    } catch (error) {
+      console.error('Failed to add calendar note:', error);
+    }
+  };
 
   const handleAddEntry = async () => {
     if (!quickAddData.details.trim()) return;
@@ -116,8 +143,62 @@ const Journal = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-3">
+            {/* Calendar Notes Section */}
+            <Card className="mb-6">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <CalendarIcon className="w-5 h-5 text-primary" />
+                  <CardTitle>Calendar Notes - Write Your Daily Story</CardTitle>
+                </div>
+                <p className="text-sm text-muted-foreground">Select a date and freestyle your experiences, thoughts, and stories</p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Calendar */}
+                  <div className="flex flex-col items-center">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={setSelectedDate}
+                      className="rounded-md border"
+                    />
+                    {selectedDate && (
+                      <p className="text-sm text-muted-foreground mt-4">
+                        Writing for: <span className="font-semibold text-foreground">{format(selectedDate, 'MMMM d, yyyy')}</span>
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Note Writing Area */}
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="calendar-note">Your Story for {selectedDate && format(selectedDate, 'MMM d')}</Label>
+                      <Textarea
+                        id="calendar-note"
+                        placeholder="Write freely about your day... Share your feelings, experiences, memorable moments, or anything on your mind."
+                        rows={12}
+                        value={calendarNote}
+                        onChange={(e) => setCalendarNote(e.target.value)}
+                        className="resize-none"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        {calendarNote.length} characters
+                      </p>
+                    </div>
+                    <Button 
+                      className="w-full"
+                      onClick={handleAddCalendarNote}
+                      disabled={!calendarNote.trim()}
+                    >
+                      Save Story
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             <div className="mb-6">
-              <h1 className="text-2xl font-bold mb-4">Journal</h1>
+              <h1 className="text-2xl font-bold mb-4">Journal Entries</h1>
               
               {/* Filter Tabs */}
               <div className="flex flex-wrap items-center gap-2 mb-4">
