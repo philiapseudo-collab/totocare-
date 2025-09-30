@@ -22,6 +22,10 @@ import ChecklistDetail from "./pages/ChecklistDetail";
 import NotFound from "./pages/NotFound";
 import ProfileSetup from "./pages/ProfileSetup";
 import Profile from "./pages/Profile";
+import Checklist from "./pages/Checklist";
+import QuickAdd from "./pages/QuickAdd";
+import Upcoming from "./pages/Upcoming";
+import RecentActivityPage from "./pages/RecentActivity";
 import { useProfile } from "./hooks/useProfile";
 
 const queryClient = new QueryClient();
@@ -56,6 +60,10 @@ const AuthenticatedApp = () => {
           <Route path="/profile-setup" element={<ProfileSetup />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/journal" element={<Journal />} />
+          <Route path="/checklist" element={<Checklist />} />
+          <Route path="/quick-add" element={<QuickAdd />} />
+          <Route path="/upcoming" element={<Upcoming />} />
+          <Route path="/recent-activity" element={<RecentActivityPage />} />
           <Route path="/vaccinations" element={<Vaccinations />} />
           <Route path="/clinic-visits" element={<ClinicVisits />} />
           <Route path="/reproductive-health" element={<ReproductiveHealth />} />
