@@ -16,12 +16,8 @@ interface AnalyticsRequest {
   };
 }
 
-const supabase = createClient(
-  Deno.env.get("SUPABASE_URL") ?? "",
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-);
 
-const calculatePregnancyProgress = async (patientId: string) => {
+const calculatePregnancyProgress = async (supabase: any, patientId: string) => {
   // Get active pregnancy
   const { data: pregnancy, error } = await supabase
     .from('pregnancies')
@@ -57,7 +53,7 @@ const calculatePregnancyProgress = async (patientId: string) => {
   };
 };
 
-const calculateInfantGrowth = async (patientId: string) => {
+const calculateInfantGrowth = async (supabase: any, patientId: string) => {
   // Get infant data for the mother
   const { data: infants, error } = await supabase
     .from('infants')
@@ -105,7 +101,7 @@ const calculateInfantGrowth = async (patientId: string) => {
   };
 };
 
-const analyzeHealthTrends = async (patientId: string, dateRange?: { start: string; end: string }) => {
+const analyzeHealthTrends = async (supabase: any, patientId: string, dateRange?: { start: string; end: string }) => {
   const startDate = dateRange?.start || new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
   const endDate = dateRange?.end || new Date().toISOString();
 
@@ -130,13 +126,13 @@ const analyzeHealthTrends = async (patientId: string, dateRange?: { start: strin
   }
 
   // Analyze weight trends
-  const weightData = visits?.filter(v => v.weight).map(v => ({
+  const weightData = visits?.filter((v: any) => v.weight).map((v: any) => ({
     date: v.visit_date,
     weight: v.weight
   })) || [];
 
   // Blood pressure trends
-  const bpData = visits?.filter(v => v.blood_pressure).map(v => ({
+  const bpData = visits?.filter((v: any) => v.blood_pressure).map((v: any) => ({
     date: v.visit_date,
     bloodPressure: v.blood_pressure
   })) || [];
@@ -150,7 +146,7 @@ const analyzeHealthTrends = async (patientId: string, dateRange?: { start: strin
   };
 };
 
-const assessRisk = async (patientId: string) => {
+const assessRisk = async (supabase: any, patientId: string) => {
   // Get all relevant health data
   const { data: conditions } = await supabase
     .from('conditions')
@@ -176,7 +172,7 @@ const assessRisk = async (patientId: string) => {
     'severe anemia'
   ];
 
-  conditions?.forEach(condition => {
+  conditions?.forEach((condition: any) => {
     if (highRiskConditions.some(risk => 
       condition.condition_name.toLowerCase().includes(risk.toLowerCase())
     )) {
@@ -212,29 +208,67 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Verify authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: "Authentication required", success: false }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: "Invalid authentication", success: false }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { patientId, analysisType, dateRange }: AnalyticsRequest = await req.json();
 
     if (!patientId || !analysisType) {
-      throw new Error('Missing required parameters');
+      return new Response(
+        JSON.stringify({ error: "Missing required parameters", success: false }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate analysisType
+    const validTypes = ['pregnancy_progress', 'infant_growth', 'health_trends', 'risk_assessment'];
+    if (!validTypes.includes(analysisType)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid analysis type", success: false }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     let result;
 
     switch (analysisType) {
       case 'pregnancy_progress':
-        result = await calculatePregnancyProgress(patientId);
+        result = await calculatePregnancyProgress(supabase, patientId);
         break;
       case 'infant_growth':
-        result = await calculateInfantGrowth(patientId);
+        result = await calculateInfantGrowth(supabase, patientId);
         break;
       case 'health_trends':
-        result = await analyzeHealthTrends(patientId, dateRange);
+        result = await analyzeHealthTrends(supabase, patientId, dateRange);
         break;
       case 'risk_assessment':
-        result = await assessRisk(patientId);
+        result = await assessRisk(supabase, patientId);
         break;
       default:
-        throw new Error('Invalid analysis type');
+        return new Response(
+          JSON.stringify({ error: "Invalid analysis type", success: false }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
     }
 
     return new Response(
@@ -256,7 +290,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.error("Error in health-analytics function:", error);
     return new Response(
       JSON.stringify({ 
-        error: error.message,
+        error: "Unable to generate analytics. Please try again later.",
         success: false 
       }),
       {

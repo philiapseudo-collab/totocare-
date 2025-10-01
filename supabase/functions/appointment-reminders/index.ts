@@ -12,11 +12,6 @@ interface AppointmentReminderRequest {
   checkUpcoming?: boolean;
 }
 
-const supabase = createClient(
-  Deno.env.get("SUPABASE_URL") ?? "",
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-);
-
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -24,6 +19,43 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Verify authentication - only healthcare providers should access this
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: "Authentication required", success: false }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: "Invalid authentication", success: false }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Verify user is a healthcare provider or admin
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single();
+
+    if (!profile || !['healthcare_provider', 'admin'].includes(profile.role)) {
+      return new Response(
+        JSON.stringify({ error: "Insufficient permissions", success: false }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { appointmentId, checkUpcoming }: AppointmentReminderRequest = await req.json();
     
     let appointments = [];
@@ -40,7 +72,13 @@ const handler = async (req: Request): Promise<Response> => {
         .eq('id', appointmentId)
         .single();
         
-      if (error) throw error;
+      if (error) {
+        console.error("Database error fetching appointment:", error);
+        return new Response(
+          JSON.stringify({ error: "Unable to fetch appointment data", success: false }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
       appointments = [data];
     } else if (checkUpcoming) {
       // Get appointments for the next 24 hours that haven't been reminded
@@ -59,7 +97,13 @@ const handler = async (req: Request): Promise<Response> => {
         .lte('appointment_date', tomorrow.toISOString())
         .gte('appointment_date', new Date().toISOString());
         
-      if (error) throw error;
+      if (error) {
+        console.error("Database error fetching appointments:", error);
+        return new Response(
+          JSON.stringify({ error: "Unable to fetch appointments", success: false }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
       appointments = data || [];
     }
 
@@ -117,7 +161,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.error("Error in appointment-reminders function:", error);
     return new Response(
       JSON.stringify({ 
-        error: error.message,
+        error: "Unable to process reminders. Please try again later.",
         success: false 
       }),
       {
