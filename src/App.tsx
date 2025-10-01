@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AppHeader } from "@/components/AppHeader";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { AuthForm } from "@/components/AuthForm";
@@ -31,6 +31,7 @@ import { useProfile } from "./hooks/useProfile";
 const queryClient = new QueryClient();
 
 const AuthenticatedApp = () => {
+  const location = useLocation();
   const { user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
 
@@ -46,9 +47,15 @@ const AuthenticatedApp = () => {
     return <AuthForm onSuccess={() => {}} />;
   }
 
-  // Redirect to profile setup if profile is not completed
-  if (profile && !profile.profile_completed && window.location.pathname !== '/profile-setup') {
-    return <ProfileSetup />;
+  // Redirect based on profile completion
+  const justCompleted = (location.state as any)?.justCompletedProfile;
+
+  if (profile && !profile.profile_completed && !justCompleted && window.location.pathname !== '/profile-setup') {
+    return <Navigate to="/profile-setup" replace />;
+  }
+
+  if (profile && profile.profile_completed && window.location.pathname === '/profile-setup') {
+    return <Navigate to="/" replace />;
   }
 
   return (

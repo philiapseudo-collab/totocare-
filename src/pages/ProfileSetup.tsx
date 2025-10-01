@@ -85,7 +85,7 @@ export default function ProfileSetup() {
         description: "Your profile has been set up successfully.",
       });
 
-      navigate("/", { replace: true });
+      navigate("/", { replace: true, state: { justCompletedProfile: true } });
     } catch (error: any) {
       toast({
         title: "Error",
