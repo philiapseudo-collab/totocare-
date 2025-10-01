@@ -27,27 +27,36 @@ export const ActivityCard = React.memo(({ item, onAction, className }: ActivityC
     general: "📋"
   }), []);
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (onAction && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      onAction(item);
+    }
+  };
+
   return (
-    <Card className={cn("hover:shadow-md transition-shadow", className)}>
+    <Card 
+      className={cn(
+        "hover:shadow-md transition-shadow",
+        onAction && "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        className
+      )}
+      tabIndex={onAction ? 0 : undefined}
+      onKeyDown={handleKeyDown}
+      onClick={onAction ? () => onAction(item) : undefined}
+      role={onAction ? "button" : undefined}
+    >
       <CardContent className="p-4">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center space-x-2 mb-2">
-              <span className="text-lg">{typeIcons[item.type]}</span>
+              <span className="text-lg" aria-hidden="true">{typeIcons[item.type]}</span>
               <h3 className="font-medium text-foreground">{item.title}</h3>
               <StatusBadge status={item.status}>{item.status}</StatusBadge>
             </div>
             <p className="text-sm text-muted-foreground mb-2">{item.description}</p>
             <p className="text-xs text-muted-foreground">{item.time}</p>
           </div>
-          {onAction && (
-            <button
-              onClick={() => onAction(item)}
-              className="text-primary hover:text-primary/80 text-sm font-medium"
-            >
-              View
-            </button>
-          )}
         </div>
       </CardContent>
     </Card>
