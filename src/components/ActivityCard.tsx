@@ -1,3 +1,4 @@
+import React, { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/StatusBadge";
 import { cn } from "@/lib/utils";
@@ -17,14 +18,14 @@ export interface ActivityCardProps {
   className?: string;
 }
 
-export function ActivityCard({ item, onAction, className }: ActivityCardProps) {
-  const typeIcons = {
+export const ActivityCard = React.memo(({ item, onAction, className }: ActivityCardProps) => {
+  const typeIcons = useMemo(() => ({
     vaccination: "💉",
     appointment: "📅",
     screening: "🔬",
     medication: "💊",
     general: "📋"
-  };
+  }), []);
 
   return (
     <Card className={cn("hover:shadow-md transition-shadow", className)}>
@@ -51,4 +52,4 @@ export function ActivityCard({ item, onAction, className }: ActivityCardProps) {
       </CardContent>
     </Card>
   );
-}
+});
