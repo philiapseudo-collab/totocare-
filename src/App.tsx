@@ -43,7 +43,7 @@ const AuthenticatedApp = () => {
   }
 
   if (!user) {
-    return <AuthForm onSuccess={() => window.location.reload()} />;
+    return <AuthForm onSuccess={() => {}} />;
   }
 
   // Redirect to profile setup if profile is not completed
