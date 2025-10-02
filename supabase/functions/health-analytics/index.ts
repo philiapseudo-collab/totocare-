@@ -9,22 +9,148 @@ const corsHeaders = {
 
 interface AnalyticsRequest {
   patientId: string;
-  analysisType: 'pregnancy_progress' | 'infant_growth' | 'health_trends' | 'risk_assessment';
+  pregnancyId?: string;
+  analysisType: 'pregnancy_progress' | 'infant_growth' | 'health_trends' | 'risk_assessment' | 'comprehensive';
   dateRange?: {
     start: string;
     end: string;
   };
 }
 
+// Helper: Calculate weight gain from clinic visits
+const calculateWeightGain = (visits: any[]): number => {
+  if (!visits || visits.length < 2) return 0;
+  const weights = visits.filter(v => v.weight).map(v => parseFloat(v.weight)).sort();
+  if (weights.length < 2) return 0;
+  return weights[weights.length - 1] - weights[0];
+};
+
+// Helper: Analyze blood pressure trend
+const analyzeBPTrend = (visits: any[]): string => {
+  if (!visits || visits.length === 0) return 'no_data';
+  
+  const bpReadings = visits
+    .filter(v => v.blood_pressure)
+    .map(v => {
+      const [systolic, diastolic] = v.blood_pressure.split('/').map(Number);
+      return { systolic, diastolic };
+    });
+  
+  if (bpReadings.length === 0) return 'no_data';
+  
+  const avgSystolic = bpReadings.reduce((sum, r) => sum + r.systolic, 0) / bpReadings.length;
+  const avgDiastolic = bpReadings.reduce((sum, r) => sum + r.diastolic, 0) / bpReadings.length;
+  
+  if (avgSystolic > 140 || avgDiastolic > 90) return 'high';
+  if (avgSystolic < 90 || avgDiastolic < 60) return 'low';
+  return 'normal';
+};
+
+// Helper: Identify risk factors from conditions
+const identifyRiskFactors = (conditions: any[]): string[] => {
+  if (!conditions) return [];
+  
+  const highRiskConditions = [
+    'gestational diabetes',
+    'preeclampsia',
+    'hypertension',
+    'placenta previa',
+    'anemia',
+    'thyroid disorder'
+  ];
+  
+  return conditions
+    .filter(c => c.is_active)
+    .filter(c => highRiskConditions.some(risk => 
+      c.condition_name.toLowerCase().includes(risk.toLowerCase())
+    ))
+    .map(c => c.condition_name);
+};
+
+// Helper: Get upcoming milestones based on pregnancy week
+const getUpcomingMilestones = (currentWeek: number): string[] => {
+  const milestones = [
+    { week: 12, text: 'First trimester complete' },
+    { week: 20, text: 'Anatomy scan' },
+    { week: 28, text: 'Third trimester begins' },
+    { week: 32, text: 'Regular prenatal visits' },
+    { week: 36, text: 'Weekly check-ups start' },
+    { week: 40, text: 'Due date approaching' }
+  ];
+  
+  return milestones
+    .filter(m => m.week > currentWeek)
+    .slice(0, 3)
+    .map(m => `Week ${m.week}: ${m.text}`);
+};
+
+
+// Comprehensive analytics combining all health data
+const generateComprehensiveAnalytics = async (supabase: any, patientId: string, pregnancyId?: string) => {
+  try {
+    // Fetch all relevant data
+    const [
+      { data: pregnancy },
+      { data: appointments },
+      { data: clinicVisits },
+      { data: conditions },
+      { data: screenings },
+      { data: vaccinations },
+      { data: medications }
+    ] = await Promise.all([
+      supabase.from('pregnancies').select('*').eq('mother_id', patientId).eq('status', 'pregnant').maybeSingle(),
+      supabase.from('appointments').select('*').eq('patient_id', patientId).order('appointment_date', { ascending: false }).limit(10),
+      supabase.from('clinic_visits').select('*').eq('patient_id', patientId).order('visit_date', { ascending: false }).limit(10),
+      supabase.from('conditions').select('*').eq('patient_id', patientId).eq('is_active', true),
+      supabase.from('screenings').select('*').eq('patient_id', patientId).order('scheduled_date', { ascending: false }),
+      supabase.from('vaccinations').select('*').eq('patient_id', patientId).order('scheduled_date', { ascending: false }),
+      supabase.from('medications').select('*').eq('patient_id', patientId).eq('is_active', true)
+    ]);
+
+    const currentWeek = pregnancy?.current_week || 0;
+    
+    return {
+      pregnancy: pregnancy ? {
+        currentWeek: pregnancy.current_week,
+        dueDate: pregnancy.due_date,
+        trimester: pregnancy.current_trimester,
+        multiparity: pregnancy.multiparity_count || 0
+      } : null,
+      appointments: {
+        total: appointments?.length || 0,
+        upcoming: appointments?.filter((a: any) => a.status === 'scheduled' && new Date(a.appointment_date) > new Date()).length || 0,
+        completed: appointments?.filter((a: any) => a.status === 'completed').length || 0
+      },
+      healthMetrics: {
+        totalClinicVisits: clinicVisits?.length || 0,
+        weightGain: calculateWeightGain(clinicVisits || []),
+        bloodPressureTrend: analyzeBPTrend(clinicVisits || []),
+        lastVisitDate: clinicVisits?.[0]?.visit_date || null
+      },
+      riskAssessment: {
+        activeConditions: conditions?.length || 0,
+        riskFactors: identifyRiskFactors(conditions || []),
+        activeMedications: medications?.length || 0
+      },
+      upcomingCare: {
+        pendingScreenings: screenings?.filter((s: any) => s.status === 'due').length || 0,
+        dueVaccinations: vaccinations?.filter((v: any) => v.status === 'due').length || 0,
+        nextMilestones: pregnancy ? getUpcomingMilestones(currentWeek) : []
+      }
+    };
+  } catch (error) {
+    console.error('Error generating comprehensive analytics:', error);
+    throw error;
+  }
+};
 
 const calculatePregnancyProgress = async (supabase: any, patientId: string) => {
-  // Get active pregnancy
   const { data: pregnancy, error } = await supabase
     .from('pregnancies')
     .select('*')
     .eq('mother_id', patientId)
     .eq('status', 'pregnant')
-    .single();
+    .maybeSingle();
 
   if (error || !pregnancy) {
     return { error: 'No active pregnancy found' };
@@ -34,7 +160,6 @@ const calculatePregnancyProgress = async (supabase: any, patientId: string) => {
   const today = new Date();
   const daysUntilDue = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   
-  // Calculate current week and trimester
   const conceptionDate = pregnancy.conception_date ? new Date(pregnancy.conception_date) : null;
   const currentWeek = conceptionDate 
     ? Math.floor((today.getTime() - conceptionDate.getTime()) / (1000 * 60 * 60 * 24 * 7))
@@ -49,7 +174,8 @@ const calculatePregnancyProgress = async (supabase: any, patientId: string) => {
     currentWeek,
     trimester,
     dueDate: pregnancy.due_date,
-    multiparity: pregnancy.multiparity_count || 0
+    multiparity: pregnancy.multiparity_count || 0,
+    upcomingMilestones: getUpcomingMilestones(currentWeek)
   };
 };
 
@@ -231,7 +357,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const { patientId, analysisType, dateRange }: AnalyticsRequest = await req.json();
+    const { patientId, pregnancyId, analysisType, dateRange }: AnalyticsRequest = await req.json();
 
     if (!patientId || !analysisType) {
       return new Response(
@@ -240,8 +366,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Validate analysisType
-    const validTypes = ['pregnancy_progress', 'infant_growth', 'health_trends', 'risk_assessment'];
+    const validTypes = ['pregnancy_progress', 'infant_growth', 'health_trends', 'risk_assessment', 'comprehensive'];
     if (!validTypes.includes(analysisType)) {
       return new Response(
         JSON.stringify({ error: "Invalid analysis type", success: false }),
@@ -252,6 +377,9 @@ const handler = async (req: Request): Promise<Response> => {
     let result;
 
     switch (analysisType) {
+      case 'comprehensive':
+        result = await generateComprehensiveAnalytics(supabase, patientId, pregnancyId);
+        break;
       case 'pregnancy_progress':
         result = await calculatePregnancyProgress(supabase, patientId);
         break;
