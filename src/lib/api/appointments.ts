@@ -6,7 +6,7 @@ export interface Appointment {
   healthcare_provider_id?: string;
   appointment_date: string;
   appointment_type: string;
-  status: 'scheduled' | 'completed' | 'cancelled' | 'rescheduled';
+  status: 'scheduled' | 'completed' | 'cancelled' | 'no_show';
   duration_minutes?: number;
   notes?: string;
   reminder_sent?: boolean;
