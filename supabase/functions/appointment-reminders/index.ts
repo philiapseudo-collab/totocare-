@@ -10,6 +10,7 @@ const corsHeaders = {
 interface AppointmentReminderRequest {
   appointmentId?: string;
   checkUpcoming?: boolean;
+  hoursAhead?: number; // Hours ahead to check for appointments (default 24)
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -19,44 +20,49 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Verify authentication - only healthcare providers should access this
+    // Check if request has authentication (for manual calls) or use service role (for cron)
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: "Authentication required", success: false }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    let supabase;
+    
+    if (authHeader) {
+      // Authenticated call - verify permissions
+      supabase = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+        { global: { headers: { Authorization: authHeader } } }
+      );
+
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        return new Response(
+          JSON.stringify({ error: "Invalid authentication", success: false }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Verify user is a healthcare provider or admin
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!profile || !['healthcare_provider', 'admin'].includes(profile.role)) {
+        return new Response(
+          JSON.stringify({ error: "Insufficient permissions", success: false }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    } else {
+      // No auth - use service role for automated/cron calls
+      supabase = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
       );
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: "Invalid authentication", success: false }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Verify user is a healthcare provider or admin
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single();
-
-    if (!profile || !['healthcare_provider', 'admin'].includes(profile.role)) {
-      return new Response(
-        JSON.stringify({ error: "Insufficient permissions", success: false }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const { appointmentId, checkUpcoming }: AppointmentReminderRequest = await req.json();
+    const { appointmentId, checkUpcoming, hoursAhead = 24 }: AppointmentReminderRequest = 
+      await req.json().catch(() => ({ checkUpcoming: true, hoursAhead: 24 }));
     
     let appointments = [];
     
@@ -66,8 +72,12 @@ const handler = async (req: Request): Promise<Response> => {
         .from('appointments')
         .select(`
           *,
-          patient:profiles!appointments_patient_id_fkey(first_name, last_name),
-          healthcare_provider:profiles!appointments_healthcare_provider_id_fkey(first_name, last_name)
+          patient:profiles!appointments_patient_id_fkey(
+            id,
+            first_name,
+            last_name,
+            phone
+          )
         `)
         .eq('id', appointmentId)
         .single();
@@ -81,21 +91,25 @@ const handler = async (req: Request): Promise<Response> => {
       }
       appointments = [data];
     } else if (checkUpcoming) {
-      // Get appointments for the next 24 hours that haven't been reminded
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
+      // Get appointments in the specified hours ahead that haven't been reminded
+      const now = new Date();
+      const futureTime = new Date(now.getTime() + hoursAhead * 60 * 60 * 1000);
       
       const { data, error } = await supabase
         .from('appointments')
         .select(`
           *,
-          patient:profiles!appointments_patient_id_fkey(first_name, last_name),
-          healthcare_provider:profiles!appointments_healthcare_provider_id_fkey(first_name, last_name)
+          patient:profiles!appointments_patient_id_fkey(
+            id,
+            first_name,
+            last_name,
+            phone
+          )
         `)
         .eq('status', 'scheduled')
         .eq('reminder_sent', false)
-        .lte('appointment_date', tomorrow.toISOString())
-        .gte('appointment_date', new Date().toISOString());
+        .gte('appointment_date', now.toISOString())
+        .lt('appointment_date', futureTime.toISOString());
         
       if (error) {
         console.error("Database error fetching appointments:", error);
@@ -111,30 +125,54 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Process reminders
     const results = [];
+    let successCount = 0;
+    let failureCount = 0;
+
     for (const appointment of appointments) {
       try {
-        // Here you would integrate with your notification service
-        // For now, we'll just log and mark as sent
-        console.log(`Reminder for appointment ${appointment.id}:`);
-        console.log(`Patient: ${appointment.patient?.first_name} ${appointment.patient?.last_name}`);
-        console.log(`Date: ${appointment.appointment_date}`);
-        console.log(`Type: ${appointment.appointment_type}`);
+        const patientName = appointment.patient 
+          ? `${appointment.patient.first_name} ${appointment.patient.last_name}`
+          : "Unknown Patient";
+        
+        const appointmentDate = new Date(appointment.appointment_date);
+        const formattedDate = appointmentDate.toLocaleDateString();
+        const formattedTime = appointmentDate.toLocaleTimeString();
+
+        // Log reminder details
+        console.log(`📅 Sending reminder for appointment ${appointment.id}`);
+        console.log(`   Patient: ${patientName}`);
+        console.log(`   Phone: ${appointment.patient?.phone || "N/A"}`);
+        console.log(`   Date: ${formattedDate} at ${formattedTime}`);
+        console.log(`   Type: ${appointment.appointment_type}`);
+
+        // TODO: Integrate with notification service (SMS/Email/Push)
+        // Examples:
+        // - Twilio for SMS: await sendSMS(appointment.patient.phone, message)
+        // - Resend for Email: await sendEmail(appointment.patient.email, subject, body)
+        // - Firebase for Push: await sendPushNotification(userId, message)
         
         // Mark reminder as sent
         const { error: updateError } = await supabase
           .from('appointments')
-          .update({ reminder_sent: true })
+          .update({ 
+            reminder_sent: true,
+            updated_at: new Date().toISOString()
+          })
           .eq('id', appointment.id);
           
         if (updateError) throw updateError;
         
+        successCount++;
         results.push({
           appointmentId: appointment.id,
+          patientName,
+          appointmentDate: appointment.appointment_date,
           status: 'success',
           message: 'Reminder sent successfully'
         });
       } catch (error: any) {
-        console.error(`Error processing reminder for appointment ${appointment.id}:`, error);
+        console.error(`❌ Error processing reminder for appointment ${appointment.id}:`, error);
+        failureCount++;
         results.push({
           appointmentId: appointment.id,
           status: 'error',
@@ -146,8 +184,14 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({
         success: true,
-        processedCount: appointments.length,
-        results: results
+        message: `Processed ${appointments.length} appointment reminder(s)`,
+        summary: {
+          total: appointments.length,
+          successful: successCount,
+          failed: failureCount,
+          hoursAhead
+        },
+        results
       }),
       {
         status: 200,
