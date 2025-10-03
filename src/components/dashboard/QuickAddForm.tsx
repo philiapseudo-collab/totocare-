@@ -5,15 +5,86 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 export function QuickAddForm() {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
-    entryType: "Vaccination",
-    date: "Oct 20, 2025",
-    who: "Infant",
-    clinic: "Happy Kids Clinic",
-    notes: "Mild fever after previous dose"
+    entryType: "",
+    date: "",
+    who: "",
+    clinic: "",
+    notes: ""
   });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!user || !formData.entryType || !formData.date) {
+      toast.error("Please fill in required fields");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Get the user's profile to find their patient_id
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!profile) {
+        toast.error("Profile not found");
+        return;
+      }
+
+      const commonData = {
+        patient_id: profile.id,
+        notes: formData.notes || null
+      };
+
+      // Insert based on entry type
+      if (formData.entryType === "Vaccination") {
+        await supabase.from('vaccinations').insert({
+          ...commonData,
+          vaccine_name: "New Vaccination",
+          scheduled_date: formData.date,
+          status: 'due',
+          patient_type: formData.who || 'mother'
+        });
+      } else if (formData.entryType === "Appointment") {
+        await supabase.from('appointments').insert({
+          ...commonData,
+          appointment_type: "General Checkup",
+          appointment_date: new Date(formData.date).toISOString(),
+          status: 'scheduled'
+        });
+      } else if (formData.entryType === "Screening") {
+        await supabase.from('screenings').insert({
+          ...commonData,
+          screening_type: "General Screening",
+          scheduled_date: formData.date,
+          status: 'due'
+        });
+      }
+
+      toast.success("Entry added successfully");
+      setFormData({
+        entryType: "",
+        date: "",
+        who: "",
+        clinic: "",
+        notes: ""
+      });
+    } catch (error: any) {
+      toast.error("Failed to add entry");
+      console.error('Error adding entry:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Card>
@@ -82,8 +153,13 @@ export function QuickAddForm() {
         </div>
 
         <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
-          <Button variant="outline" className="w-full sm:w-auto">Save Draft</Button>
-          <Button className="bg-cyan-500 hover:bg-cyan-600 w-full sm:w-auto">Add Entry</Button>
+          <Button 
+            onClick={handleSubmit}
+            disabled={loading || !formData.entryType || !formData.date}
+            className="w-full sm:w-auto"
+          >
+            {loading ? "Adding..." : "Add Entry"}
+          </Button>
         </div>
       </CardContent>
     </Card>
