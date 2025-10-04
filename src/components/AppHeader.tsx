@@ -17,6 +17,7 @@ import {
   LogOut,
   Menu
 } from "lucide-react";
+import leaLogo from "@/assets/lea-baby-logo.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
@@ -111,16 +112,14 @@ export function AppHeader() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-            <span className="text-white text-sm font-bold">N</span>
-          </div>
+        <NavLink to="/" className="flex items-center gap-2">
+          <img src={leaLogo} alt="LEA Baby Logo" className="w-10 h-10 object-contain" />
           <div className="hidden sm:block">
             <span className="font-bold text-foreground text-lg">LEA</span>
             <span className="text-xs text-muted-foreground ml-2">Maternease</span>
           </div>
           <span className="font-bold text-foreground sm:hidden text-lg">LEA</span>
-        </div>
+        </NavLink>
 
         {/* Main Navigation */}
         <NavigationMenu className="hidden lg:flex">
