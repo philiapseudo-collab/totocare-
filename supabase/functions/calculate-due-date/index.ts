@@ -113,9 +113,9 @@ serve(async (req) => {
     const dueDate = new Date(lmpDate);
     dueDate.setDate(dueDate.getDate() + TOTAL_PREGNANCY_DAYS);
 
-    // Calculate days remaining
-    const daysRemaining = Math.max(0, Math.floor((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
-    const weeksRemaining = Math.floor(daysRemaining / 7);
+    // Calculate days remaining (40 weeks - current gestational age)
+    const daysRemaining = Math.max(0, TOTAL_PREGNANCY_DAYS - currentGestationalDays);
+    const weeksRemaining = Math.max(0, 40 - currentWeek);
 
     // Determine trimester
     let trimester: 1 | 2 | 3;
