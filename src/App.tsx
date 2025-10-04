@@ -92,7 +92,7 @@ const AuthenticatedApp = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <ThemeProvider defaultTheme="system" storageKey="nurturecare-ui-theme">
+      <ThemeProvider defaultTheme="system" storageKey="lea-maternease-ui-theme">
         <TooltipProvider>
           <Toaster />
           <Sonner />

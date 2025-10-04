@@ -46,7 +46,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
 
       toast({
         title: "Account created successfully!",
-        description: "Welcome to NurtureCare. You can now access all features.",
+        description: "Welcome to LEA - Maternease. You can now access all features.",
       });
       
       onSuccess();
@@ -75,7 +75,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
 
       toast({
         title: "Welcome back!",
-        description: "Successfully signed in to NurtureCare.",
+        description: "Successfully signed in to LEA - Maternease.",
       });
       
       onSuccess();
@@ -99,8 +99,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
               <Heart className="h-8 w-8 text-primary" />
             </div>
             <div className="flex flex-col">
-              <h1 className="text-2xl font-bold text-foreground">NurtureCare</h1>
-              <p className="text-sm text-muted-foreground">Maternal & Infant Health</p>
+              <h1 className="text-3xl font-bold text-foreground">LEA</h1>
+              <p className="text-sm text-muted-foreground italic">Maternease - Maternal & Infant Health</p>
             </div>
           </div>
         </div>

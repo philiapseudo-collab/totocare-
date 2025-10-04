@@ -99,7 +99,7 @@ const Guides = () => {
 
   const appGuides = [
     {
-      title: "Getting Started with NurtureCare",
+      title: "Getting Started with LEA",
       description: "Complete walkthrough of setting up your profile, adding entries, and navigating the dashboard.",
       duration: "5 min read",
       topics: ["Setup", "Navigation", "Basics"]
@@ -179,7 +179,7 @@ const Guides = () => {
             </TabsTrigger>
             <TabsTrigger value="app" className="gap-2">
               <FileText className="w-4 h-4" />
-              <span className="hidden sm:inline">Using NurtureCare</span>
+              <span className="hidden sm:inline">Using LEA</span>
             </TabsTrigger>
           </TabsList>
 
@@ -229,7 +229,7 @@ const Guides = () => {
             <div>
               <h2 className="text-2xl font-bold mb-2">App Usage Guides</h2>
               <p className="text-muted-foreground mb-6">
-                Learn how to make the most of NurtureCare's features
+                Learn how to make the most of LEA's features
               </p>
             </div>
             <div className="grid md:grid-cols-2 gap-4">

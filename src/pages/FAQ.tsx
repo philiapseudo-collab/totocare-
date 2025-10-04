@@ -18,7 +18,7 @@ const FAQ = () => {
 
   const faqs = [
     {
-      question: "What can I track in NurtureCare?",
+      question: "What can I track in LEA?",
       answer: "You can log vaccinations, clinic visits, reproductive health metrics, screening results, and conditions for both mother and infant. The dashboard summarizes what's next.",
       tags: ["Getting Started", "Dashboard"]
     },
@@ -171,7 +171,7 @@ const FAQ = () => {
                   
                   <div>
                     <h4 className="font-medium mb-2">Email Us</h4>
-                    <p className="text-sm text-muted-foreground">support@nurturecare.app</p>
+                    <p className="text-sm text-muted-foreground">support@lea-maternease.app</p>
                   </div>
                 </div>
               </CardContent>

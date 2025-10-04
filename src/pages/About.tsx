@@ -45,7 +45,7 @@ const About = () => {
       {/* Header */}
       <div className="border-b border-border bg-card">
         <div className="container mx-auto p-6">
-          <h1 className="text-3xl font-bold text-foreground">About NurtureCare</h1>
+          <h1 className="text-3xl font-bold text-foreground">About LEA</h1>
           <p className="text-muted-foreground mt-2">Empowering families through comprehensive health tracking</p>
         </div>
       </div>
@@ -57,8 +57,8 @@ const About = () => {
             <CardContent className="p-8">
               <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
               <p className="text-lg text-muted-foreground leading-relaxed mb-4">
-                NurtureCare was created to simplify maternal and infant health management. We believe that every family 
-                deserves easy access to comprehensive health tracking tools that provide clarity, confidence, and peace of mind 
+                LEA (Maternease) was created to simplify maternal and infant health management. We believe that every family 
+                deserves easy access to comprehensive health tracking tools that provide clarity, confidence, and peace of mind
                 throughout pregnancy and early childhood.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed">

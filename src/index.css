@@ -2,146 +2,151 @@
 @tailwind components;
 @tailwind utilities;
 
-/* NurtureCare Healthcare Design System */
+/* LEA - Maternease Healthcare Design System */
 
 @layer base {
   :root {
-    /* Core Lilac Colors */
-    --background: 0 0% 100%;
-    --foreground: 270 20% 25%;
+    /* ===== Warm Maternal Colors ===== */
+    --background: 40 40% 98%;
+    --foreground: 340 20% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 270 20% 25%;
+    --card-foreground: 340 20% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 270 20% 25%;
+    --popover-foreground: 340 20% 20%;
 
-    /* Primary Lilac */
-    --primary: 270 50% 60%;
+    /* Primary - Warm Coral Rose */
+    --primary: 350 75% 65%;
     --primary-foreground: 0 0% 100%;
     
     /* Status Colors */
-    --success: 142 72% 29%;
+    --success: 160 60% 50%;
     --success-foreground: 0 0% 100%;
     
-    --warning: 45 93% 47%;
-    --warning-foreground: 270 20% 25%;
+    --warning: 45 90% 55%;
+    --warning-foreground: 340 20% 20%;
     
-    --error: 0 84% 60%;
+    --error: 0 75% 60%;
     --error-foreground: 0 0% 100%;
 
-    /* Soft Lilac Grays */
-    --secondary: 270 30% 96%;
-    --secondary-foreground: 270 20% 25%;
+    /* Secondary - Soft Lavender */
+    --secondary: 270 60% 80%;
+    --secondary-foreground: 270 60% 20%;
 
-    --muted: 270 30% 96%;
-    --muted-foreground: 270 15% 65%;
+    --muted: 40 35% 92%;
+    --muted-foreground: 340 15% 45%;
 
-    --accent: 270 50% 97%;
-    --accent-foreground: 270 50% 60%;
+    /* Accent - Fresh Mint */
+    --accent: 160 55% 70%;
+    --accent-foreground: 160 60% 15%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 75% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 270 20% 91%;
-    --input: 270 20% 91%;
-    --ring: 270 50% 60%;
+    --border: 340 20% 88%;
+    --input: 340 20% 88%;
+    --ring: 350 75% 65%;
 
     --radius: 0.75rem;
 
     /* Status Indicators */
-    --status-due: 45 93% 47%;
-    --status-due-foreground: 270 20% 25%;
+    --status-due: 45 90% 55%;
+    --status-due-foreground: 340 20% 20%;
     
-    --status-overdue: 0 84% 60%;
+    --status-overdue: 0 75% 60%;
     --status-overdue-foreground: 0 0% 100%;
     
-    --status-completed: 142 72% 29%;
+    --status-completed: 160 60% 50%;
     --status-completed-foreground: 0 0% 100%;
     
-    --status-scheduled: 270 50% 60%;
+    --status-scheduled: 270 60% 65%;
     --status-scheduled-foreground: 0 0% 100%;
 
-    /* Lilac Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(270 50% 60%), hsl(270 50% 70%));
-    --gradient-accent: linear-gradient(180deg, hsl(270 50% 97%), hsl(270 30% 95%));
+    /* Maternal Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(350 75% 65%), hsl(350 75% 75%));
+    --gradient-accent: linear-gradient(180deg, hsl(160 55% 70%), hsl(270 60% 80%));
 
-    /* Sidebar Lilac Theme */
-    --sidebar-background: 270 20% 25%;
+    /* Sidebar Warm Theme */
+    --sidebar-background: 340 25% 12%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 270 50% 60%;
+    --sidebar-primary: 350 75% 65%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 270 15% 35%;
+    --sidebar-accent: 340 20% 20%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 270 15% 35%;
-    --sidebar-ring: 270 50% 60%;
+    --sidebar-border: 340 20% 20%;
+    --sidebar-ring: 350 75% 65%;
   }
 
   .dark {
-    --background: 270 20% 6%;
-    --foreground: 270 15% 95%;
+    /* ===== Warm Dark Mode ===== */
+    --background: 340 25% 8%;
+    --foreground: 40 40% 95%;
 
-    --card: 270 20% 8%;
-    --card-foreground: 270 15% 95%;
+    --card: 340 25% 10%;
+    --card-foreground: 40 40% 95%;
 
-    --popover: 270 20% 8%;
-    --popover-foreground: 270 15% 95%;
+    --popover: 340 25% 10%;
+    --popover-foreground: 40 40% 95%;
 
-    --primary: 270 50% 65%;
-    --primary-foreground: 270 20% 8%;
+    /* Primary - Bright Coral Rose */
+    --primary: 350 75% 70%;
+    --primary-foreground: 340 25% 10%;
 
-    --secondary: 270 15% 12%;
-    --secondary-foreground: 270 15% 90%;
+    /* Secondary - Vibrant Lavender */
+    --secondary: 270 50% 65%;
+    --secondary-foreground: 40 40% 95%;
 
-    --muted: 270 15% 12%;
-    --muted-foreground: 270 10% 60%;
+    --muted: 340 20% 18%;
+    --muted-foreground: 40 30% 70%;
 
-    --accent: 270 15% 14%;
-    --accent-foreground: 270 50% 65%;
+    /* Accent - Bright Mint */
+    --accent: 160 55% 60%;
+    --accent-foreground: 340 25% 10%;
 
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 270 15% 95%;
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 40 40% 95%;
 
-    --border: 270 15% 15%;
-    --input: 270 15% 15%;
-    --ring: 270 50% 65%;
+    --border: 340 20% 20%;
+    --input: 340 20% 20%;
+    --ring: 350 75% 70%;
     
     /* Enhanced status colors for dark mode */
-    --status-due: 45 93% 55%;
-    --status-due-foreground: 270 20% 8%;
+    --status-due: 45 85% 60%;
+    --status-due-foreground: 340 25% 10%;
     
-    --status-overdue: 0 84% 65%;
-    --status-overdue-foreground: 270 15% 95%;
+    --status-overdue: 0 75% 65%;
+    --status-overdue-foreground: 40 40% 95%;
     
-    --status-completed: 142 72% 40%;
-    --status-completed-foreground: 270 15% 95%;
+    --status-completed: 160 55% 55%;
+    --status-completed-foreground: 40 40% 95%;
     
-    --status-scheduled: 270 50% 65%;
-    --status-scheduled-foreground: 270 20% 8%;
+    --status-scheduled: 270 60% 70%;
+    --status-scheduled-foreground: 340 25% 10%;
 
     /* Enhanced success, warning, error for dark mode */
-    --success: 142 72% 35%;
-    --success-foreground: 270 15% 95%;
+    --success: 160 55% 55%;
+    --success-foreground: 40 40% 95%;
     
-    --warning: 45 93% 55%;
-    --warning-foreground: 270 20% 8%;
+    --warning: 45 85% 60%;
+    --warning-foreground: 340 25% 10%;
     
-    --error: 0 84% 65%;
-    --error-foreground: 270 15% 95%;
+    --error: 0 75% 65%;
+    --error-foreground: 40 40% 95%;
 
     /* Sidebar dark theme */
-    --sidebar-background: 270 20% 4%;
-    --sidebar-foreground: 270 15% 90%;
-    --sidebar-primary: 270 50% 65%;
-    --sidebar-primary-foreground: 270 20% 8%;
-    --sidebar-accent: 270 15% 10%;
-    --sidebar-accent-foreground: 270 15% 90%;
-    --sidebar-border: 270 15% 12%;
-    --sidebar-ring: 270 50% 65%;
+    --sidebar-background: 340 25% 6%;
+    --sidebar-foreground: 40 40% 95%;
+    --sidebar-primary: 350 75% 70%;
+    --sidebar-primary-foreground: 340 25% 10%;
+    --sidebar-accent: 340 20% 12%;
+    --sidebar-accent-foreground: 40 40% 95%;
+    --sidebar-border: 340 20% 15%;
+    --sidebar-ring: 350 75% 70%;
 
     /* Enhanced gradients for dark mode */
-    --gradient-primary: linear-gradient(135deg, hsl(270 50% 65%), hsl(270 50% 75%));
-    --gradient-accent: linear-gradient(180deg, hsl(270 15% 14%), hsl(270 15% 10%));
+    --gradient-primary: linear-gradient(135deg, hsl(350 75% 70%), hsl(350 75% 80%));
+    --gradient-accent: linear-gradient(180deg, hsl(160 55% 60%), hsl(270 50% 65%));
   }
 }
 

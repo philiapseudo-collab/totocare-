@@ -64,7 +64,7 @@ const Index = () => {
             <span className="text-primary block mt-2">All in One Place</span>
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            NurtureCare helps you track, manage, and understand your maternal and infant health with confidence.
+            LEA - Maternease helps you track, manage, and understand your maternal and infant health with confidence and ease.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" onClick={() => navigate("/auth")} className="text-lg px-8">
@@ -111,7 +111,7 @@ const Index = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Start Your Journey?</h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Join thousands of families who trust NurtureCare for their health management.
+            Join thousands of families who trust LEA for their health management.
           </p>
           <Button size="lg" onClick={() => navigate("/auth")} className="text-lg px-8">
             Create Your Free Account
@@ -123,7 +123,7 @@ const Index = () => {
       <footer className="border-t border-border py-12 px-6">
         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8">
           <div>
-            <h3 className="font-bold text-lg mb-4">NurtureCare</h3>
+            <h3 className="font-bold text-lg mb-4">LEA - Maternease</h3>
             <p className="text-sm text-muted-foreground">
               Empowering families with comprehensive maternal and infant health tracking.
             </p>
@@ -152,7 +152,7 @@ const Index = () => {
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-          © 2025 NurtureCare. All rights reserved.
+          © 2025 LEA - Maternease. All rights reserved.
         </div>
       </footer>
     </div>

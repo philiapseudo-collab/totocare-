@@ -115,8 +115,11 @@ export function AppHeader() {
           <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
             <span className="text-white text-sm font-bold">N</span>
           </div>
-          <span className="font-semibold text-foreground hidden sm:block">NurtureCare</span>
-          <span className="font-semibold text-foreground sm:hidden">NC</span>
+          <div className="hidden sm:block">
+            <span className="font-bold text-foreground text-lg">LEA</span>
+            <span className="text-xs text-muted-foreground ml-2">Maternease</span>
+          </div>
+          <span className="font-bold text-foreground sm:hidden text-lg">LEA</span>
         </div>
 
         {/* Main Navigation */}
@@ -204,7 +207,7 @@ export function AppHeader() {
                             {item.title === "Guides" && "Educational health guides"}
                             {item.title === "Support" && "Get help and assistance"}
                             {item.title === "FAQ" && "Frequently asked questions"}
-                            {item.title === "About" && "Learn more about NurtureCare"}
+                            {item.title === "About" && "Learn more about LEA"}
                           </p>
                         </NavLink>
                       </NavigationMenuLink>

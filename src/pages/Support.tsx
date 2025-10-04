@@ -98,7 +98,7 @@ const Support = () => {
             <h1 className="text-3xl font-bold text-foreground">Support Center</h1>
           </div>
           <p className="text-muted-foreground">
-            We're here to help you get the most out of NurtureCare
+            We're here to help you get the most out of LEA - Maternease
           </p>
         </div>
       </div>
@@ -259,7 +259,7 @@ const Support = () => {
                 </a>
                 <a href="/about" className="flex items-center gap-2 text-sm hover:text-primary">
                   <Mail className="w-4 h-4" />
-                  About NurtureCare
+                  About LEA
                 </a>
               </CardContent>
             </Card>
@@ -271,8 +271,8 @@ const Support = () => {
                 <div className="space-y-3 text-sm">
                   <div className="flex items-center gap-2">
                     <Mail className="w-4 h-4 text-primary" />
-                    <a href="mailto:support@nurturecare.app" className="hover:text-primary">
-                      support@nurturecare.app
+                    <a href="mailto:support@lea-maternease.app" className="hover:text-primary">
+                      support@lea-maternease.app
                     </a>
                   </div>
                   <div className="flex items-center gap-2">
