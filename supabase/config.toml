@@ -1,1 +1,4 @@
 project_id = "krphczarhjtnbqlyhfsn"
+
+[functions.calculate-due-date]
+verify_jwt = false
