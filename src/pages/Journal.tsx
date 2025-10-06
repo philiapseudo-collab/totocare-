@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
-import { Search, Download, Plus, CalendarIcon, Eye } from "lucide-react";
+import { Search, Plus, CalendarIcon, Eye } from "lucide-react";
 import { useJournalEntries, JournalEntry } from "@/hooks/useJournalEntries";
 import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
@@ -128,10 +128,6 @@ const Journal = () => {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button variant="outline" size="sm" className="w-full sm:w-auto">
-              <Download className="w-4 h-4 mr-2" />
-              Import
-            </Button>
             <AddJournalDialog
               trigger={
                 <Button size="sm" className="w-full sm:w-auto">
