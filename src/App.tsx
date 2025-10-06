@@ -58,14 +58,14 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Redirect based on profile completion
-  const justCompleted = (location.state as any)?.justCompletedProfile;
-
-  if (profile && !profile.profile_completed && !justCompleted && window.location.pathname !== '/profile-setup') {
+  // Redirect to profile setup only if profile is incomplete AND user is trying to access dashboard
+  // Allow access to all other pages even if profile is incomplete
+  if (profile && !profile.profile_completed && location.pathname === '/') {
     return <Navigate to="/profile-setup" replace />;
   }
 
-  if (profile && profile.profile_completed && window.location.pathname === '/profile-setup') {
+  // Redirect away from profile setup if already completed
+  if (profile && profile.profile_completed && location.pathname === '/profile-setup') {
     return <Navigate to="/" replace />;
   }
 
