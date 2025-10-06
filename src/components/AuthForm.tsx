@@ -17,9 +17,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [role, setRole] = useState<'mother'>('mother');
   const { toast } = useToast();
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -33,12 +30,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
         email,
         password,
         options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-            role: role
-          }
+          emailRedirectTo: redirectUrl
         }
       });
 
@@ -46,7 +38,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
 
       toast({
         title: "Account created successfully!",
-        description: "Welcome to LEA - Maternease. You can now access all features.",
+        description: "Welcome to LEA - Maternease. Please complete your profile to continue.",
       });
       
       onSuccess();
@@ -153,33 +145,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
               
               <TabsContent value="signup" className="space-y-4 mt-4">
                 <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="first-name">First Name</Label>
-                      <Input
-                        id="first-name"
-                        type="text"
-                        placeholder="First name"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        required
-                        disabled={loading}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="last-name">Last Name</Label>
-                      <Input
-                        id="last-name"
-                        type="text"
-                        placeholder="Last name"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        required
-                        disabled={loading}
-                      />
-                    </div>
-                  </div>
-                  
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
                     <Input
@@ -197,7 +162,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                     <Input
                       id="signup-password"
                       type="password"
-                      placeholder="Create a password"
+                      placeholder="Create a password (min. 6 characters)"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -208,6 +173,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? "Creating account..." : "Create Account"}
                   </Button>
+                  <p className="text-xs text-muted-foreground text-center">
+                    You'll complete your profile after signing up
+                  </p>
                 </form>
               </TabsContent>
             </Tabs>
