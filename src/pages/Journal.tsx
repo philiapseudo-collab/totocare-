@@ -84,7 +84,7 @@ const Journal = () => {
   const tags = ["Medication", "Symptom", "Feeding", "Mood", "Monitoring"];
 
   const filteredEntries = entries.filter(entry => {
-    if (filterTab !== "All" && entry.who !== filterTab) return false;
+    if (filterTab !== "All" && entry.who.toLowerCase() !== filterTab.toLowerCase()) return false;
     if (selectedTags.length > 0 && !entry.tags.some(tag => selectedTags.includes(tag))) return false;
     return true;
   });
