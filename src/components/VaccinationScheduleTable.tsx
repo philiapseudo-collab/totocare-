@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/hooks/useProfile";
 import { toast } from "sonner";
-import { differenceInWeeks, addDays } from "date-fns";
+import { format } from "date-fns";
 import {
   Table,
   TableBody,
@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScheduleVaccinationDialog } from "@/components/forms/ScheduleVaccinationDialog";
 
 interface VaccinationScheduleTableProps {
   onSchedule?: (vaccine: string, dose: number) => void;
@@ -113,28 +114,26 @@ export const VaccinationScheduleTable = ({ onSchedule, onComplete }: Vaccination
     }
   };
 
-  const handleSchedule = async (vaccine: string, dose: number) => {
+  const handleSchedule = async (vaccine: string, dose: number, selectedDate: Date) => {
     if (!profile?.id) {
       toast.error('Please log in to schedule vaccinations');
       return;
     }
 
     try {
-      const scheduledDate = addDays(new Date(), 7); // Schedule for next week by default
-
       const { error } = await supabase
         .from('vaccinations')
         .insert({
           vaccine_name: vaccine,
           patient_id: profile.id,
           patient_type: 'infant',
-          scheduled_date: scheduledDate.toISOString().split('T')[0],
+          scheduled_date: selectedDate.toISOString().split('T')[0],
           status: 'due'
         });
 
       if (error) throw error;
       
-      toast.success(`${vaccine} - Dose ${dose} scheduled`);
+      toast.success(`${vaccine} - Dose ${dose} scheduled for ${format(selectedDate, 'MMM dd, yyyy')}`);
       onSchedule?.(vaccine, dose);
     } catch (error) {
       console.error('Error scheduling vaccination:', error);
@@ -301,15 +300,21 @@ export const VaccinationScheduleTable = ({ onSchedule, onComplete }: Vaccination
                                     </>
                                   ) : (
                                     <>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        className="h-6 px-2 text-xs"
-                                        onClick={() => handleSchedule(vaccine.vaccine, dose.doseNumber)}
-                                      >
-                                        <Calendar className="w-3 h-3 mr-1" />
-                                        Schedule
-                                      </Button>
+                                      <ScheduleVaccinationDialog
+                                        trigger={
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            className="h-6 px-2 text-xs"
+                                          >
+                                            <Calendar className="w-3 h-3 mr-1" />
+                                            Schedule
+                                          </Button>
+                                        }
+                                        vaccineName={vaccine.vaccine}
+                                        doseNumber={dose.doseNumber}
+                                        onSchedule={(date) => handleSchedule(vaccine.vaccine, dose.doseNumber, date)}
+                                      />
                                       <Button
                                         size="sm"
                                         variant="ghost"
