@@ -52,27 +52,9 @@ export const DeliveryNotification = () => {
     }
   };
 
-  const handleCreateInfant = async (pregnancyId: string) => {
-    setLoading(true);
-    try {
-      // Call the edge function to check deliveries
-      const { data, error } = await supabase.functions.invoke('check-deliveries');
-
-      if (error) throw error;
-
-      toast.success('Infant record created! Please complete the details.');
-      
-      // Refresh the list
-      await checkDuePregnancies();
-      
-      // Navigate to add infant page
-      navigate('/add-infant');
-    } catch (error) {
-      console.error('Error creating infant:', error);
-      toast.error('Failed to create infant record. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+  const handleCreateInfant = (pregnancyId: string, dueDate: string) => {
+    // Navigate to add infant page with pregnancy info
+    navigate(`/add-infant?pregnancy_id=${pregnancyId}&due_date=${dueDate}`);
   };
 
   if (duePregnancies.length === 0) return null;
@@ -106,8 +88,7 @@ export const DeliveryNotification = () => {
               </div>
               <Button 
                 size="sm"
-                onClick={() => handleCreateInfant(pregnancy.id)}
-                disabled={loading}
+                onClick={() => handleCreateInfant(pregnancy.id, pregnancy.due_date)}
               >
                 <Baby className="w-4 h-4 mr-2" />
                 Add Baby Details

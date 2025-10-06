@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,17 +27,27 @@ export default function AddInfant() {
   const { profile } = useProfile();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
+  
+  const pregnancyId = searchParams.get('pregnancy_id');
+  const dueDate = searchParams.get('due_date');
   
   const [formData, setFormData] = useState({
     first_name: "",
-    birth_date: "",
+    birth_date: dueDate || "",
     birth_weight: "",
     birth_height: "",
     gender: "",
     current_weight: "",
     current_height: "",
   });
+
+  useEffect(() => {
+    if (dueDate && !formData.birth_date) {
+      setFormData(prev => ({ ...prev, birth_date: dueDate }));
+    }
+  }, [dueDate]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -63,6 +73,7 @@ export default function AddInfant() {
       // Prepare data for insertion
       const infantData = {
         mother_id: profile.id,
+        pregnancy_id: pregnancyId || null,
         first_name: validatedData.first_name,
         birth_date: validatedData.birth_date,
         birth_weight: validatedData.birth_weight ? parseFloat(validatedData.birth_weight) : null,
@@ -79,12 +90,20 @@ export default function AddInfant() {
 
       if (error) throw error;
 
+      // Update pregnancy status if linked
+      if (pregnancyId) {
+        await supabase
+          .from("pregnancies")
+          .update({ status: 'postpartum' })
+          .eq('id', pregnancyId);
+      }
+
       toast({
         title: "Success!",
         description: "Infant profile has been created successfully.",
       });
 
-      navigate("/", { replace: true });
+      navigate("/vaccinations", { replace: true });
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         const fieldErrors: Record<string, string> = {};
