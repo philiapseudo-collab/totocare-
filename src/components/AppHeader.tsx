@@ -228,9 +228,11 @@ export function AppHeader() {
                 <span className="hidden xl:inline">Today's Checklist</span>
               </NavLink>
             </Button>
-            <Button variant="outline" size="sm" className="gap-2 hidden xl:flex">
-              <span>👶</span>
-              <span className="hidden xl:inline">Add Infant</span>
+            <Button variant="outline" size="sm" className="gap-2 hidden xl:flex" asChild>
+              <NavLink to="/add-infant">
+                <span>👶</span>
+                <span className="hidden xl:inline">Add Infant</span>
+              </NavLink>
             </Button>
             <Button className="bg-status-scheduled hover:bg-status-scheduled/90 gap-2" size="sm" asChild>
               <NavLink to="/journal">
@@ -305,6 +307,12 @@ export function AppHeader() {
                 <NavLink to="/checklist" className="flex items-center">
                   📋
                   <span className="ml-2">Today's Checklist</span>
+                </NavLink>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <NavLink to="/add-infant" className="flex items-center">
+                  👶
+                  <span className="ml-2">Add Infant</span>
                 </NavLink>
               </DropdownMenuItem>
               <DropdownMenuLabel className="text-xs text-muted-foreground">Health</DropdownMenuLabel>

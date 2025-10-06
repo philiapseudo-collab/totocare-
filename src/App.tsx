@@ -27,6 +27,7 @@ import Checklist from "./pages/Checklist";
 import QuickAdd from "./pages/QuickAdd";
 import Upcoming from "./pages/Upcoming";
 import RecentActivityPage from "./pages/RecentActivity";
+import AddInfant from "./pages/AddInfant";
 import { useProfile } from "./hooks/useProfile";
 
 const queryClient = new QueryClient();
@@ -82,6 +83,7 @@ const AuthenticatedApp = () => {
           <Route path="/quick-add" element={<QuickAdd />} />
           <Route path="/upcoming" element={<Upcoming />} />
           <Route path="/recent-activity" element={<RecentActivityPage />} />
+          <Route path="/add-infant" element={<AddInfant />} />
           <Route path="/vaccinations" element={<Vaccinations />} />
           <Route path="/clinic-visits" element={<ClinicVisits />} />
           <Route path="/reproductive-health" element={<ReproductiveHealth />} />
