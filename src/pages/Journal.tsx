@@ -12,10 +12,11 @@ import { useJournalEntries } from "@/hooks/useJournalEntries";
 import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { AddJournalDialog } from "@/components/forms/AddJournalDialog";
 
 const Journal = () => {
   const { user } = useAuth();
-  const { entries, loading, addEntry } = useJournalEntries();
+  const { entries, loading, addEntry, refetch } = useJournalEntries();
   const [filterTab, setFilterTab] = useState("All");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -131,10 +132,15 @@ const Journal = () => {
               <Download className="w-4 h-4 mr-2" />
               Import
             </Button>
-            <Button size="sm" className="w-full sm:w-auto">
-              <Plus className="w-4 h-4 mr-2" />
-              New Entry
-            </Button>
+            <AddJournalDialog
+              trigger={
+                <Button size="sm" className="w-full sm:w-auto">
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Entry
+                </Button>
+              }
+              onSuccess={refetch}
+            />
           </div>
         </div>
       </div>

@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Calendar, Heart, Thermometer } from "lucide-react";
 import { useReproductiveHealth } from "@/hooks/useReproductiveHealth";
+import { AddReproductiveHealthDialog } from "@/components/forms/AddReproductiveHealthDialog";
 
 const ReproductiveHealth = () => {
-  const { records, loading } = useReproductiveHealth();
+  const { records, loading, refetch } = useReproductiveHealth();
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -25,10 +26,15 @@ const ReproductiveHealth = () => {
             <Button variant="outline" size="sm" className="w-full sm:w-auto">
               Export
             </Button>
-            <Button size="sm" className="w-full sm:w-auto">
-              <Plus className="w-4 h-4 mr-2" />
-              New Entry
-            </Button>
+            <AddReproductiveHealthDialog
+              trigger={
+                <Button size="sm" className="w-full sm:w-auto">
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Entry
+                </Button>
+              }
+              onSuccess={refetch}
+            />
           </div>
         </div>
       </div>
@@ -55,10 +61,15 @@ const ReproductiveHealth = () => {
                 ) : records.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground mb-4">No reproductive health records found</p>
-                    <Button size="sm">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add First Entry
-                    </Button>
+                    <AddReproductiveHealthDialog
+                      trigger={
+                        <Button size="sm">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add First Entry
+                        </Button>
+                      }
+                      onSuccess={refetch}
+                    />
                   </div>
                 ) : (
                   <>

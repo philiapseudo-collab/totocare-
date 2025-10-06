@@ -4,9 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Stethoscope, Heart, Activity, AlertCircle } from "lucide-react";
 import { useConditions } from "@/hooks/useConditions";
 import { format } from "date-fns";
+import { AddConditionDialog } from "@/components/forms/AddConditionDialog";
 
 const Conditions = () => {
-  const { conditions, loading } = useConditions();
+  const { conditions, loading, refetch } = useConditions();
 
   return (
     <div className="min-h-screen bg-background">
@@ -27,10 +28,15 @@ const Conditions = () => {
             <Button variant="outline" size="sm">
               Export
             </Button>
-            <Button size="sm">
-              <Plus className="w-4 h-4 mr-2" />
-              New Condition
-            </Button>
+            <AddConditionDialog
+              trigger={
+                <Button size="sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Condition
+                </Button>
+              }
+              onSuccess={refetch}
+            />
           </div>
         </div>
       </div>
@@ -96,10 +102,15 @@ const Conditions = () => {
                   <div className="text-center py-8">
                     <AlertCircle className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
                     <p className="text-muted-foreground mb-4">No conditions found</p>
-                    <Button size="sm">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add First Condition
-                    </Button>
+                    <AddConditionDialog
+                      trigger={
+                        <Button size="sm">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add First Condition
+                        </Button>
+                      }
+                      onSuccess={refetch}
+                    />
                   </div>
                 ) : (
                   <div className="space-y-4">
