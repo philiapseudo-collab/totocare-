@@ -88,14 +88,46 @@ export default function ProfileSetup() {
         });
         return;
       }
+      // Move to step 3
+      setCurrentStep(3);
+      return;
     }
 
     if (currentStep === 3 && formData.role === "mother") {
-      // Calculate pregnancy data before final submission
-      const data = await calculatePregnancyData();
-      if (data) {
-        setCalculatedData(data);
+      // Validate pregnancy data is provided
+      if (formData.pregnancy_method === "gestational" && !formData.gestational_weeks) {
+        toast({
+          title: "Missing information",
+          description: "Please enter your gestational age",
+          variant: "destructive",
+        });
+        return;
       }
+      
+      if (formData.pregnancy_method === "lmp" && !formData.last_menstrual_period) {
+        toast({
+          title: "Missing information",
+          description: "Please enter your last menstrual period date",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Calculate pregnancy data before submission
+      const data = await calculatePregnancyData();
+      if (!data) {
+        toast({
+          title: "Error",
+          description: "Failed to calculate pregnancy data. Please check your inputs.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setCalculatedData(data);
+      // Proceed to submit
+      handleSubmit();
+      return;
     }
 
     if (currentStep < STEPS.length) {
@@ -142,17 +174,27 @@ export default function ProfileSetup() {
 
       if (profileError) throw profileError;
 
-      // If pregnant mother, create pregnancy record using calculated data
-      if (formData.role === "mother" && calculatedData) {
+      // If pregnant mother, calculate and create pregnancy record
+      if (formData.role === "mother") {
+        // Ensure we have calculated data
+        let pregnancyData = calculatedData;
+        if (!pregnancyData) {
+          pregnancyData = await calculatePregnancyData();
+        }
+        
+        if (!pregnancyData) {
+          throw new Error("Failed to calculate pregnancy data. Please enter your gestational age or last menstrual period.");
+        }
+
         const { error: pregnancyError } = await supabase
           .from("pregnancies")
           .insert({
             mother_id: profile.id,
-            current_week: calculatedData.currentWeek,
-            due_date: calculatedData.dueDate,
+            current_week: pregnancyData.currentWeek,
+            due_date: pregnancyData.dueDate,
             status: "pregnant",
-            current_trimester: calculatedData.trimester === 1 ? 'first' : 
-                             calculatedData.trimester === 2 ? 'second' : 'third',
+            current_trimester: pregnancyData.trimester === 1 ? 'first' : 
+                             pregnancyData.trimester === 2 ? 'second' : 'third',
           });
 
         if (pregnancyError) throw pregnancyError;
@@ -342,42 +384,97 @@ export default function ProfileSetup() {
                   </div>
 
                   {formData.pregnancy_method === "gestational" ? (
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="gestational_weeks">Weeks</Label>
-                        <Input
-                          id="gestational_weeks"
-                          type="number"
-                          min="0"
-                          max="42"
-                          value={formData.gestational_weeks}
-                          onChange={(e) => setFormData({ ...formData, gestational_weeks: e.target.value })}
-                          placeholder="e.g., 28"
-                        />
+                    <>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="gestational_weeks">Weeks *</Label>
+                          <Input
+                            id="gestational_weeks"
+                            type="number"
+                            min="0"
+                            max="42"
+                            value={formData.gestational_weeks}
+                            onChange={(e) => setFormData({ ...formData, gestational_weeks: e.target.value })}
+                            placeholder="e.g., 28"
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="gestational_days">Days</Label>
+                          <Input
+                            id="gestational_days"
+                            type="number"
+                            min="0"
+                            max="6"
+                            value={formData.gestational_days}
+                            onChange={(e) => setFormData({ ...formData, gestational_days: e.target.value })}
+                            placeholder="e.g., 3"
+                          />
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="gestational_days">Days</Label>
-                        <Input
-                          id="gestational_days"
-                          type="number"
-                          min="0"
-                          max="6"
-                          value={formData.gestational_days}
-                          onChange={(e) => setFormData({ ...formData, gestational_days: e.target.value })}
-                          placeholder="e.g., 3"
-                        />
-                      </div>
-                    </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={async () => {
+                          const data = await calculatePregnancyData();
+                          if (data) {
+                            setCalculatedData(data);
+                            toast({
+                              title: "Calculated!",
+                              description: "Your pregnancy information has been calculated.",
+                            });
+                          } else {
+                            toast({
+                              title: "Error",
+                              description: "Please enter valid gestational age.",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                        disabled={!formData.gestational_weeks}
+                        className="w-full"
+                      >
+                        Calculate Due Date
+                      </Button>
+                    </>
                   ) : (
-                    <div className="space-y-2">
-                      <Label htmlFor="last_menstrual_period">Last Menstrual Period</Label>
-                      <Input
-                        id="last_menstrual_period"
-                        type="date"
-                        value={formData.last_menstrual_period}
-                        onChange={(e) => setFormData({ ...formData, last_menstrual_period: e.target.value })}
-                      />
-                    </div>
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="last_menstrual_period">Last Menstrual Period *</Label>
+                        <Input
+                          id="last_menstrual_period"
+                          type="date"
+                          value={formData.last_menstrual_period}
+                          onChange={(e) => setFormData({ ...formData, last_menstrual_period: e.target.value })}
+                          max={new Date().toISOString().split('T')[0]}
+                          required
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={async () => {
+                          const data = await calculatePregnancyData();
+                          if (data) {
+                            setCalculatedData(data);
+                            toast({
+                              title: "Calculated!",
+                              description: "Your pregnancy information has been calculated.",
+                            });
+                          } else {
+                            toast({
+                              title: "Error",
+                              description: "Please enter a valid date.",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                        disabled={!formData.last_menstrual_period}
+                        className="w-full"
+                      >
+                        Calculate Due Date
+                      </Button>
+                    </>
                   )}
 
                   {calculatedData && (

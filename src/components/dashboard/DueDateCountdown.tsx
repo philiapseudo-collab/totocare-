@@ -50,17 +50,21 @@ export function DueDateCountdown() {
 
         setPregnancy(pregnancyData);
 
-        // Calculate days remaining
+        // Calculate days remaining until due date (real-time calculation)
         const dueDate = new Date(pregnancyData.due_date);
+        dueDate.setHours(0, 0, 0, 0);
         const today = new Date();
+        today.setHours(0, 0, 0, 0);
         const timeDiff = dueDate.getTime() - today.getTime();
         const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
         
         setDaysRemaining(Math.max(0, daysDiff));
 
-        // Calculate weeks passed (40 weeks total pregnancy)
+        // Calculate weeks remaining (40 weeks - current week)
         const totalWeeks = 40;
         const currentWeek = pregnancyData.current_week || 0;
+        const weeksRemaining = Math.max(0, totalWeeks - currentWeek);
+        
         setWeeksPassed(currentWeek);
         setProgressPercentage((currentWeek / totalWeeks) * 100);
 
