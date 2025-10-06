@@ -904,6 +904,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      trigger_delivery_check: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
     }
     Enums: {
       appointment_status: "scheduled" | "completed" | "cancelled" | "no_show"

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -5,14 +6,17 @@ import { Plus, Calendar, AlertCircle } from "lucide-react";
 import { useVaccinations } from "@/hooks/useVaccinations";
 import { useVaccinationRecommendations } from "@/hooks/useVaccinationRecommendations";
 import { useUpcomingInfantVaccinations } from "@/hooks/useUpcomingInfantVaccinations";
+import { useNewInfantDetection } from "@/hooks/useNewInfantDetection";
 import { format } from "date-fns";
 import { AddVaccinationDialog } from "@/components/forms/AddVaccinationDialog";
 import { Separator } from "@/components/ui/separator";
 import { VaccinationScheduleTable } from "@/components/VaccinationScheduleTable";
-import { DeliveryNotification } from "@/components/DeliveryNotification";
+import { CompleteInfantDetailsDialog } from "@/components/CompleteInfantDetailsDialog";
 import { toast } from "sonner";
 
 const Vaccinations = () => {
+  const [selectedInfant, setSelectedInfant] = useState<any>(null);
+  
   const {
     vaccinations,
     loading,
@@ -29,6 +33,14 @@ const Vaccinations = () => {
     markAsCompleted,
     refetch: refetchUpcoming
   } = useUpcomingInfantVaccinations();
+
+  // Detect new infants that need details completed
+  const {
+    newInfants,
+    hasNewInfants,
+    checkForNewInfants,
+    dismissInfant
+  } = useNewInfantDetection();
 
   const handleScheduleVaccine = async (vaccinationData?: any) => {
     if (vaccinationData) {
@@ -89,8 +101,46 @@ const Vaccinations = () => {
       </div>
 
       <div className="p-4 sm:p-6 space-y-6">
-        {/* Delivery Notification */}
-        <DeliveryNotification />
+        {/* New Infant Alert */}
+        {hasNewInfants && newInfants[0] && (
+          <Card className="border-primary bg-primary/5">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <AlertCircle className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">New Baby Profile Created!</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Complete your baby's profile to start tracking vaccinations
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => setSelectedInfant(newInfants[0])}
+                  size="sm"
+                >
+                  Complete Profile
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Complete Infant Details Dialog */}
+        {selectedInfant && (
+          <CompleteInfantDetailsDialog
+            open={!!selectedInfant}
+            onOpenChange={(open) => !open && setSelectedInfant(null)}
+            infant={selectedInfant}
+            onComplete={() => {
+              checkForNewInfants();
+              refetchUpcoming();
+              dismissInfant(selectedInfant.id);
+            }}
+          />
+        )}
         
         {/* Upcoming Vaccinations Section - Based on Infant Age */}
         <Card>
