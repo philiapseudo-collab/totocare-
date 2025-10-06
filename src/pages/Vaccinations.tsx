@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { AddVaccinationDialog } from "@/components/forms/AddVaccinationDialog";
 import { Separator } from "@/components/ui/separator";
 import { VaccinationScheduleTable } from "@/components/VaccinationScheduleTable";
+import { ScheduleVaccinationDialog } from "@/components/forms/ScheduleVaccinationDialog";
 import { CompleteInfantDetailsDialog } from "@/components/CompleteInfantDetailsDialog";
 import { toast } from "sonner";
 
@@ -41,19 +42,19 @@ const Vaccinations = () => {
     dismissInfant
   } = useNewInfantDetection();
 
-  const handleScheduleVaccine = async (vaccinationData?: any) => {
-    if (vaccinationData) {
-      const success = await scheduleVaccination(vaccinationData);
-      if (success) {
-        toast.success('Vaccination scheduled successfully');
-        refetch();
-        refetchUpcoming();
-      } else {
-        toast.error('Failed to schedule vaccination');
-      }
-    } else {
+  const handleScheduleVaccine = async (vaccinationData: any, selectedDate: Date) => {
+    const dataWithDate = {
+      ...vaccinationData,
+      scheduled_date: selectedDate.toISOString().split('T')[0]
+    };
+    
+    const success = await scheduleVaccination(dataWithDate);
+    if (success) {
+      toast.success(`Vaccination scheduled for ${format(selectedDate, 'MMM dd, yyyy')}`);
       refetch();
       refetchUpcoming();
+    } else {
+      toast.error('Failed to schedule vaccination');
     }
   };
 
@@ -213,14 +214,20 @@ const Vaccinations = () => {
                           </p>
                         </div>
                         <div className="flex gap-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleScheduleVaccine(vaccination)}
-                          >
-                            <Calendar className="w-3 h-3 mr-1" />
-                            Schedule
-                          </Button>
+                          <ScheduleVaccinationDialog
+                            trigger={
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                              >
+                                <Calendar className="w-3 h-3 mr-1" />
+                                Schedule
+                              </Button>
+                            }
+                            vaccineName={vaccination.vaccine_name}
+                            doseNumber={vaccination.dose_number}
+                            onSchedule={(date) => handleScheduleVaccine(vaccination, date)}
+                          />
                           <Button 
                             size="sm"
                             onClick={() => handleCompleteVaccine(vaccination)}
