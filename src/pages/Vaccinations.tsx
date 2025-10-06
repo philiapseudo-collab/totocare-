@@ -4,11 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Calendar, AlertCircle } from "lucide-react";
 import { useVaccinations } from "@/hooks/useVaccinations";
 import { useVaccinationRecommendations } from "@/hooks/useVaccinationRecommendations";
+import { useUpcomingInfantVaccinations } from "@/hooks/useUpcomingInfantVaccinations";
 import { format } from "date-fns";
 import { AddVaccinationDialog } from "@/components/forms/AddVaccinationDialog";
 import { Separator } from "@/components/ui/separator";
 import { VaccinationScheduleTable } from "@/components/VaccinationScheduleTable";
 import { toast } from "sonner";
+
 const Vaccinations = () => {
   const {
     vaccinations,
@@ -17,18 +19,46 @@ const Vaccinations = () => {
   } = useVaccinations();
   
   const { recommendations, loading: loadingRecommendations } = useVaccinationRecommendations();
+  
+  // Get upcoming vaccinations based on infant age
+  const {
+    upcomingVaccinations,
+    loading: loadingUpcoming,
+    scheduleVaccination,
+    markAsCompleted,
+    refetch: refetchUpcoming
+  } = useUpcomingInfantVaccinations();
 
-  // Get next 3 upcoming vaccinations (due status only)
-  const upcomingVaccinations = vaccinations
-    .filter(v => v.status === 'due')
-    .slice(0, 3);
-
-  const handleScheduleVaccine = (vaccine: string, dose: number) => {
-    refetch();
+  const handleScheduleVaccine = async (vaccinationData?: any) => {
+    if (vaccinationData) {
+      const success = await scheduleVaccination(vaccinationData);
+      if (success) {
+        toast.success('Vaccination scheduled successfully');
+        refetch();
+        refetchUpcoming();
+      } else {
+        toast.error('Failed to schedule vaccination');
+      }
+    } else {
+      refetch();
+      refetchUpcoming();
+    }
   };
 
-  const handleCompleteVaccine = (vaccine: string, dose: number) => {
-    refetch();
+  const handleCompleteVaccine = async (vaccinationData?: any) => {
+    if (vaccinationData) {
+      const success = await markAsCompleted(vaccinationData);
+      if (success) {
+        toast.success('Vaccination marked as completed');
+        refetch();
+        refetchUpcoming();
+      } else {
+        toast.error('Failed to mark vaccination as completed');
+      }
+    } else {
+      refetch();
+      refetchUpcoming();
+    }
   };
 
   return <div className="min-h-screen bg-background">
@@ -58,7 +88,7 @@ const Vaccinations = () => {
       </div>
 
       <div className="p-4 sm:p-6 space-y-6">
-        {/* Due Vaccinations Section - Next 3 upcoming */}
+        {/* Upcoming Vaccinations Section - Based on Infant Age */}
         <Card>
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
@@ -66,49 +96,67 @@ const Vaccinations = () => {
               <Badge variant="outline">{upcomingVaccinations.length} Due</Badge>
             </div>
             <p className="text-sm text-muted-foreground">
-              Next vaccinations to schedule or complete
+              Automatically calculated based on infant age and immunization schedule
             </p>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="text-center py-8 text-muted-foreground">Loading vaccinations...</div>
+            {loadingUpcoming ? (
+              <div className="text-center py-8 text-muted-foreground">Calculating upcoming vaccinations...</div>
             ) : upcomingVaccinations.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-muted-foreground mb-4">No upcoming vaccinations. Use the schedule below to mark vaccines as needed.</p>
+                <p className="text-muted-foreground mb-2">No upcoming vaccinations at this time.</p>
+                <p className="text-sm text-muted-foreground">
+                  {vaccinations.length === 0 
+                    ? "Add an infant profile to see upcoming vaccinations based on their age."
+                    : "All age-appropriate vaccinations are up to date!"}
+                </p>
               </div>
             ) : (
               <div className="space-y-3">
-                {upcomingVaccinations.map(vaccination => (
-                  <div key={vaccination.id} className="border border-border rounded-lg p-4">
+                {upcomingVaccinations.map((vaccination, index) => (
+                  <div key={`${vaccination.infant_id}-${vaccination.vaccine_name}-${index}`} className="border border-border rounded-lg p-4 bg-card hover:bg-muted/30 transition-colors">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="flex items-center gap-3 flex-1">
-                        <Calendar className="w-5 h-5 text-primary flex-shrink-0" />
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Calendar className="w-5 h-5 text-primary" />
+                        </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-medium">{vaccination.vaccine_name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {vaccination.patient_type}
-                          </p>
+                          <h3 className="font-semibold text-foreground">{vaccination.vaccine_name}</h3>
+                          <div className="flex flex-col gap-1 mt-1">
+                            <p className="text-sm text-muted-foreground">
+                              For: <span className="font-medium text-foreground">{vaccination.infant_name}</span>
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Dose {vaccination.dose_number} • Due at {vaccination.age_weeks ? `${vaccination.age_weeks} weeks` : `${vaccination.age_months} months`}
+                            </p>
+                            {vaccination.vaccine_details?.diseases && (
+                              <p className="text-xs text-muted-foreground">
+                                Protects against: {vaccination.vaccine_details.diseases.slice(0, 2).join(', ')}
+                                {vaccination.vaccine_details.diseases.length > 2 && ` +${vaccination.vaccine_details.diseases.length - 2} more`}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
                       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                         <div className="text-left sm:text-right">
-                          <p className="text-sm text-muted-foreground">Scheduled Date</p>
-                          <p className="font-medium">
-                            {format(new Date(vaccination.scheduled_date), 'MMM dd, yyyy')}
+                          <p className="text-xs text-muted-foreground">Due Date</p>
+                          <p className="font-semibold text-foreground">
+                            {format(new Date(vaccination.due_date), 'MMM dd, yyyy')}
                           </p>
                         </div>
                         <div className="flex gap-2">
                           <Button 
                             variant="outline" 
                             size="sm"
-                            onClick={() => handleScheduleVaccine(vaccination.vaccine_name, 1)}
+                            onClick={() => handleScheduleVaccine(vaccination)}
                           >
                             <Calendar className="w-3 h-3 mr-1" />
-                            Reschedule
+                            Schedule
                           </Button>
                           <Button 
                             size="sm"
-                            onClick={() => handleCompleteVaccine(vaccination.vaccine_name, 1)}
+                            onClick={() => handleCompleteVaccine(vaccination)}
                           >
                             Mark Done
                           </Button>
@@ -124,8 +172,14 @@ const Vaccinations = () => {
 
         {/* Kenya Vaccination Schedule Table */}
         <VaccinationScheduleTable 
-          onSchedule={handleScheduleVaccine}
-          onComplete={handleCompleteVaccine}
+          onSchedule={() => {
+            refetch();
+            refetchUpcoming();
+          }}
+          onComplete={() => {
+            refetch();
+            refetchUpcoming();
+          }}
         />
 
         {/* Suggested Vaccinations */}
