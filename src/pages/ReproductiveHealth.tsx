@@ -134,7 +134,7 @@ const ReproductiveHealth = () => {
                   <>
                     <div>
                       <h4 className="font-medium">Latest Record</h4>
-                      <p className="text-sm">{new Date(records[0].record_date).toLocaleDateString()}</p>
+                      <p className="text-sm">{new Date(records[0].record_date + 'T00:00:00').toLocaleDateString()}</p>
                       <Badge variant="secondary">Cycle Day {records[0].menstrual_cycle_day || 'N/A'}</Badge>
                     </div>
                     <div className="bg-accent p-3 rounded-lg text-sm text-muted-foreground">

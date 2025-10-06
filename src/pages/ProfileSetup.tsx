@@ -43,7 +43,14 @@ export default function ProfileSetup() {
     if (formData.role !== "mother") return null;
 
     try {
-      let requestBody: any = { userId: user?.id };
+      // Get user's current date in their timezone
+      const today = new Date();
+      const userDate = today.toISOString().split('T')[0];
+      
+      let requestBody: any = { 
+        userId: user?.id,
+        currentDate: userDate
+      };
 
       if (formData.pregnancy_method === "gestational") {
         if (!formData.gestational_weeks) return null;
@@ -484,7 +491,7 @@ export default function ProfileSetup() {
                         <div className="grid grid-cols-2 gap-2 text-sm">
                           <div>
                             <span className="text-muted-foreground">Due Date:</span>
-                            <p className="font-medium">{new Date(calculatedData.dueDate).toLocaleDateString()}</p>
+                            <p className="font-medium">{new Date(calculatedData.dueDate + 'T00:00:00').toLocaleDateString()}</p>
                           </div>
                           <div>
                             <span className="text-muted-foreground">Current Week:</span>

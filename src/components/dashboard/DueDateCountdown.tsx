@@ -62,9 +62,8 @@ export function DueDateCountdown() {
 
         setPregnancy(pregnancyData);
 
-        // Calculate days remaining until due date (real-time calculation)
-        const dueDate = new Date(pregnancyData.due_date);
-        dueDate.setHours(0, 0, 0, 0);
+        // Calculate days remaining until due date using user's local timezone
+        const dueDate = new Date(pregnancyData.due_date + 'T00:00:00');
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const timeDiff = dueDate.getTime() - today.getTime();
@@ -111,12 +110,17 @@ export function DueDateCountdown() {
       const weeks = parseInt(editWeeks);
       const days = parseInt(editDays);
 
+      // Get user's current date in their timezone
+      const today = new Date();
+      const userDate = today.toISOString().split('T')[0];
+
       // Calculate new due date based on gestational age
       const { data, error } = await supabase.functions.invoke('calculate-due-date', {
         body: {
           gestationalWeeks: weeks,
           gestationalDays: days,
-          userId: user?.id
+          userId: user?.id,
+          currentDate: userDate
         }
       });
 
@@ -299,7 +303,7 @@ export function DueDateCountdown() {
         <div className="flex items-center justify-between text-sm text-muted-foreground pt-2">
           <div className="flex items-center gap-1">
             <CalendarDays className="h-4 w-4" />
-            <span>Due: {new Date(pregnancy.due_date).toLocaleDateString()}</span>
+            <span>Due: {new Date(pregnancy.due_date + 'T00:00:00').toLocaleDateString()}</span>
           </div>
           <div className="capitalize">
             {pregnancy.current_trimester} trimester

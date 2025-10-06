@@ -10,6 +10,8 @@ interface CalculationInput {
   gestationalDays?: number;
   lastMenstrualPeriod?: string;
   userId?: string;
+  userTimezone?: string;
+  currentDate?: string;
 }
 
 interface CalculationResult {
@@ -30,9 +32,9 @@ serve(async (req) => {
   }
 
   try {
-    const { gestationalWeeks, gestationalDays, lastMenstrualPeriod, userId }: CalculationInput = await req.json();
+    const { gestationalWeeks, gestationalDays, lastMenstrualPeriod, userId, currentDate }: CalculationInput = await req.json();
 
-    console.log('Calculate due date request:', { gestationalWeeks, gestationalDays, lastMenstrualPeriod, userId });
+    console.log('Calculate due date request:', { gestationalWeeks, gestationalDays, lastMenstrualPeriod, userId, currentDate });
 
     // Validation
     if (!lastMenstrualPeriod && (gestationalWeeks === undefined || gestationalWeeks === null)) {
@@ -65,7 +67,8 @@ serve(async (req) => {
       }
     }
 
-    const today = new Date();
+    // Use the user's current date in their timezone, or server date as fallback
+    const today = currentDate ? new Date(currentDate + 'T00:00:00') : new Date();
     today.setHours(0, 0, 0, 0);
     
     let lmpDate: Date;
