@@ -222,9 +222,11 @@ export function AppHeader() {
         <div className="flex items-center gap-4">
           {/* Action Buttons */}
           <div className="hidden lg:flex items-center gap-2">
-            <Button variant="outline" size="sm" className="gap-2 hidden xl:flex">
-              <span>📋</span>
-              <span className="hidden xl:inline">Today's Checklist</span>
+            <Button variant="outline" size="sm" className="gap-2 hidden xl:flex" asChild>
+              <NavLink to="/checklist">
+                <span>📋</span>
+                <span className="hidden xl:inline">Today's Checklist</span>
+              </NavLink>
             </Button>
             <Button variant="outline" size="sm" className="gap-2 hidden xl:flex">
               <span>👶</span>
@@ -297,6 +299,12 @@ export function AppHeader() {
                 <NavLink to="/" className="flex items-center">
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   Dashboard
+                </NavLink>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <NavLink to="/checklist" className="flex items-center">
+                  📋
+                  <span className="ml-2">Today's Checklist</span>
                 </NavLink>
               </DropdownMenuItem>
               <DropdownMenuLabel className="text-xs text-muted-foreground">Health</DropdownMenuLabel>
