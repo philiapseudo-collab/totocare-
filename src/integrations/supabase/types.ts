@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      antenatal_visit_schedule: {
+        Row: {
+          created_at: string
+          gestational_week_max: number | null
+          gestational_week_min: number
+          health_education_topics: Json | null
+          id: string
+          key_activities: Json
+          tests_required: Json | null
+          visit_number: number
+          visit_title: string
+        }
+        Insert: {
+          created_at?: string
+          gestational_week_max?: number | null
+          gestational_week_min: number
+          health_education_topics?: Json | null
+          id?: string
+          key_activities: Json
+          tests_required?: Json | null
+          visit_number: number
+          visit_title: string
+        }
+        Update: {
+          created_at?: string
+          gestational_week_max?: number | null
+          gestational_week_min?: number
+          health_education_topics?: Json | null
+          id?: string
+          key_activities?: Json
+          tests_required?: Json | null
+          visit_number?: number
+          visit_title?: string
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
           appointment_date: string
@@ -188,6 +224,179 @@ export type Database = {
           },
         ]
       }
+      danger_signs: {
+        Row: {
+          created_at: string
+          danger_sign: string
+          id: string
+          patient_type: string
+          recommended_action: string
+          severity: string
+          timing: string | null
+        }
+        Insert: {
+          created_at?: string
+          danger_sign: string
+          id?: string
+          patient_type: string
+          recommended_action: string
+          severity: string
+          timing?: string | null
+        }
+        Update: {
+          created_at?: string
+          danger_sign?: string
+          id?: string
+          patient_type?: string
+          recommended_action?: string
+          severity?: string
+          timing?: string | null
+        }
+        Relationships: []
+      }
+      growth_milestones: {
+        Row: {
+          age_months: number
+          created_at: string
+          id: string
+          milestone_category: string
+          milestone_description: string
+          warning_signs: Json | null
+        }
+        Insert: {
+          age_months: number
+          created_at?: string
+          id?: string
+          milestone_category: string
+          milestone_description: string
+          warning_signs?: Json | null
+        }
+        Update: {
+          age_months?: number
+          created_at?: string
+          id?: string
+          milestone_category?: string
+          milestone_description?: string
+          warning_signs?: Json | null
+        }
+        Relationships: []
+      }
+      healthcare_content: {
+        Row: {
+          content: Json
+          content_type: string
+          created_at: string
+          id: string
+          order_index: number
+          section_title: string
+          topic_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          content: Json
+          content_type: string
+          created_at?: string
+          id?: string
+          order_index?: number
+          section_title: string
+          topic_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          content_type?: string
+          created_at?: string
+          id?: string
+          order_index?: number
+          section_title?: string
+          topic_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "healthcare_content_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      healthcare_topics: {
+        Row: {
+          category: string
+          created_at: string
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          order_index: number
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          order_index?: number
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          order_index?: number
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      immunization_schedule: {
+        Row: {
+          age_months: number | null
+          age_weeks: number | null
+          created_at: string
+          dose_number: number | null
+          gestational_timing: string | null
+          id: string
+          patient_type: string
+          side_effects: Json | null
+          vaccine_details: Json | null
+          vaccine_name: string
+        }
+        Insert: {
+          age_months?: number | null
+          age_weeks?: number | null
+          created_at?: string
+          dose_number?: number | null
+          gestational_timing?: string | null
+          id?: string
+          patient_type: string
+          side_effects?: Json | null
+          vaccine_details?: Json | null
+          vaccine_name: string
+        }
+        Update: {
+          age_months?: number | null
+          age_weeks?: number | null
+          created_at?: string
+          dose_number?: number | null
+          gestational_timing?: string | null
+          id?: string
+          patient_type?: string
+          side_effects?: Json | null
+          vaccine_details?: Json | null
+          vaccine_name?: string
+        }
+        Relationships: []
+      }
       infants: {
         Row: {
           birth_date: string
@@ -346,6 +555,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      nutrition_guidelines: {
+        Row: {
+          created_at: string
+          foods_to_avoid: Json | null
+          foods_to_include: Json | null
+          guideline_title: string
+          id: string
+          recommendations: Json
+          target_group: string
+        }
+        Insert: {
+          created_at?: string
+          foods_to_avoid?: Json | null
+          foods_to_include?: Json | null
+          guideline_title: string
+          id?: string
+          recommendations: Json
+          target_group: string
+        }
+        Update: {
+          created_at?: string
+          foods_to_avoid?: Json | null
+          foods_to_include?: Json | null
+          guideline_title?: string
+          id?: string
+          recommendations?: Json
+          target_group?: string
+        }
+        Relationships: []
       }
       pregnancies: {
         Row: {
