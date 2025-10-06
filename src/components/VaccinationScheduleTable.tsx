@@ -172,9 +172,7 @@ export const VaccinationScheduleTable = ({ onSchedule, onComplete }: Vaccination
               <TableRow className="bg-muted/50">
                 <TableHead className="font-bold">Vaccine</TableHead>
                 <TableHead className="font-bold">Diseases Prevented</TableHead>
-                <TableHead className="font-bold">Dosage</TableHead>
                 <TableHead className="font-bold">Number of Doses</TableHead>
-                <TableHead className="font-bold">Route of Administration</TableHead>
                 <TableHead className="font-bold">Age of Administration</TableHead>
                 <TableHead className="font-bold text-center">Actions</TableHead>
               </TableRow>
@@ -190,9 +188,7 @@ export const VaccinationScheduleTable = ({ onSchedule, onComplete }: Vaccination
                       ))}
                     </ul>
                   </TableCell>
-                  <TableCell>{vaccine.dosage}</TableCell>
                   <TableCell className="text-center">{vaccine.numberOfDoses}</TableCell>
-                  <TableCell className="text-sm">{vaccine.route}</TableCell>
                   <TableCell>
                     <ul className="list-disc list-inside text-sm space-y-1">
                       {vaccine.ageOfAdministration.map((age, i) => {
