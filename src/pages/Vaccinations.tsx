@@ -18,12 +18,17 @@ const Vaccinations = () => {
   
   const { recommendations, loading: loadingRecommendations } = useVaccinationRecommendations();
 
+  // Get next 3 upcoming vaccinations (due status only)
+  const upcomingVaccinations = vaccinations
+    .filter(v => v.status === 'due')
+    .slice(0, 3);
+
   const handleScheduleVaccine = (vaccine: string, dose: number) => {
-    toast.success(`${vaccine} - Dose ${dose} marked as scheduled`);
+    refetch();
   };
 
   const handleCompleteVaccine = (vaccine: string, dose: number) => {
-    toast.success(`${vaccine} - Dose ${dose} marked as completed`);
+    refetch();
   };
 
   return <div className="min-h-screen bg-background">
@@ -53,44 +58,31 @@ const Vaccinations = () => {
       </div>
 
       <div className="p-4 sm:p-6 space-y-6">
-        {/* Due Vaccinations Section - Now at the top */}
+        {/* Due Vaccinations Section - Next 3 upcoming */}
         <Card>
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-semibold">Due Vaccinations</CardTitle>
-              <div className="flex space-x-2">
-                <Badge variant="outline">Due</Badge>
-                <Badge variant="outline">Overdue</Badge>
-              </div>
+              <CardTitle className="text-lg font-semibold">Upcoming Vaccinations</CardTitle>
+              <Badge variant="outline">{upcomingVaccinations.length} Due</Badge>
             </div>
+            <p className="text-sm text-muted-foreground">
+              Next vaccinations to schedule or complete
+            </p>
           </CardHeader>
           <CardContent>
             {loading ? (
               <div className="text-center py-8 text-muted-foreground">Loading vaccinations...</div>
-            ) : vaccinations.length === 0 ? (
+            ) : upcomingVaccinations.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-muted-foreground mb-4">No vaccinations found</p>
-                <AddVaccinationDialog 
-                  trigger={
-                    <Button size="sm">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add First Vaccination
-                    </Button>
-                  } 
-                  onSuccess={refetch} 
-                />
+                <p className="text-muted-foreground mb-4">No upcoming vaccinations. Use the schedule below to mark vaccines as needed.</p>
               </div>
             ) : (
               <div className="space-y-3">
-                {vaccinations.map(vaccination => (
+                {upcomingVaccinations.map(vaccination => (
                   <div key={vaccination.id} className="border border-border rounded-lg p-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="flex items-center gap-3 flex-1">
-                        {vaccination.status === "overdue" ? (
-                          <AlertCircle className="w-5 h-5 text-error flex-shrink-0" />
-                        ) : (
-                          <Calendar className="w-5 h-5 text-warning flex-shrink-0" />
-                        )}
+                        <Calendar className="w-5 h-5 text-primary flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <h3 className="font-medium">{vaccination.vaccine_name}</h3>
                           <p className="text-sm text-muted-foreground">
@@ -100,35 +92,26 @@ const Vaccinations = () => {
                       </div>
                       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                         <div className="text-left sm:text-right">
-                          <p className="text-sm text-muted-foreground">Date</p>
+                          <p className="text-sm text-muted-foreground">Scheduled Date</p>
                           <p className="font-medium">
-                            {vaccination.administered_date 
-                              ? format(new Date(vaccination.administered_date), 'MMM dd, yyyy')
-                              : format(new Date(vaccination.scheduled_date), 'MMM dd, yyyy')
-                            }
+                            {format(new Date(vaccination.scheduled_date), 'MMM dd, yyyy')}
                           </p>
                         </div>
                         <div className="flex gap-2">
-                          {vaccination.status === "completed" ? (
-                            <Badge variant="default">Completed</Badge>
-                          ) : (
-                            <>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => handleScheduleVaccine(vaccination.vaccine_name, 1)}
-                              >
-                                <Calendar className="w-3 h-3 mr-1" />
-                                Schedule
-                              </Button>
-                              <Button 
-                                size="sm"
-                                onClick={() => handleCompleteVaccine(vaccination.vaccine_name, 1)}
-                              >
-                                Mark Done
-                              </Button>
-                            </>
-                          )}
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleScheduleVaccine(vaccination.vaccine_name, 1)}
+                          >
+                            <Calendar className="w-3 h-3 mr-1" />
+                            Reschedule
+                          </Button>
+                          <Button 
+                            size="sm"
+                            onClick={() => handleCompleteVaccine(vaccination.vaccine_name, 1)}
+                          >
+                            Mark Done
+                          </Button>
                         </div>
                       </div>
                     </div>

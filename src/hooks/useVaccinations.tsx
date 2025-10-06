@@ -41,6 +41,28 @@ export const useVaccinations = () => {
 
   useEffect(() => {
     fetchVaccinations();
+
+    if (!user) return;
+
+    // Setup realtime subscription
+    const channel = supabase
+      .channel('vaccinations-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'vaccinations'
+        },
+        () => {
+          fetchVaccinations();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   return { vaccinations, loading, refetch: fetchVaccinations };
