@@ -21,6 +21,7 @@ interface VaccineSchedule {
   ageOfAdministration: string[];
 }
 
+// Ordered chronologically by age of administration (birth to 10 years)
 const kenyaVaccinationSchedule: VaccineSchedule[] = [
   {
     vaccine: "BCG",
