@@ -4,9 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Calendar, AlertCircle } from "lucide-react";
 import { useVaccinations } from "@/hooks/useVaccinations";
 import { format } from "date-fns";
+import { AddVaccinationDialog } from "@/components/forms/AddVaccinationDialog";
 
 const Vaccinations = () => {
-  const { vaccinations, loading } = useVaccinations();
+  const { vaccinations, loading, refetch } = useVaccinations();
 
   return (
     <div className="min-h-screen bg-background">
@@ -27,10 +28,15 @@ const Vaccinations = () => {
             <Button variant="outline" size="sm" className="w-full sm:w-auto">
               Export
             </Button>
-            <Button size="sm" className="w-full sm:w-auto">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Vaccination
-            </Button>
+            <AddVaccinationDialog 
+              trigger={
+                <Button size="sm" className="w-full sm:w-auto">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Vaccination
+                </Button>
+              }
+              onSuccess={refetch}
+            />
           </div>
         </div>
       </div>
@@ -62,10 +68,15 @@ const Vaccinations = () => {
                 ) : vaccinations.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground mb-4">No vaccinations found</p>
-                    <Button size="sm">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add First Vaccination
-                    </Button>
+                    <AddVaccinationDialog 
+                      trigger={
+                        <Button size="sm">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add First Vaccination
+                        </Button>
+                      }
+                      onSuccess={refetch}
+                    />
                   </div>
                 ) : (
                   <div className="space-y-4">

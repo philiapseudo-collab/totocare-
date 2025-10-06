@@ -4,9 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Calendar, FileText, Clock } from "lucide-react";
 import { useClinicVisits } from "@/hooks/useClinicVisits";
 import { format } from "date-fns";
+import { AddClinicVisitDialog } from "@/components/forms/AddClinicVisitDialog";
 
 const ClinicVisits = () => {
-  const { visits, loading } = useClinicVisits();
+  const { visits, loading, refetch } = useClinicVisits();
 
   return (
     <div className="min-h-screen bg-background">
@@ -27,10 +28,15 @@ const ClinicVisits = () => {
             <Button variant="outline" size="sm" className="w-full sm:w-auto">
               Export
             </Button>
-            <Button size="sm" className="w-full sm:w-auto">
-              <Plus className="w-4 h-4 mr-2" />
-              New Visit
-            </Button>
+            <AddClinicVisitDialog
+              trigger={
+                <Button size="sm" className="w-full sm:w-auto">
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Visit
+                </Button>
+              }
+              onSuccess={refetch}
+            />
           </div>
         </div>
       </div>
@@ -63,10 +69,15 @@ const ClinicVisits = () => {
                 ) : visits.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground mb-4">No clinic visits found</p>
-                    <Button size="sm">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add First Visit
-                    </Button>
+                    <AddClinicVisitDialog
+                      trigger={
+                        <Button size="sm">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add First Visit
+                        </Button>
+                      }
+                      onSuccess={refetch}
+                    />
                   </div>
                 ) : (
                   <div className="space-y-4">

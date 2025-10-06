@@ -112,6 +112,7 @@ export function QuickAddForm() {
             <Label htmlFor="date" className="text-sm font-medium">Date</Label>
             <Input 
               id="date"
+              type="date"
               value={formData.date}
               onChange={(e) => setFormData(prev => ({...prev, date: e.target.value}))}
             />

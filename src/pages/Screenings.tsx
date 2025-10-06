@@ -4,9 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, FileText } from "lucide-react";
 import { useScreenings } from "@/hooks/useScreenings";
 import { format } from "date-fns";
+import { AddScreeningDialog } from "@/components/forms/AddScreeningDialog";
 
 const Screenings = () => {
-  const { screenings, loading } = useScreenings();
+  const { screenings, loading, refetch } = useScreenings();
 
   const recommendations = [
     {
@@ -40,10 +41,15 @@ const Screenings = () => {
             <Button variant="outline" size="sm">
               Export
             </Button>
-            <Button size="sm">
-              <Plus className="w-4 h-4 mr-2" />
-              New Screening
-            </Button>
+            <AddScreeningDialog
+              trigger={
+                <Button size="sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Screening
+                </Button>
+              }
+              onSuccess={refetch}
+            />
           </div>
         </div>
       </div>
@@ -71,10 +77,15 @@ const Screenings = () => {
                 ) : screenings.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground mb-4">No screenings found</p>
-                    <Button size="sm">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add First Screening
-                    </Button>
+                    <AddScreeningDialog
+                      trigger={
+                        <Button size="sm">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add First Screening
+                        </Button>
+                      }
+                      onSuccess={refetch}
+                    />
                   </div>
                 ) : (
                   <div className="space-y-4">
