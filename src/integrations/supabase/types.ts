@@ -881,6 +881,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_and_create_deliveries: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      create_infant_from_delivery: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_primary_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["user_role"]
