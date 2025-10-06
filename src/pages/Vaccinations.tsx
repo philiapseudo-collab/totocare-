@@ -7,6 +7,8 @@ import { useVaccinationRecommendations } from "@/hooks/useVaccinationRecommendat
 import { format } from "date-fns";
 import { AddVaccinationDialog } from "@/components/forms/AddVaccinationDialog";
 import { Separator } from "@/components/ui/separator";
+import { VaccinationScheduleTable } from "@/components/VaccinationScheduleTable";
+import { toast } from "sonner";
 const Vaccinations = () => {
   const {
     vaccinations,
@@ -15,6 +17,15 @@ const Vaccinations = () => {
   } = useVaccinations();
   
   const { recommendations, loading: loadingRecommendations } = useVaccinationRecommendations();
+
+  const handleScheduleVaccine = (vaccine: string, dose: number) => {
+    toast.success(`${vaccine} - Dose ${dose} marked as scheduled`);
+  };
+
+  const handleCompleteVaccine = (vaccine: string, dose: number) => {
+    toast.success(`${vaccine} - Dose ${dose} marked as completed`);
+  };
+
   return <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="border-b border-border bg-card">
@@ -42,6 +53,12 @@ const Vaccinations = () => {
       </div>
 
       <div className="p-4 sm:p-6 space-y-6">
+        {/* Kenya Vaccination Schedule Table */}
+        <VaccinationScheduleTable 
+          onSchedule={handleScheduleVaccine}
+          onComplete={handleCompleteVaccine}
+        />
+
         {/* Suggested Vaccinations */}
         {!loadingRecommendations && recommendations.length > 0 && (
           <Card>
