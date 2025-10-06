@@ -2,11 +2,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useHealthcareTopics, useHealthcareContent } from "@/hooks/useHealthcareTopics";
 import { useAntenatalSchedule } from "@/hooks/useAntenatalSchedule";
 import { useDangerSigns } from "@/hooks/useDangerSigns";
 import { useProfile } from "@/hooks/useProfile";
-import { Skeleton } from "@/components/ui/skeleton";
 import { 
   Heart, Baby, Stethoscope, Shield, Apple, Users, 
   AlertTriangle, CheckCircle, Clock, Activity
