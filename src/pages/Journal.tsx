@@ -19,7 +19,6 @@ const Journal = () => {
   const { user } = useAuth();
   const { entries, loading, addEntry, updateEntry, deleteEntry, refetch } = useJournalEntries();
   const [filterTab, setFilterTab] = useState("All");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [calendarNote, setCalendarNote] = useState("");
   const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
@@ -81,11 +80,9 @@ const Journal = () => {
   };
 
   const tabs = ["All", "Mother", "Infant"];
-  const tags = ["Medication", "Symptom", "Feeding", "Mood", "Monitoring"];
 
   const filteredEntries = entries.filter(entry => {
     if (filterTab !== "All" && entry.who.toLowerCase() !== filterTab.toLowerCase()) return false;
-    if (selectedTags.length > 0 && !entry.tags.some(tag => selectedTags.includes(tag))) return false;
     return true;
   });
 
@@ -231,29 +228,6 @@ const Journal = () => {
                     placeholder="Type to filter entries"
                     className="pl-10"
                   />
-                </div>
-
-                {/* Tags */}
-                <div>
-                  <Label className="text-sm font-medium mb-2 block">Tags</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {tags.map((tag) => (
-                      <Badge
-                        key={tag}
-                        variant={selectedTags.includes(tag) ? "default" : "outline"}
-                        className="cursor-pointer"
-                        onClick={() => {
-                          setSelectedTags(prev => 
-                            prev.includes(tag) 
-                              ? prev.filter(t => t !== tag)
-                              : [...prev, tag]
-                          );
-                        }}
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
                 </div>
 
                 {/* Date Range and Sort */}
