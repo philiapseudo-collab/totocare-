@@ -43,7 +43,6 @@ const Index = () => {
   ];
 
   if (user) {
-    navigate("/dashboard");
     return null;
   }
 
