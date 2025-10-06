@@ -5,12 +5,13 @@ import { Plus, Calendar, AlertCircle } from "lucide-react";
 import { useVaccinations } from "@/hooks/useVaccinations";
 import { format } from "date-fns";
 import { AddVaccinationDialog } from "@/components/forms/AddVaccinationDialog";
-
 const Vaccinations = () => {
-  const { vaccinations, loading, refetch } = useVaccinations();
-
-  return (
-    <div className="min-h-screen bg-background">
+  const {
+    vaccinations,
+    loading,
+    refetch
+  } = useVaccinations();
+  return <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="border-b border-border bg-card">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 gap-4">
@@ -28,15 +29,10 @@ const Vaccinations = () => {
             <Button variant="outline" size="sm" className="w-full sm:w-auto">
               Export
             </Button>
-            <AddVaccinationDialog 
-              trigger={
-                <Button size="sm" className="w-full sm:w-auto">
+            <AddVaccinationDialog trigger={<Button size="sm" className="w-full sm:w-auto">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Vaccination
-                </Button>
-              }
-              onSuccess={refetch}
-            />
+                </Button>} onSuccess={refetch} />
           </div>
         </div>
       </div>
@@ -55,7 +51,7 @@ const Vaccinations = () => {
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between text-sm mb-2">
-                  <span className="text-muted-foreground mb-2 sm:mb-0">3 items need attention</span>
+                  
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Button variant="outline" size="sm" className="w-full sm:w-auto">Send Reminder</Button>
                     <Button size="sm" className="w-full sm:w-auto">Mark All Completed</Button>
@@ -63,33 +59,18 @@ const Vaccinations = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                {loading ? (
-                  <div className="text-center py-8 text-muted-foreground">Loading vaccinations...</div>
-                ) : vaccinations.length === 0 ? (
-                  <div className="text-center py-8">
+                {loading ? <div className="text-center py-8 text-muted-foreground">Loading vaccinations...</div> : vaccinations.length === 0 ? <div className="text-center py-8">
                     <p className="text-muted-foreground mb-4">No vaccinations found</p>
-                    <AddVaccinationDialog 
-                      trigger={
-                        <Button size="sm">
+                    <AddVaccinationDialog trigger={<Button size="sm">
                           <Plus className="w-4 h-4 mr-2" />
                           Add First Vaccination
-                        </Button>
-                      }
-                      onSuccess={refetch}
-                    />
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {vaccinations.map((vaccination) => (
-                      <div key={vaccination.id} className="border border-border rounded-lg p-4">
+                        </Button>} onSuccess={refetch} />
+                  </div> : <div className="space-y-4">
+                    {vaccinations.map(vaccination => <div key={vaccination.id} className="border border-border rounded-lg p-4">
                         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                           <div className="flex flex-col sm:flex-row sm:items-center gap-4 flex-1">
                             <div className="flex items-center gap-2">
-                              {vaccination.status === "overdue" ? (
-                                <AlertCircle className="w-5 h-5 text-error flex-shrink-0" />
-                              ) : (
-                                <Calendar className="w-5 h-5 text-warning flex-shrink-0" />
-                              )}
+                              {vaccination.status === "overdue" ? <AlertCircle className="w-5 h-5 text-error flex-shrink-0" /> : <Calendar className="w-5 h-5 text-warning flex-shrink-0" />}
                               <div className="min-w-0">
                                 <h3 className="font-medium">{vaccination.vaccine_name}</h3>
                                 <p className="text-sm text-muted-foreground">{vaccination.patient_type}</p>
@@ -102,24 +83,16 @@ const Vaccinations = () => {
                           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                             <div className="text-left sm:text-right">
                               <p className="font-medium">{format(new Date(vaccination.scheduled_date), 'MMM dd, yyyy')}</p>
-                              {vaccination.notes && (
-                                <p className="text-sm text-muted-foreground truncate">{vaccination.notes}</p>
-                              )}
+                              {vaccination.notes && <p className="text-sm text-muted-foreground truncate">{vaccination.notes}</p>}
                             </div>
                             <div className="flex gap-2">
-                              {vaccination.status === "overdue" ? (
-                                <Button variant="outline" size="sm" className="flex-1 sm:flex-none">Schedule</Button>
-                              ) : (
-                                <Button variant="outline" size="sm" className="flex-1 sm:flex-none">Complete</Button>
-                              )}
+                              {vaccination.status === "overdue" ? <Button variant="outline" size="sm" className="flex-1 sm:flex-none">Schedule</Button> : <Button variant="outline" size="sm" className="flex-1 sm:flex-none">Complete</Button>}
                               <Button variant="outline" size="sm" className="flex-1 sm:flex-none">Remind</Button>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      </div>)}
+                  </div>}
               </CardContent>
             </Card>
 
@@ -127,8 +100,7 @@ const Vaccinations = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {vaccinations.length > 0 && vaccinations[0] && (
-              <Card>
+            {vaccinations.length > 0 && vaccinations[0] && <Card>
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold">Quick Update</CardTitle>
                 </CardHeader>
@@ -151,15 +123,12 @@ const Vaccinations = () => {
                     <label className="text-sm text-muted-foreground">Status</label>
                     <p className="font-medium capitalize">{vaccinations[0].status}</p>
                   </div>
-                  {vaccinations[0].notes && (
-                    <div>
+                  {vaccinations[0].notes && <div>
                       <label className="text-sm text-muted-foreground">Notes</label>
                       <p className="text-sm">{vaccinations[0].notes}</p>
-                    </div>
-                  )}
+                    </div>}
                 </CardContent>
-              </Card>
-            )}
+              </Card>}
 
             <Card>
               <CardHeader>
@@ -181,8 +150,6 @@ const Vaccinations = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Vaccinations;
