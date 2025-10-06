@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +16,7 @@ import { CompleteInfantDetailsDialog } from "@/components/CompleteInfantDetailsD
 import { toast } from "sonner";
 
 const Vaccinations = () => {
+  const navigate = useNavigate();
   const [selectedInfant, setSelectedInfant] = useState<any>(null);
   
   const {
@@ -89,6 +91,15 @@ const Vaccinations = () => {
             <h1 className="text-xl sm:text-2xl font-bold text-foreground">Due Vaccinations</h1>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full sm:w-auto gap-2"
+              onClick={() => navigate('/add-infant')}
+            >
+              <Plus className="w-4 h-4" />
+              Add Infant
+            </Button>
             <Button variant="outline" size="sm" className="w-full sm:w-auto">
               Export
             </Button>
@@ -159,11 +170,16 @@ const Vaccinations = () => {
             ) : upcomingVaccinations.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-muted-foreground mb-2">No upcoming vaccinations at this time.</p>
-                <p className="text-sm text-muted-foreground">
-                  {vaccinations.length === 0 
-                    ? "Add an infant profile to see upcoming vaccinations based on their age."
-                    : "All age-appropriate vaccinations are up to date!"}
+                <p className="text-sm text-muted-foreground mb-4">
+                  Add an infant profile to start tracking vaccinations based on their age.
                 </p>
+                <Button 
+                  onClick={() => navigate('/add-infant')}
+                  className="gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Infant Profile
+                </Button>
               </div>
             ) : (
               <div className="space-y-3">
