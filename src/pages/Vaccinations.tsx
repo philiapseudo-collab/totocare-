@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Calendar, AlertCircle } from "lucide-react";
 import { useVaccinations } from "@/hooks/useVaccinations";
-import { useVaccinationRecommendations } from "@/hooks/useVaccinationRecommendations";
 import { useUpcomingInfantVaccinations } from "@/hooks/useUpcomingInfantVaccinations";
 import { useNewInfantDetection } from "@/hooks/useNewInfantDetection";
 import { format } from "date-fns";
@@ -24,8 +23,6 @@ const Vaccinations = () => {
     loading,
     refetch
   } = useVaccinations();
-  
-  const { recommendations, loading: loadingRecommendations } = useVaccinationRecommendations();
   
   // Get upcoming vaccinations based on infant age
   const {
@@ -251,49 +248,6 @@ const Vaccinations = () => {
             refetchUpcoming();
           }}
         />
-
-        {/* Suggested Vaccinations */}
-        {!loadingRecommendations && recommendations.length > 0 && (
-          <Card>
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-primary" />
-                Suggested Vaccinations (Kenya Schedule)
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Based on infant age and gestational age
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {recommendations.map((rec, index) => (
-                  <div key={index} className="border border-border rounded-lg p-4 bg-muted/30">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="flex-1">
-                        <h3 className="font-medium">{rec.vaccine_name}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          For: {rec.patient_name} ({rec.patient_type})
-                          {rec.age_months !== null && ` • ${rec.age_months} months`}
-                          {rec.gestational_timing && ` • ${rec.gestational_timing}`}
-                          {rec.dose_number && ` • Dose ${rec.dose_number}`}
-                        </p>
-                      </div>
-                      <AddVaccinationDialog
-                        trigger={
-                          <Button size="sm" variant="default">
-                            <Plus className="w-4 h-4 mr-2" />
-                            Add to Schedule
-                          </Button>
-                        }
-                        onSuccess={refetch}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>;
 };
