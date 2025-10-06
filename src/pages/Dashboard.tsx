@@ -5,6 +5,7 @@ import { KeyMetrics } from "@/components/dashboard/KeyMetrics";
 import { ConditionsPanel } from "@/components/dashboard/ConditionsPanel";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { DueDateCountdown } from "@/components/dashboard/DueDateCountdown";
+import { DeliveryNotification } from "@/components/DeliveryNotification";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +27,9 @@ const Dashboard = () => {
   if (isMobile) {
     return (
       <div className="p-4 max-w-7xl mx-auto space-y-6">
+        {/* Delivery Notification */}
+        <DeliveryNotification />
+        
         {/* Due Date Countdown */}
         <DueDateCountdown />
 
@@ -59,7 +63,10 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
+      {/* Delivery Notification - Full Width */}
+      <DeliveryNotification />
+      
       {/* 3-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Left Column */}

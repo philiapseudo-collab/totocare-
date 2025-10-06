@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { AddVaccinationDialog } from "@/components/forms/AddVaccinationDialog";
 import { Separator } from "@/components/ui/separator";
 import { VaccinationScheduleTable } from "@/components/VaccinationScheduleTable";
+import { DeliveryNotification } from "@/components/DeliveryNotification";
 import { toast } from "sonner";
 
 const Vaccinations = () => {
@@ -88,6 +89,9 @@ const Vaccinations = () => {
       </div>
 
       <div className="p-4 sm:p-6 space-y-6">
+        {/* Delivery Notification */}
+        <DeliveryNotification />
+        
         {/* Upcoming Vaccinations Section - Based on Infant Age */}
         <Card>
           <CardHeader className="pb-4">
