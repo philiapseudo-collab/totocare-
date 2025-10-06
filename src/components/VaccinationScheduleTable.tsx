@@ -44,27 +44,6 @@ const kenyaVaccinationSchedule: VaccineSchedule[] = [
     ]
   },
   {
-    vaccine: "Rotavirus",
-    diseases: ["Rotavirus Diarrhea"],
-    dosage: "1.0 ml",
-    numberOfDoses: 2,
-    route: "Oral",
-    ageOfAdministration: [
-      "1st Dose at 6 weeks of life or at first contact with an unvaccinated child under 1 years",
-      "2nd Dose at 10 weeks or 4 weeks after Rota 1"
-    ]
-  },
-  {
-    vaccine: "IPV",
-    diseases: ["Poliomyelitis"],
-    dosage: "0.5 ml",
-    numberOfDoses: 1,
-    route: "Intramuscular (IM) into the upper outer aspect of the right thigh",
-    ageOfAdministration: [
-      "At 14 weeks or at first contact with an unvaccinated child below one year"
-    ]
-  },
-  {
     vaccine: "Dpt-HepB-Hib (Pentavalent)",
     diseases: ["Diphtheria", "Tetanus", "Whooping cough (pertussis)", "Hepatitis B", "Haemophilus influenzae type b pneumonia and meningitis"],
     dosage: "0.5ml",
@@ -86,6 +65,27 @@ const kenyaVaccinationSchedule: VaccineSchedule[] = [
       "1st Dose at 6 weeks of life or at first contact with an unvaccinated child under 5 years",
       "2nd Dose at 10 weeks or 4 weeks after PCV1",
       "3rd Dose at 14 weeks or 4 weeks after PCV2"
+    ]
+  },
+  {
+    vaccine: "Rotavirus",
+    diseases: ["Rotavirus Diarrhea"],
+    dosage: "1.0 ml",
+    numberOfDoses: 2,
+    route: "Oral",
+    ageOfAdministration: [
+      "1st Dose at 6 weeks of life or at first contact with an unvaccinated child under 1 years",
+      "2nd Dose at 10 weeks or 4 weeks after Rota 1"
+    ]
+  },
+  {
+    vaccine: "IPV",
+    diseases: ["Poliomyelitis"],
+    dosage: "0.5 ml",
+    numberOfDoses: 1,
+    route: "Intramuscular (IM) into the upper outer aspect of the right thigh",
+    ageOfAdministration: [
+      "At 14 weeks or at first contact with an unvaccinated child below one year"
     ]
   },
   {
