@@ -7,20 +7,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
-import { Search, Download, Plus, CalendarIcon } from "lucide-react";
-import { useJournalEntries } from "@/hooks/useJournalEntries";
+import { Search, Download, Plus, CalendarIcon, Eye } from "lucide-react";
+import { useJournalEntries, JournalEntry } from "@/hooks/useJournalEntries";
 import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { AddJournalDialog } from "@/components/forms/AddJournalDialog";
+import { ViewEditJournalDialog } from "@/components/forms/ViewEditJournalDialog";
 
 const Journal = () => {
   const { user } = useAuth();
-  const { entries, loading, addEntry, refetch } = useJournalEntries();
+  const { entries, loading, addEntry, updateEntry, deleteEntry, refetch } = useJournalEntries();
   const [filterTab, setFilterTab] = useState("All");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [calendarNote, setCalendarNote] = useState("");
+  const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [quickAddData, setQuickAddData] = useState({
     type: "Note",
     date: new Date().toISOString(),
@@ -288,18 +291,30 @@ const Journal = () => {
               ) : (
                 <>
                   {filteredEntries.map((entry) => (
-                    <Card key={entry.id}>
+                    <Card key={entry.id} className="cursor-pointer hover:shadow-md transition-shadow">
                       <CardContent className="p-6">
                         <div className="flex justify-between items-start mb-3">
-                          <div>
+                          <div className="flex-1">
                             <h3 className="font-semibold">{entry.title}</h3>
                             <p className="text-sm text-muted-foreground">{entry.who} • {entry.entry_type}</p>
                           </div>
-                          <span className="text-xs text-muted-foreground">
-                            {format(new Date(entry.entry_date), 'MMM d, yyyy • h:mm a')}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">
+                              {format(new Date(entry.entry_date), 'MMM d, yyyy • h:mm a')}
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedEntry(entry);
+                                setViewDialogOpen(true);
+                              }}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
-                        <p className="text-sm mb-3">{entry.content}</p>
+                        <p className="text-sm mb-3 line-clamp-2">{entry.content}</p>
                         <div className="flex gap-2">
                           {entry.tags.map((tag) => (
                             <Badge key={tag} variant="secondary">
@@ -454,6 +469,16 @@ const Journal = () => {
           </div>
         </div>
       </div>
+
+      {selectedEntry && (
+        <ViewEditJournalDialog
+          entry={selectedEntry}
+          open={viewDialogOpen}
+          onOpenChange={setViewDialogOpen}
+          onUpdate={updateEntry}
+          onDelete={deleteEntry}
+        />
+      )}
     </div>
   );
 };

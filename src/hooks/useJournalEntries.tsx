@@ -67,9 +67,58 @@ export const useJournalEntries = () => {
     }
   };
 
+  const updateEntry = async (id: string, updates: Partial<Omit<JournalEntry, 'id' | 'created_at' | 'updated_at' | 'user_id'>>) => {
+    if (!user) {
+      toast.error('You must be logged in to update entries');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('journal_entries')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setEntries(prev => prev.map(entry => entry.id === id ? data : entry));
+      toast.success('Entry updated successfully');
+      return data;
+    } catch (error: any) {
+      toast.error('Failed to update entry');
+      console.error('Error updating entry:', error);
+      throw error;
+    }
+  };
+
+  const deleteEntry = async (id: string) => {
+    if (!user) {
+      toast.error('You must be logged in to delete entries');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('journal_entries')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      setEntries(prev => prev.filter(entry => entry.id !== id));
+      toast.success('Entry deleted successfully');
+    } catch (error: any) {
+      toast.error('Failed to delete entry');
+      console.error('Error deleting entry:', error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     fetchEntries();
   }, [user]);
 
-  return { entries, loading, addEntry, refetch: fetchEntries };
+  return { entries, loading, addEntry, updateEntry, deleteEntry, refetch: fetchEntries };
 };
