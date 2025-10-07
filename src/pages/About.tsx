@@ -100,7 +100,7 @@ const About = () => {
               <div>
                 <h3 className="font-semibold text-lg mb-2">Comprehensive Health Tracking</h3>
                 <p className="text-muted-foreground">
-                  Track vaccinations, appointments, screenings, medications, and health conditions for both mother and infant 
+                  Track vaccinations, appointments, medications, and health conditions for both mother and infant 
                   in one centralized platform.
                 </p>
               </div>

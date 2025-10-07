@@ -2,17 +2,11 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Syringe,
-  Calendar,
-  Heart,
-  Activity,
   Search,
   FileText,
   BookOpen,
   HelpCircle,
   Info,
-  User,
-  Badge as BadgeIcon,
-  Microscope,
   AlertTriangle
 } from "lucide-react";
 
@@ -52,21 +46,6 @@ const healthItems = [
     url: "/vaccinations",
     icon: Syringe,
     badge: "3"
-  },
-  {
-    title: "Clinic Visits",
-    url: "/clinic-visits",
-    icon: Calendar,
-  },
-  {
-    title: "Reproductive Health", 
-    url: "/reproductive-health",
-    icon: Heart,
-  },
-  {
-    title: "Screenings",
-    url: "/screenings",
-    icon: Microscope,
   },
   {
     title: "Conditions",

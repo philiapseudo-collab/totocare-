@@ -2,17 +2,12 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Syringe,
-  Calendar,
-  Heart,
-  Activity,
   Search,
   FileText,
   BookOpen,
   HelpCircle,
   Info,
   User,
-  Badge as BadgeIcon,
-  Microscope,
   AlertTriangle,
   LogOut,
   Menu
@@ -51,21 +46,6 @@ const healthItems = [
     url: "/vaccinations",
     icon: Syringe,
     badge: "3"
-  },
-  {
-    title: "Clinic Visits",
-    url: "/clinic-visits",
-    icon: Calendar,
-  },
-  {
-    title: "Reproductive Health", 
-    url: "/reproductive-health",
-    icon: Heart,
-  },
-  {
-    title: "Screenings",
-    url: "/screenings",
-    icon: Microscope,
   },
   {
     title: "Conditions",
@@ -169,9 +149,6 @@ export function AppHeader() {
                           <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">
                             {item.title === "Journal" && "Track daily health entries"}
                             {item.title === "Vaccinations" && "Manage vaccination schedules"}
-                            {item.title === "Clinic Visits" && "Schedule and track appointments"}
-                            {item.title === "Reproductive Health" && "Monitor reproductive wellness"}
-                            {item.title === "Screenings" && "Track health screenings"}
                             {item.title === "Conditions" && "Monitor health conditions"}
                           </p>
                         </NavLink>

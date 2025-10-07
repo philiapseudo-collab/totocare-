@@ -9,12 +9,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { CheckCircle2, Calendar as CalendarIcon, Syringe, Stethoscope, FlaskConical, Clock } from "lucide-react";
+import { CheckCircle2, Calendar as CalendarIcon, Syringe, Stethoscope, Clock } from "lucide-react";
 import { format } from "date-fns";
 
 interface ChecklistItem {
   id: string;
-  type: "appointment" | "vaccination" | "screening";
+  type: "appointment" | "vaccination";
   title: string;
   description?: string;
   date: string;
@@ -64,14 +64,6 @@ const Checklist = () => {
         .eq('scheduled_date', todayStr)
         .in('status', ['due', 'overdue']);
 
-      // Fetch screenings
-      const { data: screenings } = await supabase
-        .from('screenings')
-        .select('*')
-        .eq('patient_id', profile.id)
-        .eq('scheduled_date', todayStr)
-        .in('status', ['due']);
-
       // Combine all items
       const allItems: ChecklistItem[] = [
         ...(appointments || []).map(apt => ({
@@ -91,16 +83,7 @@ const Checklist = () => {
           date: format(new Date(vac.scheduled_date), 'MMM dd, yyyy'),
           status: vac.status,
           originalDate: vac.scheduled_date,
-        })),
-        ...(screenings || []).map(scr => ({
-          id: scr.id,
-          type: 'screening' as const,
-          title: scr.screening_type,
-          description: scr.notes,
-          date: format(new Date(scr.scheduled_date), 'MMM dd, yyyy'),
-          status: scr.status,
-          originalDate: scr.scheduled_date,
-        })),
+        }))
       ];
 
       setItems(allItems);
@@ -121,11 +104,10 @@ const Checklist = () => {
     
     try {
       const newStatus = isCompleted ? 
-        (item.type === 'vaccination' ? 'due' : item.type === 'screening' ? 'due' : 'scheduled') : 
+        (item.type === 'vaccination' ? 'due' : 'scheduled') : 
         'completed';
       
-      const table = item.type === 'appointment' ? 'appointments' : 
-                    item.type === 'vaccination' ? 'vaccinations' : 'screenings';
+      const table = item.type === 'appointment' ? 'appointments' : 'vaccinations';
       
       const updateData: any = { status: newStatus };
       
@@ -133,8 +115,6 @@ const Checklist = () => {
         // No completed_date field for appointments
       } else if (item.type === 'vaccination') {
         updateData.administered_date = isCompleted ? null : new Date().toISOString().split('T')[0];
-      } else if (item.type === 'screening') {
-        updateData.completed_date = isCompleted ? null : new Date().toISOString().split('T')[0];
       }
 
       const { error } = await supabase
@@ -165,8 +145,7 @@ const Checklist = () => {
 
   const handleReschedule = async (item: ChecklistItem, newDate: Date) => {
     try {
-      const table = item.type === 'appointment' ? 'appointments' : 
-                    item.type === 'vaccination' ? 'vaccinations' : 'screenings';
+      const table = item.type === 'appointment' ? 'appointments' : 'vaccinations';
       
       const dateField = item.type === 'appointment' ? 'appointment_date' : 'scheduled_date';
       const newDateStr = item.type === 'appointment' 
@@ -195,8 +174,6 @@ const Checklist = () => {
         return <Syringe className="w-5 h-5 text-blue-500" />;
       case 'appointment':
         return <Stethoscope className="w-5 h-5 text-green-500" />;
-      case 'screening':
-        return <FlaskConical className="w-5 h-5 text-purple-500" />;
       default:
         return <Clock className="w-5 h-5" />;
     }

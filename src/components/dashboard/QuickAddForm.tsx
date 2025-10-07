@@ -61,13 +61,6 @@ export function QuickAddForm() {
           appointment_date: new Date(formData.date).toISOString(),
           status: 'scheduled'
         });
-      } else if (formData.entryType === "Screening") {
-        await supabase.from('screenings').insert({
-          ...commonData,
-          screening_type: "General Screening",
-          scheduled_date: formData.date,
-          status: 'due'
-        });
       }
 
       toast.success("Entry added successfully");
@@ -102,7 +95,6 @@ export function QuickAddForm() {
               <SelectContent>
                 <SelectItem value="Vaccination">Vaccination</SelectItem>
                 <SelectItem value="Appointment">Appointment</SelectItem>
-                <SelectItem value="Screening">Screening</SelectItem>
                 <SelectItem value="Medication">Medication</SelectItem>
               </SelectContent>
             </Select>

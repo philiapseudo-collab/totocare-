@@ -8,9 +8,6 @@ const FAQ = () => {
   const categories = [
     "Getting Started",
     "Vaccinations", 
-    "Clinic Visits",
-    "Reproductive Health",
-    "Screenings",
     "Conditions",
     "Privacy & Data",
     "Account"
@@ -19,7 +16,7 @@ const FAQ = () => {
   const faqs = [
     {
       question: "What can I track in LEA?",
-      answer: "You can log vaccinations, clinic visits, reproductive health metrics, screening results, and conditions for both mother and infant. The dashboard summarizes what's next.",
+      answer: "You can log vaccinations, appointments, medications, and conditions for both mother and infant. The dashboard summarizes what's next.",
       tags: ["Getting Started", "Dashboard"]
     },
     {
@@ -41,11 +38,6 @@ const FAQ = () => {
       question: "How are conditions like gestational diabetes managed in the app?",
       answer: "Each condition has a dedicated card to log readings, meds, and notes. You'll see graphs for key values and status like 'Monitoring' or 'On meds'.",
       tags: ["Conditions"]
-    },
-    {
-      question: "Where do I find screening results?",
-      answer: "Go to Screenings to review scheduled tests and recorded results, organized by date.",
-      tags: ["Screenings"]
     }
   ];
 
@@ -90,7 +82,7 @@ const FAQ = () => {
             <div className="mb-8">
               <h1 className="text-2xl font-bold mb-2">Frequently Asked Questions</h1>
               <p className="text-muted-foreground mb-6">
-                Find quick answers about vaccinations, visits, screenings, reproductive health, and condition tracking.
+                Find quick answers about vaccinations, appointments, medications, and condition tracking.
               </p>
               
               {/* Search */}

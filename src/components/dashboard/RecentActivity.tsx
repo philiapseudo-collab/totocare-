@@ -1,16 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity } from "lucide-react";
 import { useJournalEntries } from "@/hooks/useJournalEntries";
-import { useClinicVisits } from "@/hooks/useClinicVisits";
 import { useVaccinations } from "@/hooks/useVaccinations";
-import { useScreenings } from "@/hooks/useScreenings";
 import { format } from "date-fns";
 
 export function RecentActivity() {
   const { entries } = useJournalEntries();
-  const { visits } = useClinicVisits();
   const { vaccinations } = useVaccinations();
-  const { screenings } = useScreenings();
 
   // Combine all activities and sort by date
   const activities = [
@@ -20,23 +16,11 @@ export function RecentActivity() {
       date: new Date(e.entry_date),
       icon: '📝'
     })),
-    ...visits.map(v => ({ 
-      type: 'Clinic Visit', 
-      title: v.visit_type, 
-      date: new Date(v.visit_date),
-      icon: '🏥'
-    })),
     ...vaccinations.map(v => ({ 
       type: 'Vaccination', 
       title: v.vaccine_name, 
       date: new Date(v.scheduled_date),
       icon: '💉'
-    })),
-    ...screenings.map(s => ({ 
-      type: 'Screening', 
-      title: s.screening_type, 
-      date: new Date(s.scheduled_date),
-      icon: '🔬'
     }))
   ].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 5);
 

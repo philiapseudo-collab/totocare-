@@ -10,9 +10,6 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import Vaccinations from "./pages/Vaccinations";
-import ClinicVisits from "./pages/ClinicVisits";
-import ReproductiveHealth from "./pages/ReproductiveHealth";
-import Screenings from "./pages/Screenings";
 import Conditions from "./pages/Conditions";
 import Journal from "./pages/Journal";
 import Guides from "./pages/Guides";
@@ -85,9 +82,6 @@ const AuthenticatedApp = () => {
           <Route path="/recent-activity" element={<RecentActivityPage />} />
           <Route path="/add-infant" element={<AddInfant />} />
           <Route path="/vaccinations" element={<Vaccinations />} />
-          <Route path="/clinic-visits" element={<ClinicVisits />} />
-          <Route path="/reproductive-health" element={<ReproductiveHealth />} />
-          <Route path="/screenings" element={<Screenings />} />
           <Route path="/conditions" element={<Conditions />} />
           <Route path="/guides" element={<Guides />} />
           <Route path="/support" element={<Support />} />

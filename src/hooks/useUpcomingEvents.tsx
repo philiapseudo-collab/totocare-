@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 export interface UpcomingEvent {
   id: string;
   title: string;
-  type: 'vaccination' | 'appointment' | 'screening';
+  type: 'vaccination' | 'appointment';
   date: string;
   status: string;
   location?: string;
@@ -46,16 +46,6 @@ export const useUpcomingEvents = () => {
 
       if (vaccError) throw vaccError;
 
-      // Fetch upcoming screenings
-      const { data: screenings, error: screenError } = await supabase
-        .from('screenings')
-        .select('*')
-        .gte('scheduled_date', now.toISOString().split('T')[0])
-        .lte('scheduled_date', weekFromNow.toISOString().split('T')[0])
-        .order('scheduled_date', { ascending: true });
-
-      if (screenError) throw screenError;
-
       const allEvents: UpcomingEvent[] = [
         ...(appointments || []).map(apt => ({
           id: apt.id,
@@ -72,14 +62,6 @@ export const useUpcomingEvents = () => {
           date: new Date(vac.scheduled_date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
           status: vac.status,
           description: vac.notes || undefined
-        })),
-        ...(screenings || []).map(scr => ({
-          id: scr.id,
-          title: scr.screening_type,
-          type: 'screening' as const,
-          date: new Date(scr.scheduled_date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
-          status: scr.status,
-          description: scr.notes || undefined
         }))
       ];
 
