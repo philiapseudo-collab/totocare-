@@ -504,10 +504,15 @@ export type Database = {
           frequency: string
           id: string
           is_active: boolean | null
+          last_notified_at: string | null
           medication_name: string
           notes: string | null
+          notification_enabled: boolean | null
           patient_id: string
           prescribed_by: string | null
+          reminder_sound: string | null
+          reminder_times: Json | null
+          snooze_until: string | null
           start_date: string
           updated_at: string
         }
@@ -518,10 +523,15 @@ export type Database = {
           frequency: string
           id?: string
           is_active?: boolean | null
+          last_notified_at?: string | null
           medication_name: string
           notes?: string | null
+          notification_enabled?: boolean | null
           patient_id: string
           prescribed_by?: string | null
+          reminder_sound?: string | null
+          reminder_times?: Json | null
+          snooze_until?: string | null
           start_date: string
           updated_at?: string
         }
@@ -532,10 +542,15 @@ export type Database = {
           frequency?: string
           id?: string
           is_active?: boolean | null
+          last_notified_at?: string | null
           medication_name?: string
           notes?: string | null
+          notification_enabled?: boolean | null
           patient_id?: string
           prescribed_by?: string | null
+          reminder_sound?: string | null
+          reminder_times?: Json | null
+          snooze_until?: string | null
           start_date?: string
           updated_at?: string
         }
@@ -888,6 +903,16 @@ export type Database = {
       create_infant_from_delivery: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      get_due_medication_reminders: {
+        Args: { user_profile_id: string }
+        Returns: {
+          dosage: string
+          medication_id: string
+          medication_name: string
+          patient_type: string
+          reminder_time: string
+        }[]
       }
       get_primary_role: {
         Args: { _user_id: string }

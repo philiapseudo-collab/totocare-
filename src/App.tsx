@@ -26,7 +26,10 @@ import QuickAdd from "./pages/QuickAdd";
 import Upcoming from "./pages/Upcoming";
 import RecentActivityPage from "./pages/RecentActivity";
 import AddInfant from "./pages/AddInfant";
+import Medications from "./pages/Medications";
 import { useProfile } from "./hooks/useProfile";
+import { useEffect } from "react";
+import { medicationNotificationService } from "./lib/medicationNotifications";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +37,18 @@ const AuthenticatedApp = () => {
   const location = useLocation();
   const { user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
+
+  // Initialize medication notifications when user is authenticated
+  useEffect(() => {
+    if (user && profile?.id) {
+      medicationNotificationService.requestNotificationPermission();
+      medicationNotificationService.startMonitoring(profile.id);
+      
+      return () => {
+        medicationNotificationService.stopMonitoring();
+      };
+    }
+  }, [user, profile?.id]);
 
   if (authLoading || profileLoading) {
     return (
@@ -84,6 +99,7 @@ const AuthenticatedApp = () => {
           <Route path="/add-infant" element={<AddInfant />} />
           <Route path="/vaccinations" element={<Vaccinations />} />
           <Route path="/conditions" element={<Conditions />} />
+          <Route path="/medications" element={<Medications />} />
           <Route path="/guides" element={<Guides />} />
           <Route path="/support" element={<Support />} />
           <Route path="/faq" element={<FAQ />} />

@@ -7,7 +7,8 @@ import {
   BookOpen,
   HelpCircle,
   Info,
-  AlertTriangle
+  AlertTriangle,
+  Pill
 } from "lucide-react";
 
 import {
@@ -51,6 +52,11 @@ const healthItems = [
     title: "Conditions",
     url: "/conditions",
     icon: AlertTriangle,
+  },
+  {
+    title: "Medications",
+    url: "/medications",
+    icon: Pill,
   },
 ];
 
