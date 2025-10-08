@@ -18,13 +18,43 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY not configured");
     }
 
-    const prompt = `You are a maternal and infant health advisor. Generate 3-4 concise, actionable health insights based on this data:
-${pregnancyWeek ? `- Pregnancy: Week ${pregnancyWeek}` : ''}
-${infantAgeMonths !== null && infantAgeMonths !== undefined ? `- Infant age: ${infantAgeMonths} months` : ''}
-${recentConditions?.length ? `- Active conditions: ${recentConditions.join(', ')}` : ''}
-${upcomingEvents?.length ? `- Upcoming: ${upcomingEvents.join(', ')}` : ''}
+    // Medical reference data from Kenya Ministry of Health Mother & Child Health Handbook
+    const medicalGuidelines = {
+      dangerSignsMother: ["Heavy bleeding", "Fever", "Severe headache", "Foul vaginal discharge", "Fits/Convulsions"],
+      dangerSignsBaby: ["Stops breastfeeding", "Fast/difficult breathing", "Hot or cold", "Less active", "Jaundice"],
+      nutritionPregnancy: "Eat 5+ food groups daily, one extra meal, 7-12kg total weight gain",
+      nutritionBreastfeeding: "Two extra small meals daily, exclusive breastfeeding 6 months",
+      weightGain: {
+        trimester1: "0.5kg/month",
+        trimester2: "1-1.5kg/month",
+        trimester3: "2-2.2kg/month"
+      },
+      ancSchedule: "8 visits during pregnancy at weeks 8, 12, 16, 20, 24, 28, 32, 36"
+    };
 
-Provide practical, personalized tips focusing on current stage, nutrition, exercise, or important milestones. Keep each insight under 20 words.`;
+    const context = [];
+    if (pregnancyWeek) {
+      context.push(`Pregnancy Week ${pregnancyWeek}`);
+      if (pregnancyWeek <= 13) context.push("1st trimester - expect 0.5kg/month weight gain");
+      else if (pregnancyWeek <= 26) context.push("2nd trimester - expect 1-1.5kg/month weight gain");
+      else context.push("3rd trimester - expect 2-2.2kg/month weight gain");
+    }
+    if (infantAgeMonths !== null && infantAgeMonths !== undefined) {
+      context.push(`Infant ${infantAgeMonths} months old`);
+      if (infantAgeMonths < 6) context.push("Exclusive breastfeeding recommended");
+    }
+    if (recentConditions?.length) context.push(`Active conditions: ${recentConditions.join(', ')}`);
+    if (upcomingEvents?.length) context.push(`Upcoming: ${upcomingEvents.join(', ')}`);
+
+    const prompt = `Based on Kenya Ministry of Health guidelines, generate 3-4 actionable health insights for:
+${context.join('\n')}
+
+Reference Guidelines:
+- Nutrition: ${pregnancyWeek ? medicalGuidelines.nutritionPregnancy : medicalGuidelines.nutritionBreastfeeding}
+- ANC: ${medicalGuidelines.ancSchedule}
+- Watch for danger signs: ${pregnancyWeek ? medicalGuidelines.dangerSignsMother.join(', ') : medicalGuidelines.dangerSignsBaby.join(', ')}
+
+Provide practical, stage-specific tips on nutrition, exercise, danger signs to watch, or milestones. Each insight under 20 words.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -37,7 +67,7 @@ Provide practical, personalized tips focusing on current stage, nutrition, exerc
         messages: [
           {
             role: "system",
-            content: "You are a maternal and infant health expert. Provide clear, evidence-based health insights in a warm, supportive tone."
+            content: "You are a maternal and infant health expert following Kenya Ministry of Health guidelines. Provide clear, evidence-based health insights from the Mother & Child Health Handbook in a warm, supportive tone. Focus on practical advice mothers can act on immediately."
           },
           {
             role: "user",

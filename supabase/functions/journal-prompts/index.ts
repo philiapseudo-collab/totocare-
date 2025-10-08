@@ -18,14 +18,29 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY not configured");
     }
 
+    // Context based on Kenya MOH guidelines
+    let stageInfo = '';
+    if (pregnancyWeek) {
+      if (pregnancyWeek <= 13) stageInfo = 'Early pregnancy (1st trimester) - focus on prenatal care, nutrition, managing morning sickness';
+      else if (pregnancyWeek <= 26) stageInfo = 'Mid pregnancy (2nd trimester) - focus on fetal movements, energy levels, preparation';
+      else stageInfo = 'Late pregnancy (3rd trimester) - focus on birth preparation, body changes, nesting';
+    } else if (infantAgeMonths !== null && infantAgeMonths !== undefined) {
+      if (infantAgeMonths < 6) stageInfo = 'Early infancy - exclusive breastfeeding, sleep patterns, bonding';
+      else if (infantAgeMonths < 12) stageInfo = 'Mid infancy - introducing foods, mobility milestones, teething';
+      else stageInfo = 'Toddler stage - walking, communication, independence';
+    }
+
     const context = pregnancyWeek 
       ? `pregnancy at week ${pregnancyWeek}`
       : infantAgeMonths !== null 
       ? `infant at ${infantAgeMonths} months old`
       : 'general maternal health';
 
-    const prompt = `Generate 3 thoughtful, reflective journal prompts for a mother tracking their ${context}. Entry type: ${entryType || 'general'}.
-Make prompts specific to this stage, encouraging emotional reflection, milestone tracking, or health observations. Each prompt should be a question, under 15 words.`;
+    const prompt = `Generate 3 thoughtful, reflective journal prompts for a mother tracking their ${context}. 
+Entry type: ${entryType || 'general'}.
+Stage guidance: ${stageInfo}
+
+Make prompts specific to this developmental stage, encouraging emotional reflection, milestone tracking, health observations, or self-care. Each prompt should be a warm, open-ended question under 15 words that helps mothers document their unique journey.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -38,7 +53,7 @@ Make prompts specific to this stage, encouraging emotional reflection, milestone
         messages: [
           {
             role: "system",
-            content: "You are a supportive maternal health companion. Create meaningful, stage-appropriate journal prompts."
+            content: "You are a supportive maternal health companion following Kenya Ministry of Health guidelines. Create meaningful, culturally-sensitive, stage-appropriate journal prompts that encourage mothers to reflect on their physical health, emotional well-being, milestones, and self-care journey."
           },
           {
             role: "user",
