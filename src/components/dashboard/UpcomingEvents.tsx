@@ -10,13 +10,13 @@ export function UpcomingEvents() {
   const getIcon = (type: string) => {
     switch (type) {
       case "vaccination":
-        return <Syringe className="w-4 h-4 text-blue-500" />;
+        return <span className="text-2xl">💉</span>;
       case "appointment":
-        return <Calendar className="w-4 h-4 text-green-500" />;
+        return <span className="text-2xl">👩‍⚕️</span>;
       case "screening":
-        return <FlaskConical className="w-4 h-4 text-purple-500" />;
+        return <span className="text-2xl">🔬</span>;
       default:
-        return <Calendar className="w-4 h-4" />;
+        return <span className="text-2xl">📅</span>;
     }
   };
 
@@ -48,7 +48,10 @@ export function UpcomingEvents() {
   return (
     <Card>
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold">Upcoming</CardTitle>
+        <CardTitle className="text-lg font-semibold flex items-center gap-2">
+          <span className="text-2xl">📆</span>
+          Coming Up
+        </CardTitle>
         <p className="text-sm text-muted-foreground">Next 7 days</p>
       </CardHeader>
       <CardContent className="space-y-4">

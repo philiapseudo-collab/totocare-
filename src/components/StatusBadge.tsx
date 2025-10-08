@@ -7,23 +7,44 @@ export interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, children, className }: StatusBadgeProps) {
-  const statusStyles = {
-    due: "bg-status-due text-status-due-foreground",
-    overdue: "bg-status-overdue text-status-overdue-foreground",
-    completed: "bg-status-completed text-status-completed-foreground",
-    scheduled: "bg-status-scheduled text-status-scheduled-foreground",
-    missed: "bg-status-overdue text-status-overdue-foreground",
-    upcoming: "bg-status-due text-status-due-foreground",
+  const statusConfig = {
+    due: { 
+      style: "bg-status-due text-status-due-foreground",
+      emoji: "⏰"
+    },
+    overdue: { 
+      style: "bg-status-overdue text-status-overdue-foreground",
+      emoji: "🚨"
+    },
+    completed: { 
+      style: "bg-status-completed text-status-completed-foreground",
+      emoji: "✅"
+    },
+    scheduled: { 
+      style: "bg-status-scheduled text-status-scheduled-foreground",
+      emoji: "📅"
+    },
+    missed: { 
+      style: "bg-status-overdue text-status-overdue-foreground",
+      emoji: "❌"
+    },
+    upcoming: { 
+      style: "bg-status-due text-status-due-foreground",
+      emoji: "🔜"
+    },
   };
+
+  const config = statusConfig[status];
 
   return (
     <span
       className={cn(
-        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
-        statusStyles[status],
+        "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium",
+        config.style,
         className
       )}
     >
+      <span>{config.emoji}</span>
       {children}
     </span>
   );

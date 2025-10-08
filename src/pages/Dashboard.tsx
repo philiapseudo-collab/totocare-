@@ -18,12 +18,12 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   const navigationButtons = [
-    { title: "Journal", icon: BookOpen, path: "/journal", color: "bg-primary" },
-    { title: "Today's Checklist", icon: CheckSquare, path: "/checklist", color: "bg-accent" },
-    { title: "Quick Add", icon: Plus, path: "/quick-add", color: "bg-secondary" },
-    { title: "Upcoming", icon: Calendar, path: "/upcoming", color: "bg-primary" },
-    { title: "Conditions", icon: AlertCircle, path: "/conditions", color: "bg-accent" },
-    { title: "Recent Activity", icon: Activity, path: "/recent-activity", color: "bg-secondary" },
+    { title: "Journal", icon: BookOpen, path: "/journal", color: "bg-primary", emoji: "📝" },
+    { title: "Checklist", icon: CheckSquare, path: "/checklist", color: "bg-green-600", emoji: "✅" },
+    { title: "Add Entry", icon: Plus, path: "/quick-add", color: "bg-blue-600", emoji: "➕" },
+    { title: "Coming Up", icon: Calendar, path: "/upcoming", color: "bg-purple-600", emoji: "📅" },
+    { title: "Health Issues", icon: AlertCircle, path: "/conditions", color: "bg-orange-600", emoji: "🩺" },
+    { title: "History", icon: Activity, path: "/recent-activity", color: "bg-indigo-600", emoji: "📊" },
   ];
 
   if (isMobile) {
@@ -43,18 +43,17 @@ const Dashboard = () => {
         {/* Navigation Buttons - 2x3 Grid */}
         <div className="grid grid-cols-2 gap-4">
           {navigationButtons.map((button) => {
-            const Icon = button.icon;
             return (
               <Card
                 key={button.path}
-                className="cursor-pointer hover:shadow-lg transition-shadow"
+                className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 border-2"
                 onClick={() => navigate(button.path)}
               >
                 <CardContent className="p-6 flex flex-col items-center justify-center space-y-3">
-                  <div className={`${button.color} p-4 rounded-full`}>
-                    <Icon className="w-6 h-6 text-white" />
+                  <div className="text-5xl mb-2">
+                    {button.emoji}
                   </div>
-                  <h3 className="font-semibold text-center text-sm">{button.title}</h3>
+                  <h3 className="font-bold text-center text-base">{button.title}</h3>
                 </CardContent>
               </Card>
             );

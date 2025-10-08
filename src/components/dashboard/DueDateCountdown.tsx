@@ -214,8 +214,8 @@ export function DueDateCountdown() {
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <Baby className="h-5 w-5 text-primary" />
-            Due Date Countdown
+            <span className="text-2xl">🤰</span>
+            Baby Coming Soon
           </CardTitle>
           <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
             <DialogTrigger asChild>
@@ -285,28 +285,35 @@ export function DueDateCountdown() {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="text-center">
-          <div className="text-3xl font-bold text-primary mb-1">
+        <div className="text-center bg-primary/10 rounded-xl p-6">
+          <div className="text-5xl mb-3">📅</div>
+          <div className="text-4xl font-bold text-primary mb-2">
             {weeksRemaining}w {daysRemainingInWeek}d
           </div>
-          <p className="text-sm text-muted-foreground">until your due date</p>
+          <p className="text-base font-medium">until baby arrives</p>
         </div>
 
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span>Week {weeksPassed} of 40</span>
+        <div className="space-y-3">
+          <div className="flex justify-between text-base font-medium">
+            <span className="flex items-center gap-2">
+              <span>🗓</span>
+              Week {weeksPassed} of 40
+            </span>
             <span>{Math.round(progressPercentage)}%</span>
           </div>
-          <Progress value={progressPercentage} className="h-2" />
+          <Progress value={progressPercentage} className="h-3" />
         </div>
 
-        <div className="flex items-center justify-between text-sm text-muted-foreground pt-2">
-          <div className="flex items-center gap-1">
-            <CalendarDays className="h-4 w-4" />
-            <span>Due: {new Date(pregnancy.due_date + 'T00:00:00').toLocaleDateString()}</span>
+        <div className="flex flex-col gap-2 text-sm pt-2 bg-secondary/30 rounded-lg p-3">
+          <div className="flex items-center gap-2">
+            <CalendarDays className="h-4 w-4 text-primary" />
+            <span className="font-medium">Due Date:</span>
+            <span>{new Date(pregnancy.due_date + 'T00:00:00').toLocaleDateString()}</span>
           </div>
-          <div className="capitalize">
-            {pregnancy.current_trimester} trimester
+          <div className="flex items-center gap-2">
+            <span className="text-lg">🤰</span>
+            <span className="font-medium">Stage:</span>
+            <span className="capitalize">{pregnancy.current_trimester} Trimester</span>
           </div>
         </div>
       </CardContent>
