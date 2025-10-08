@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { AppHeader } from "@/components/AppHeader";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { QuickActionFAB } from "@/components/QuickActionFAB";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
@@ -92,6 +93,7 @@ const AuthenticatedApp = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
+      {user && <QuickActionFAB />}
     </div>
   );
 };

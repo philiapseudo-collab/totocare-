@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { GlobalSearch } from "@/components/GlobalSearch";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -197,6 +198,8 @@ export function AppHeader() {
 
         {/* Right Side Actions */}
         <div className="flex items-center gap-4">
+          <GlobalSearch />
+          
           {/* Action Buttons */}
           <div className="hidden lg:flex items-center gap-2">
             <Button variant="outline" size="sm" className="gap-2 hidden xl:flex" asChild>

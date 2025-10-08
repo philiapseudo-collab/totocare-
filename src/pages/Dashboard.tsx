@@ -6,6 +6,8 @@ import { ConditionsPanel } from "@/components/dashboard/ConditionsPanel";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { DueDateCountdown } from "@/components/dashboard/DueDateCountdown";
 import { DeliveryNotification } from "@/components/DeliveryNotification";
+import { AIInsightsPanel } from "@/components/dashboard/AIInsightsPanel";
+import { HealthAnalytics } from "@/components/dashboard/HealthAnalytics";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
@@ -67,13 +69,16 @@ const Dashboard = () => {
       {/* Delivery Notification - Full Width */}
       <DeliveryNotification />
       
+      {/* AI Insights - Full Width */}
+      <AIInsightsPanel />
+      
       {/* 3-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Left Column */}
         <div className="space-y-6">
           <KeyMetrics />
+          <HealthAnalytics />
           <RecentActivity />
-          <TodaysChecklist />
         </div>
 
         {/* Middle Column */}
@@ -86,6 +91,7 @@ const Dashboard = () => {
         <div className="space-y-6">
           <DueDateCountdown />
           <ConditionsPanel />
+          <TodaysChecklist />
         </div>
       </div>
     </div>
