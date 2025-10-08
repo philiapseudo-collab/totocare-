@@ -11,7 +11,7 @@ import { HealthAnalytics } from "@/components/dashboard/HealthAnalytics";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, CheckSquare, Plus, Calendar, AlertCircle, Activity } from "lucide-react";
+import { BookOpen, CheckSquare, Plus, Calendar, AlertCircle, Activity, Pill } from "lucide-react";
 
 const Dashboard = () => {
   const isMobile = useIsMobile();
@@ -19,11 +19,11 @@ const Dashboard = () => {
 
   const navigationButtons = [
     { title: "Journal", icon: BookOpen, path: "/journal", color: "bg-primary", emoji: "📝" },
+    { title: "Medications", icon: Pill, path: "/medications", color: "bg-pink-600", emoji: "💊" },
     { title: "Checklist", icon: CheckSquare, path: "/checklist", color: "bg-green-600", emoji: "✅" },
     { title: "Add Entry", icon: Plus, path: "/quick-add", color: "bg-blue-600", emoji: "➕" },
     { title: "Coming Up", icon: Calendar, path: "/upcoming", color: "bg-purple-600", emoji: "📅" },
     { title: "Health Issues", icon: AlertCircle, path: "/conditions", color: "bg-orange-600", emoji: "🩺" },
-    { title: "History", icon: Activity, path: "/recent-activity", color: "bg-indigo-600", emoji: "📊" },
   ];
 
   if (isMobile) {
