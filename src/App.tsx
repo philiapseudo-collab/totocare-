@@ -27,6 +27,7 @@ import Upcoming from "./pages/Upcoming";
 import RecentActivityPage from "./pages/RecentActivity";
 import AddInfant from "./pages/AddInfant";
 import Medications from "./pages/Medications";
+import Donate from "./pages/Donate";
 import { useProfile } from "./hooks/useProfile";
 import { useEffect } from "react";
 import { medicationNotificationService } from "./lib/medicationNotifications";
@@ -67,6 +68,7 @@ const AuthenticatedApp = () => {
         <Route path="/guides" element={<Guides />} />
         <Route path="/support" element={<Support />} />
         <Route path="/faq" element={<FAQ />} />
+        <Route path="/donate" element={<Donate />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );
@@ -100,6 +102,7 @@ const AuthenticatedApp = () => {
           <Route path="/vaccinations" element={<Vaccinations />} />
           <Route path="/conditions" element={<Conditions />} />
           <Route path="/medications" element={<Medications />} />
+          <Route path="/donate" element={<Donate />} />
           <Route path="/guides" element={<Guides />} />
           <Route path="/support" element={<Support />} />
           <Route path="/faq" element={<FAQ />} />

@@ -107,6 +107,45 @@ export type Database = {
           },
         ]
       }
+      campaigns: {
+        Row: {
+          category: string
+          condition_type: string
+          created_at: string
+          current_amount: number | null
+          description: string
+          id: string
+          is_active: boolean | null
+          target_amount: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          condition_type: string
+          created_at?: string
+          current_amount?: number | null
+          description: string
+          id?: string
+          is_active?: boolean | null
+          target_amount?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          condition_type?: string
+          created_at?: string
+          current_amount?: number | null
+          description?: string
+          id?: string
+          is_active?: boolean | null
+          target_amount?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       clinic_visits: {
         Row: {
           blood_pressure: string | null
@@ -253,6 +292,62 @@ export type Database = {
           timing?: string | null
         }
         Relationships: []
+      }
+      donations: {
+        Row: {
+          amount: number
+          anonymous: boolean | null
+          campaign_id: string
+          created_at: string
+          donor_email: string | null
+          donor_name: string | null
+          donor_phone: string | null
+          id: string
+          mpesa_receipt_number: string | null
+          payment_method: string
+          payment_status: string
+          transaction_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          anonymous?: boolean | null
+          campaign_id: string
+          created_at?: string
+          donor_email?: string | null
+          donor_name?: string | null
+          donor_phone?: string | null
+          id?: string
+          mpesa_receipt_number?: string | null
+          payment_method: string
+          payment_status?: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          anonymous?: boolean | null
+          campaign_id?: string
+          created_at?: string
+          donor_email?: string | null
+          donor_name?: string | null
+          donor_phone?: string | null
+          id?: string
+          mpesa_receipt_number?: string | null
+          payment_method?: string
+          payment_status?: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donations_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       growth_milestones: {
         Row: {

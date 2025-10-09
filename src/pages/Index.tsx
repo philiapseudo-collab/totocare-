@@ -105,6 +105,25 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Donation Section */}
+      <section className="py-20 px-6 bg-gradient-to-r from-primary/10 via-primary/5 to-background">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-6">Support Maternal & Infant Health</h2>
+          <p className="text-xl text-muted-foreground mb-8">
+            Your donation can save lives. Help us provide critical care for mothers and babies in need.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" onClick={() => navigate("/donate")} className="text-lg px-8" variant="default">
+              <Heart className="w-5 h-5 mr-2" />
+              Donate Now
+            </Button>
+            <Button size="lg" onClick={() => navigate("/donate")} className="text-lg px-8" variant="outline">
+              View Campaigns
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 px-6 bg-primary/5">
         <div className="max-w-4xl mx-auto text-center">
