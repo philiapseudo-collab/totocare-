@@ -76,7 +76,7 @@ const AuthenticatedApp = () => {
 
   // Redirect to profile setup only if profile is incomplete AND user is trying to access dashboard
   // Allow access to all other pages even if profile is incomplete
-  if (profile && !profile.profile_completed && location.pathname === '/') {
+  if (profile && !profile.profile_completed && (location.pathname === '/' || location.pathname === '/dashboard')) {
     return <Navigate to="/profile-setup" replace />;
   }
 
@@ -91,6 +91,7 @@ const AuthenticatedApp = () => {
       <main className="container mx-auto px-4 py-4 sm:py-6">
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile-setup" element={<ProfileSetup />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/journal" element={<Journal />} />
