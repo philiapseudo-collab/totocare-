@@ -91,6 +91,25 @@ const Dashboard = () => {
         <div className="space-y-6">
           <DueDateCountdown />
           
+          {/* Medication Reminder Card */}
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 border-2 bg-gradient-to-br from-pink-50 to-purple-50 dark:from-pink-950/20 dark:to-purple-950/20"
+            onClick={() => navigate('/medications')}
+          >
+            <CardContent className="p-6 text-center space-y-4">
+              <div className="text-6xl mb-2">💊</div>
+              <h3 className="font-bold text-xl">Medication Reminders</h3>
+              <p className="text-sm text-muted-foreground">
+                Manage your medications and set reminders
+              </p>
+              <div className="pt-2">
+                <span className="inline-flex items-center gap-2 text-pink-600 dark:text-pink-400 font-semibold">
+                  View Medications <Pill className="h-4 w-4" />
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+          
           {/* Donation Card */}
           <Card 
             className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 border-2 bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20"
