@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import {
   DropdownMenu,
@@ -233,6 +234,9 @@ export function AppHeader() {
 
           {/* Theme Toggle */}
           <ThemeToggle />
+
+          {/* Language Toggle */}
+          <LanguageToggle />
 
           {/* User Menu */}
           <DropdownMenu>

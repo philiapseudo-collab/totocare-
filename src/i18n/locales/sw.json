@@ -1,0 +1,60 @@
+{
+  "nav": {
+    "dashboard": "Dashibodi",
+    "journal": "Jarida",
+    "vaccinations": "Chanjo",
+    "conditions": "Hali za Afya",
+    "medications": "Dawa",
+    "upcoming": "Inayokuja",
+    "checklist": "Orodha ya Ukaguzi",
+    "guides": "Mwongozo",
+    "support": "Msaada",
+    "donate": "Changia",
+    "profile": "Wasifu",
+    "logout": "Toka",
+    "about": "Kuhusu",
+    "faq": "Maswali Yanayoulizwa Mara kwa Mara"
+  },
+  "common": {
+    "add": "Ongeza",
+    "edit": "Hariri",
+    "delete": "Futa",
+    "save": "Hifadhi",
+    "cancel": "Ghairi",
+    "search": "Tafuta",
+    "export": "Hamisha",
+    "loading": "Inapakia...",
+    "noData": "Hakuna data inayopatikana",
+    "welcome": "Karibu",
+    "viewAll": "Angalia Yote"
+  },
+  "dashboard": {
+    "title": "Dashibodi",
+    "quickActions": "Vitendo vya Haraka",
+    "recentActivity": "Shughuli za Hivi Karibuni",
+    "upcomingEvents": "Matukio Yanayokuja",
+    "healthAnalytics": "Uchanganuzi wa Afya",
+    "aiInsights": "Maarifa ya AI",
+    "keyMetrics": "Vipimo Muhimu",
+    "todaysChecklist": "Orodha ya Leo",
+    "dueDateCountdown": "Hesabu ya Tarehe ya Kujifungua"
+  },
+  "donation": {
+    "title": "Unga Mkono Huduma ya Mama na Mtoto",
+    "description": "Saidia wamama na watoto kupata huduma bora za afya",
+    "button": "Changia Sasa"
+  },
+  "medication": {
+    "title": "Vikumbusho vya Dawa",
+    "description": "Usisahau ratiba yako ya dawa",
+    "button": "Angalia Dawa",
+    "addMedication": "Ongeza Dawa"
+  },
+  "auth": {
+    "login": "Ingia",
+    "signup": "Jisajili",
+    "email": "Barua Pepe",
+    "password": "Nywila",
+    "forgotPassword": "Umesahau Nywila?"
+  }
+}

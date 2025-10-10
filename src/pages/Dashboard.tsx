@@ -12,10 +12,12 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { BookOpen, CheckSquare, Plus, Calendar, AlertCircle, Activity, Pill, Heart } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const Dashboard = () => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const navigationButtons = [
     { title: "Journal", icon: BookOpen, path: "/journal", color: "bg-primary", emoji: "📝" },
@@ -98,13 +100,13 @@ const Dashboard = () => {
           >
             <CardContent className="p-6 text-center space-y-4">
               <div className="text-6xl mb-2">💊</div>
-              <h3 className="font-bold text-xl">Medication Reminders</h3>
+              <h3 className="font-bold text-xl">{t('medication.title')}</h3>
               <p className="text-sm text-muted-foreground">
-                Manage your medications and set reminders
+                {t('medication.description')}
               </p>
               <div className="pt-2">
                 <span className="inline-flex items-center gap-2 text-pink-600 dark:text-pink-400 font-semibold">
-                  View Medications <Pill className="h-4 w-4" />
+                  {t('medication.button')} <Pill className="h-4 w-4" />
                 </span>
               </div>
             </CardContent>
@@ -117,13 +119,13 @@ const Dashboard = () => {
           >
             <CardContent className="p-6 text-center space-y-4">
               <div className="text-6xl mb-2">❤️</div>
-              <h3 className="font-bold text-xl">Support Our Mission</h3>
+              <h3 className="font-bold text-xl">{t('donation.title')}</h3>
               <p className="text-sm text-muted-foreground">
-                Help us improve maternal and infant healthcare
+                {t('donation.description')}
               </p>
               <div className="pt-2">
                 <span className="inline-flex items-center gap-2 text-red-600 dark:text-red-400 font-semibold">
-                  Make a Donation <Heart className="h-4 w-4" />
+                  {t('donation.button')} <Heart className="h-4 w-4" />
                 </span>
               </div>
             </CardContent>
