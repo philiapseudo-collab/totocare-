@@ -8,7 +8,8 @@ import {
   HelpCircle,
   Info,
   AlertTriangle,
-  Pill
+  Pill,
+  Heart
 } from "lucide-react";
 
 import {
@@ -61,6 +62,11 @@ const healthItems = [
 ];
 
 const resourceItems = [
+  {
+    title: "Donate",
+    url: "/donate",
+    icon: Heart,
+  },
   {
     title: "Guides",
     url: "/guides",
