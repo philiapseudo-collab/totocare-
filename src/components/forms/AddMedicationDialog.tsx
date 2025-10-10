@@ -106,7 +106,6 @@ export const AddMedicationDialog = ({ open, onOpenChange, medication, onSuccess 
       const medicationData = {
         ...formData,
         patient_id: profile.id,
-        patient_type: "mother",
         reminder_times: reminderTimes,
         start_date: format(formData.start_date, "yyyy-MM-dd"),
         end_date: formData.end_date ? format(formData.end_date, "yyyy-MM-dd") : null,
