@@ -90,6 +90,26 @@ const Dashboard = () => {
         {/* Right Column */}
         <div className="space-y-6">
           <DueDateCountdown />
+          
+          {/* Donation Card */}
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 border-2 bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20"
+            onClick={() => navigate('/donate')}
+          >
+            <CardContent className="p-6 text-center space-y-4">
+              <div className="text-6xl mb-2">❤️</div>
+              <h3 className="font-bold text-xl">Support Our Mission</h3>
+              <p className="text-sm text-muted-foreground">
+                Help us improve maternal and infant healthcare
+              </p>
+              <div className="pt-2">
+                <span className="inline-flex items-center gap-2 text-red-600 dark:text-red-400 font-semibold">
+                  Make a Donation <Heart className="h-4 w-4" />
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+          
           <ConditionsPanel />
           <TodaysChecklist />
         </div>
