@@ -7,6 +7,7 @@ import { Baby, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { useAppTranslation } from '@/hooks/useAppTranslation';
 
 interface DuePregnancy {
   id: string;
@@ -16,6 +17,7 @@ interface DuePregnancy {
 }
 
 export const DeliveryNotification = () => {
+  const { t } = useAppTranslation();
   const [duePregnancies, setDuePregnancies] = useState<DuePregnancy[]>([]);
   const [loading, setLoading] = useState(false);
   const { profile } = useProfile();
@@ -64,7 +66,7 @@ export const DeliveryNotification = () => {
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
           <AlertCircle className="w-5 h-5 text-primary" />
-          <CardTitle className="text-lg font-semibold">Delivery Alert</CardTitle>
+          <CardTitle className="text-lg font-semibold" data-i18n="deliveryAlert.title">{t("deliveryAlert.title")}</CardTitle>
         </div>
       </CardHeader>
       <CardContent>
@@ -76,27 +78,28 @@ export const DeliveryNotification = () => {
                   <Baby className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">
-                    Your pregnancy has reached the due date
+                  <p className="font-medium text-foreground" data-i18n="deliveryAlert.reachedDueDate">
+                    {t("deliveryAlert.reachedDueDate")}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {pregnancy.days_overdue === 0 
-                      ? 'Due today' 
-                      : `${pregnancy.days_overdue} day${pregnancy.days_overdue > 1 ? 's' : ''} overdue`}
+                      ? t("deliveryAlert.dueToday")
+                      : t("deliveryAlert.daysOverdue", { days: pregnancy.days_overdue, plural: pregnancy.days_overdue > 1 ? 's' : '' })}
                   </p>
                 </div>
               </div>
               <Button 
                 size="sm"
                 onClick={() => handleCreateInfant(pregnancy.id, pregnancy.due_date)}
+                data-i18n="deliveryAlert.addBabyDetails"
               >
                 <Baby className="w-4 h-4 mr-2" />
-                Add Baby Details
+                {t("deliveryAlert.addBabyDetails")}
               </Button>
             </div>
           ))}
-          <p className="text-xs text-muted-foreground mt-2">
-            Click "Add Baby Details" to create your infant's profile and start tracking vaccinations.
+          <p className="text-xs text-muted-foreground mt-2" data-i18n="deliveryAlert.instructionText">
+            {t("deliveryAlert.instructionText")}
           </p>
         </div>
       </CardContent>

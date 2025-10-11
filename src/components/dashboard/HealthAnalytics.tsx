@@ -2,8 +2,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
+import { useAppTranslation } from "@/hooks/useAppTranslation";
 
 export function HealthAnalytics() {
+  const { t } = useAppTranslation();
   const { profile, pregnancy } = useProfile();
 
   // Mock data for demonstration - in production, fetch from actual records
@@ -18,9 +20,9 @@ export function HealthAnalytics() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg">
+        <CardTitle className="flex items-center gap-2 text-lg" data-i18n="healthTrends.title">
           <TrendingUp className="h-5 w-5" />
-          Health Trends
+          {t("healthTrends.title")}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -29,11 +31,11 @@ export function HealthAnalytics() {
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
             <XAxis 
               dataKey="week" 
-              label={{ value: 'Week', position: 'insideBottom', offset: -5 }}
+              label={{ value: t("healthTrends.week"), position: 'insideBottom', offset: -5 }}
               className="text-xs"
             />
             <YAxis 
-              label={{ value: 'Weight (kg)', angle: -90, position: 'insideLeft' }}
+              label={{ value: t("healthTrends.weight"), angle: -90, position: 'insideLeft' }}
               className="text-xs"
             />
             <Tooltip 
@@ -52,8 +54,8 @@ export function HealthAnalytics() {
             />
           </LineChart>
         </ResponsiveContainer>
-        <p className="text-xs text-muted-foreground mt-2 text-center">
-          Track your weight progression throughout pregnancy
+        <p className="text-xs text-muted-foreground mt-2 text-center" data-i18n="healthTrends.trackWeight">
+          {t("healthTrends.trackWeight")}
         </p>
       </CardContent>
     </Card>

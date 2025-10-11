@@ -3,8 +3,10 @@ import { Badge } from "@/components/ui/badge";
 import { Syringe, Calendar, FlaskConical } from "lucide-react";
 import { useUpcomingEvents } from "@/hooks/useUpcomingEvents";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAppTranslation } from "@/hooks/useAppTranslation";
 
 export function UpcomingEvents() {
+  const { t } = useAppTranslation();
   const { events, loading } = useUpcomingEvents();
 
   const getIcon = (type: string) => {
@@ -31,8 +33,8 @@ export function UpcomingEvents() {
     return (
       <Card>
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg font-semibold">Upcoming</CardTitle>
-          <p className="text-sm text-muted-foreground">Next 7 days</p>
+          <CardTitle className="text-lg font-semibold" data-i18n="comingUp.title">{t("comingUp.title")}</CardTitle>
+          <p className="text-sm text-muted-foreground" data-i18n="comingUp.next7Days">{t("comingUp.next7Days")}</p>
         </CardHeader>
         <CardContent className="space-y-4">
           {[1, 2, 3].map((i) => (
@@ -48,17 +50,17 @@ export function UpcomingEvents() {
   return (
     <Card>
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold flex items-center gap-2">
+        <CardTitle className="text-lg font-semibold flex items-center gap-2" data-i18n="comingUp.title">
           <span className="text-2xl">📆</span>
-          Coming Up
+          {t("comingUp.title")}
         </CardTitle>
-        <p className="text-sm text-muted-foreground">Next 7 days</p>
+        <p className="text-sm text-muted-foreground" data-i18n="comingUp.next7Days">{t("comingUp.next7Days")}</p>
       </CardHeader>
       <CardContent className="space-y-4">
         {events.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>No upcoming events in the next 7 days</p>
+            <p data-i18n="comingUp.noUpcomingEvents">{t("comingUp.noUpcomingEvents")}</p>
           </div>
         ) : (
           events.map((event) => (

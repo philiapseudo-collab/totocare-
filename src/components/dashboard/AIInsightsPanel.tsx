@@ -5,8 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/hooks/useProfile";
 import { useConditions } from "@/hooks/useConditions";
 import { useUpcomingEvents } from "@/hooks/useUpcomingEvents";
+import { useAppTranslation } from "@/hooks/useAppTranslation";
 
 export function AIInsightsPanel() {
+  const { t } = useAppTranslation();
   const { profile, pregnancy } = useProfile();
   const { conditions } = useConditions();
   const { events } = useUpcomingEvents();
@@ -41,9 +43,9 @@ export function AIInsightsPanel() {
   return (
     <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg">
+        <CardTitle className="flex items-center gap-2 text-lg" data-i18n="aiInsights.title">
           <Sparkles className="h-5 w-5 text-primary" />
-          AI Health Insights
+          {t("aiInsights.title")}
         </CardTitle>
       </CardHeader>
       <CardContent>

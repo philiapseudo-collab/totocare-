@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Calendar, Droplet } from "lucide-react";
 import { VisualHealthCard } from "@/components/VisualHealthCard";
+import { useAppTranslation } from "@/hooks/useAppTranslation";
 
 interface Metric {
   id: string;
@@ -13,6 +14,7 @@ interface Metric {
 }
 
 export function KeyMetrics() {
+  const { t } = useAppTranslation();
   const { profile, pregnancy } = useProfile();
   const [fetalDevelopment, setFetalDevelopment] = useState<string>("");
   const [loadingDevelopment, setLoadingDevelopment] = useState(false);
@@ -58,7 +60,7 @@ export function KeyMetrics() {
   return (
     <Card>
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold">📊 Health Stats</CardTitle>
+        <CardTitle className="text-lg font-semibold" data-i18n="healthStats.title">📊 {t("healthStats.title")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
@@ -66,9 +68,9 @@ export function KeyMetrics() {
             <VisualHealthCard
               icon={Calendar}
               emoji="🤰"
-              title="Pregnancy Week"
+              title={t("healthStats.pregnancyWeek")}
               value={pregnancy.current_week?.toString() || "-"}
-              unit="weeks"
+              unit={t("healthStats.weeks")}
               color="blue"
             />
           )}
@@ -76,7 +78,7 @@ export function KeyMetrics() {
             <VisualHealthCard
               icon={Droplet}
               emoji="🩸"
-              title="Blood Type"
+              title={t("healthStats.bloodType")}
               value={profile.blood_group}
               color="red"
             />
@@ -87,14 +89,14 @@ export function KeyMetrics() {
           <div className="pt-4 border-t border-border">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-2xl">👶</span>
-              <h4 className="text-sm font-semibold text-foreground">
-                Week {pregnancy.current_week} Baby Development
+              <h4 className="text-sm font-semibold text-foreground" data-i18n="healthStats.babyDevelopment">
+                {t("healthStats.babyDevelopment", { week: pregnancy.current_week })}
               </h4>
             </div>
             {loadingDevelopment ? (
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-sm">Loading info...</span>
+                <span className="text-sm" data-i18n="healthStats.loadingInfo">{t("healthStats.loadingInfo")}</span>
               </div>
             ) : (
               <p className="text-sm text-muted-foreground leading-relaxed">

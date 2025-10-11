@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useAppTranslation } from "@/hooks/useAppTranslation";
 
 interface Pregnancy {
   id: string;
@@ -19,6 +20,7 @@ interface Pregnancy {
 }
 
 export function DueDateCountdown() {
+  const { t } = useAppTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [pregnancy, setPregnancy] = useState<Pregnancy | null>(null);
@@ -163,9 +165,9 @@ export function DueDateCountdown() {
     return (
       <Card>
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
+          <CardTitle className="text-lg font-semibold flex items-center gap-2" data-i18n="babyDevelopment.dueDateCountdown">
             <Baby className="h-5 w-5 text-primary" />
-            Due Date Countdown
+            {t("babyDevelopment.dueDateCountdown")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -183,14 +185,14 @@ export function DueDateCountdown() {
     return (
       <Card>
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
+          <CardTitle className="text-lg font-semibold flex items-center gap-2" data-i18n="babyDevelopment.dueDateCountdown">
             <Baby className="h-5 w-5 text-primary" />
-            Due Date Countdown
+            {t("babyDevelopment.dueDateCountdown")}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-center py-4">
-            No active pregnancy found
+          <p className="text-muted-foreground text-center py-4" data-i18n="babyDevelopment.noActivePregnancy">
+            {t("babyDevelopment.noActivePregnancy")}
           </p>
         </CardContent>
       </Card>
@@ -213,9 +215,9 @@ export function DueDateCountdown() {
     <Card>
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
+          <CardTitle className="text-lg font-semibold flex items-center gap-2" data-i18n="babyDevelopment.title">
             <span className="text-2xl">🤰</span>
-            Baby Coming Soon
+            {t("babyDevelopment.title")}
           </CardTitle>
           <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
             <DialogTrigger asChild>
@@ -232,15 +234,15 @@ export function DueDateCountdown() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Update Gestational Age</DialogTitle>
-                <DialogDescription>
-                  Enter your current gestational age to update the due date calculation
+                <DialogTitle data-i18n="babyDevelopment.updateGestationalAge">{t("babyDevelopment.updateGestationalAge")}</DialogTitle>
+                <DialogDescription data-i18n="babyDevelopment.updateDescription">
+                  {t("babyDevelopment.updateDescription")}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 pt-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="edit-weeks">Weeks</Label>
+                    <Label htmlFor="edit-weeks" data-i18n="babyDevelopment.weeks">{t("babyDevelopment.weeks")}</Label>
                     <Input
                       id="edit-weeks"
                       type="number"
@@ -252,7 +254,7 @@ export function DueDateCountdown() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="edit-days">Days</Label>
+                    <Label htmlFor="edit-days" data-i18n="babyDevelopment.days">{t("babyDevelopment.days")}</Label>
                     <Input
                       id="edit-days"
                       type="number"
@@ -269,14 +271,16 @@ export function DueDateCountdown() {
                     variant="outline"
                     onClick={() => setEditDialogOpen(false)}
                     disabled={updating}
+                    data-i18n="babyDevelopment.cancel"
                   >
-                    Cancel
+                    {t("babyDevelopment.cancel")}
                   </Button>
                   <Button
                     onClick={handleUpdateGestationalAge}
                     disabled={updating}
+                    data-i18n="babyDevelopment.update"
                   >
-                    {updating ? "Updating..." : "Update"}
+                    {updating ? t("babyDevelopment.updating") : t("babyDevelopment.update")}
                   </Button>
                 </div>
               </div>
@@ -290,14 +294,14 @@ export function DueDateCountdown() {
           <div className="text-4xl font-bold text-primary mb-2">
             {weeksRemaining}w {daysRemainingInWeek}d
           </div>
-          <p className="text-base font-medium">until baby arrives</p>
+          <p className="text-base font-medium" data-i18n="babyDevelopment.untilBabyArrives">{t("babyDevelopment.untilBabyArrives")}</p>
         </div>
 
         <div className="space-y-3">
           <div className="flex justify-between text-base font-medium">
             <span className="flex items-center gap-2">
               <span>🗓</span>
-              Week {weeksPassed} of 40
+              <span data-i18n="babyDevelopment.weekOf40">{t("babyDevelopment.weekOf40", { week: weeksPassed })}</span>
             </span>
             <span>{Math.round(progressPercentage)}%</span>
           </div>
@@ -307,13 +311,13 @@ export function DueDateCountdown() {
         <div className="flex flex-col gap-2 text-sm pt-2 bg-secondary/30 rounded-lg p-3">
           <div className="flex items-center gap-2">
             <CalendarDays className="h-4 w-4 text-primary" />
-            <span className="font-medium">Due Date:</span>
+            <span className="font-medium" data-i18n="babyDevelopment.dueDate">{t("babyDevelopment.dueDate")}</span>
             <span>{new Date(pregnancy.due_date + 'T00:00:00').toLocaleDateString()}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-lg">🤰</span>
-            <span className="font-medium">Stage:</span>
-            <span className="capitalize">{pregnancy.current_trimester} Trimester</span>
+            <span className="font-medium" data-i18n="babyDevelopment.stage">{t("babyDevelopment.stage")}</span>
+            <span className="capitalize">{pregnancy.current_trimester} {t("babyDevelopment.trimester")}</span>
           </div>
         </div>
       </CardContent>

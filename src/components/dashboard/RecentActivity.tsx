@@ -3,21 +3,23 @@ import { Activity } from "lucide-react";
 import { useJournalEntries } from "@/hooks/useJournalEntries";
 import { useVaccinations } from "@/hooks/useVaccinations";
 import { format } from "date-fns";
+import { useAppTranslation } from "@/hooks/useAppTranslation";
 
 export function RecentActivity() {
+  const { t } = useAppTranslation();
   const { entries } = useJournalEntries();
   const { vaccinations } = useVaccinations();
 
   // Combine all activities and sort by date
   const activities = [
     ...entries.map(e => ({ 
-      type: 'Journal', 
+      type: t("recentActivity.journal"), 
       title: e.title, 
       date: new Date(e.entry_date),
       icon: '📝'
     })),
     ...vaccinations.map(v => ({ 
-      type: 'Vaccination', 
+      type: t("recentActivity.vaccination"), 
       title: v.vaccine_name, 
       date: new Date(v.scheduled_date),
       icon: '💉'
@@ -27,14 +29,14 @@ export function RecentActivity() {
   return (
     <Card>
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold">Recent Activity</CardTitle>
+        <CardTitle className="text-lg font-semibold" data-i18n="recentActivity.title">{t("recentActivity.title")}</CardTitle>
       </CardHeader>
       <CardContent>
         {activities.length === 0 ? (
           <div className="text-center py-8">
             <Activity className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-            <p className="text-muted-foreground">No recent activity</p>
-            <p className="text-sm text-muted-foreground mt-1">Activities will appear here as you use the app</p>
+            <p className="text-muted-foreground" data-i18n="recentActivity.noActivity">{t("recentActivity.noActivity")}</p>
+            <p className="text-sm text-muted-foreground mt-1" data-i18n="recentActivity.activitiesWillAppear">{t("recentActivity.activitiesWillAppear")}</p>
           </div>
         ) : (
           <div className="space-y-3">
