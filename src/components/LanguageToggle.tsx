@@ -13,25 +13,37 @@ export const LanguageToggle = () => {
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
+    localStorage.setItem('i18nextLng', lng);
   };
+
+  const currentLanguage = i18n.language || 'en';
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Languages className="h-5 w-5" />
+        <Button variant="ghost" size="icon" className="relative">
+          <Languages className="h-5 w-5 transition-transform hover:scale-110" />
           <span className="sr-only">Toggle language</span>
+          <span className="absolute -top-1 -right-1 text-[10px] font-semibold bg-primary text-primary-foreground rounded px-1">
+            {currentLanguage.toUpperCase()}
+          </span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => changeLanguage("en")}>
-          <span className={i18n.language === "en" ? "font-bold" : ""}>
-            English
+      <DropdownMenuContent align="end" className="w-40">
+        <DropdownMenuItem 
+          onClick={() => changeLanguage("en")}
+          className="language-transition cursor-pointer"
+        >
+          <span className={currentLanguage === "en" ? "font-bold text-primary" : ""}>
+            🇬🇧 English
           </span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => changeLanguage("sw")}>
-          <span className={i18n.language === "sw" ? "font-bold" : ""}>
-            Kiswahili
+        <DropdownMenuItem 
+          onClick={() => changeLanguage("sw")}
+          className="language-transition cursor-pointer"
+        >
+          <span className={currentLanguage === "sw" ? "font-bold text-primary" : ""}>
+            🇹🇿 Kiswahili
           </span>
         </DropdownMenuItem>
       </DropdownMenuContent>

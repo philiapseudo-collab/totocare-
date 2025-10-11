@@ -158,4 +158,14 @@
   body {
     @apply bg-background text-foreground font-sans;
   }
+  
+  /* Smooth text transitions for language switching */
+  [data-i18n],
+  h1, h2, h3, h4, h5, h6, p, span, button, label {
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  .language-transition {
+    transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
+  }
 }
