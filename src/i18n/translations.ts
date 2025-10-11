@@ -71,7 +71,7 @@ export const translations = {
         activeCampaigns: "Active Campaigns",
         goesToCare: "Goes to Care",
         categoryMaternal: "Maternal",
-        categoryInfant: "Infant"
+        categoryInfant: "Infant",
       },
       medication: {
         title: "Medication Reminders",
@@ -207,8 +207,8 @@ export const translations = {
         activeCampaigns: "Kampeni Zinazoendelea",
         goesToCare: "Huenda kwa Huduma",
         categoryMaternal: "Mama",
-        categoryInfant: "Mtoto"
-      }
+        categoryInfant: "Mtoto",
+      },
       medication: {
         title: "Vikumbusho vya Dawa",
         description: "Usisahau ratiba yako ya dawa",
