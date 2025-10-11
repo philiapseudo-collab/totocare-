@@ -12,10 +12,11 @@ if (!i18n.isInitialized) {
     .init({
       resources,
       fallbackLng: 'en',
-      lng: localStorage.getItem('i18nextLng') || 'en',
+      lng: (localStorage.getItem('appLang') || localStorage.getItem('i18nextLng') || 'en'),
       detection: {
         order: ['localStorage', 'navigator'],
         caches: ['localStorage'],
+        lookupLocalStorage: 'appLang',
       },
       interpolation: {
         escapeValue: false,

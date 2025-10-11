@@ -168,4 +168,20 @@
   .language-transition {
     transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
   }
+  
+  /* When switching languages, gently fade text */
+  body.language-transitioning [data-i18n],
+  body.language-transitioning h1,
+  body.language-transitioning h2,
+  body.language-transitioning h3,
+  body.language-transitioning h4,
+  body.language-transitioning h5,
+  body.language-transitioning h6,
+  body.language-transitioning p,
+  body.language-transitioning span,
+  body.language-transitioning button,
+  body.language-transitioning label {
+    opacity: 0;
+    transform: translateY(2px);
+  }
 }

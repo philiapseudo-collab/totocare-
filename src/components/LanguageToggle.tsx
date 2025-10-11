@@ -6,17 +6,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export const LanguageToggle = () => {
-  const { i18n } = useTranslation();
+  const { language, setLanguage } = useLanguage();
 
   const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-    localStorage.setItem('i18nextLng', lng);
+    setLanguage(lng as any);
   };
 
-  const currentLanguage = i18n.language || 'en';
+  const currentLanguage = language || 'en';
 
   return (
     <DropdownMenu>
