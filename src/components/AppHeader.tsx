@@ -19,6 +19,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { useAppTranslation } from "@/hooks/useAppTranslation";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import {
   DropdownMenu,
@@ -88,6 +89,23 @@ export function AppHeader() {
   const fullName = profile ? `${profile.first_name} ${profile.last_name}` : "User";
   const userInitial = profile?.first_name?.charAt(0).toUpperCase() || "U";
 
+  const { t } = useAppTranslation();
+
+  const getNavKeyForUrl = (url: string) => {
+    switch (url) {
+      case '/': return 'nav.dashboard';
+      case '/journal': return 'nav.journal';
+      case '/vaccinations': return 'nav.vaccinations';
+      case '/conditions': return 'nav.conditions';
+      case '/guides': return 'nav.guides';
+      case '/support': return 'nav.support';
+      case '/faq': return 'nav.faq';
+      case '/about': return 'nav.about';
+      case '/profile': return 'nav.profile';
+      default: return '';
+    }
+  };
+
   const isActive = (path: string) => currentPath === path;
 
   return (
@@ -118,14 +136,14 @@ export function AppHeader() {
                   }
                 >
                   <LayoutDashboard className="mr-2 h-4 w-4" />
-                  Dashboard
+                  <span data-i18n>{t('nav.dashboard')}</span>
                 </NavLink>
               </NavigationMenuLink>
             </NavigationMenuItem>
 
             {/* Health Dropdown */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Health</NavigationMenuTrigger>
+              <NavigationMenuTrigger><span data-i18n>{t('nav.health')}</span></NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
                   {healthItems.map((item) => (
@@ -141,7 +159,7 @@ export function AppHeader() {
                         >
                           <div className="flex items-center gap-2 text-sm font-medium leading-none">
                             <item.icon className="h-4 w-4" />
-                            {item.title}
+                            <span data-i18n>{t(getNavKeyForUrl(item.url))}</span>
                             {item.badge && (
                               <span className="ml-auto bg-primary text-primary-foreground px-2 py-0.5 rounded text-xs">
                                 {item.badge}
@@ -163,7 +181,7 @@ export function AppHeader() {
 
             {/* Resources Dropdown */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
+              <NavigationMenuTrigger><span data-i18n>{t('nav.resources')}</span></NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
                   {resourceItems.map((item) => (
@@ -179,7 +197,7 @@ export function AppHeader() {
                         >
                           <div className="flex items-center gap-2 text-sm font-medium leading-none">
                             <item.icon className="h-4 w-4" />
-                            {item.title}
+                            <span data-i18n>{t(getNavKeyForUrl(item.url))}</span>
                           </div>
                           <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">
                             {item.title === "Guides" && "Educational health guides"}
@@ -206,7 +224,7 @@ export function AppHeader() {
             <Button variant="outline" size="sm" className="gap-2 hidden xl:flex" asChild>
               <NavLink to="/checklist">
                 <span>📋</span>
-                <span className="hidden xl:inline">Today's Checklist</span>
+                <span data-i18n className="hidden xl:inline">{t('dashboard.todaysChecklist')}</span>
               </NavLink>
             </Button>
             <Button variant="outline" size="sm" className="gap-2 hidden xl:flex" asChild>
@@ -218,7 +236,7 @@ export function AppHeader() {
             <Button className="bg-status-scheduled hover:bg-status-scheduled/90 gap-2" size="sm" asChild>
               <NavLink to="/journal">
                 <FileText className="h-4 w-4" />
-                <span className="hidden sm:inline">Journal</span>
+                <span data-i18n className="hidden sm:inline">{t('nav.journal')}</span>
               </NavLink>
             </Button>
           </div>
@@ -260,12 +278,12 @@ export function AppHeader() {
               <DropdownMenuItem asChild>
                 <NavLink to="/profile" className="flex items-center">
                   <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                  <span data-i18n>{t('nav.profile')}</span>
                 </NavLink>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={signOut}>
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
+                <span data-i18n>{t('nav.logout')}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -279,18 +297,18 @@ export function AppHeader() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end">
-              <DropdownMenuLabel>Navigation</DropdownMenuLabel>
+              <DropdownMenuLabel data-i18n>Navigation</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <NavLink to="/" className="flex items-center">
                   <LayoutDashboard className="mr-2 h-4 w-4" />
-                  Dashboard
+                  <span data-i18n>{t('nav.dashboard')}</span>
                 </NavLink>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <NavLink to="/checklist" className="flex items-center">
                   📋
-                  <span className="ml-2">Today's Checklist</span>
+                  <span data-i18n className="ml-2">{t('dashboard.todaysChecklist')}</span>
                 </NavLink>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
@@ -299,7 +317,7 @@ export function AppHeader() {
                   <span className="ml-2">Add Infant</span>
                 </NavLink>
               </DropdownMenuItem>
-              <DropdownMenuLabel className="text-xs text-muted-foreground">Health</DropdownMenuLabel>
+              <DropdownMenuLabel data-i18n className="text-xs text-muted-foreground">{t('nav.health')}</DropdownMenuLabel>
               {healthItems.map((item) => (
                 <DropdownMenuItem key={item.title} asChild>
                   <NavLink to={item.url} className="flex items-center">
@@ -314,7 +332,7 @@ export function AppHeader() {
                 </DropdownMenuItem>
               ))}
               <DropdownMenuSeparator />
-              <DropdownMenuLabel className="text-xs text-muted-foreground">Resources</DropdownMenuLabel>
+              <DropdownMenuLabel data-i18n className="text-xs text-muted-foreground">{t('nav.resources')}</DropdownMenuLabel>
               {resourceItems.map((item) => (
                 <DropdownMenuItem key={item.title} asChild>
                   <NavLink to={item.url} className="flex items-center">
