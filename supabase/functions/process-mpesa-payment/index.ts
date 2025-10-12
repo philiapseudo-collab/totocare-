@@ -64,7 +64,7 @@ serve(async (req) => {
     console.error('M-Pesa payment error:', error);
     return new Response(
       JSON.stringify({
-        error: error.message || 'Failed to process M-Pesa payment',
+        error: error instanceof Error ? error.message : 'Failed to process M-Pesa payment',
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
