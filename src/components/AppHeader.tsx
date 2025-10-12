@@ -110,9 +110,9 @@ export function AppHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-4">
+      <div className="container flex h-16 items-center justify-between px-2 sm:px-4 gap-2">
         {/* Logo */}
-        <NavLink to="/" className="flex items-center gap-2">
+        <NavLink to="/" className="flex items-center gap-2 shrink-0">
           <img src={leaLogo} alt="LEA Baby Logo" className="w-10 h-10 object-contain" />
           <div className="hidden sm:block">
             <span className="font-bold text-foreground text-lg">LEA</span>
@@ -216,7 +216,7 @@ export function AppHeader() {
         </NavigationMenu>
 
         {/* Right Side Actions */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <GlobalSearch />
           
           {/* Action Buttons */}
