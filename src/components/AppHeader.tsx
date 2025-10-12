@@ -10,7 +10,8 @@ import {
   User,
   AlertTriangle,
   LogOut,
-  Menu
+  Menu,
+  BarChart3
 } from "lucide-react";
 import leaLogo from "@/assets/baby-avatar-logo.png";
 import { Button } from "@/components/ui/button";

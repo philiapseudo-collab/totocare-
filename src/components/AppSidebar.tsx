@@ -9,7 +9,8 @@ import {
   Info,
   AlertTriangle,
   Pill,
-  Heart
+  Heart,
+  BarChart3
 } from "lucide-react";
 
 import {
@@ -34,6 +35,11 @@ const overviewItems = [
     title: "Dashboard",
     url: "/",
     icon: LayoutDashboard,
+  },
+  {
+    title: "Analytics",
+    url: "/analytics",
+    icon: BarChart3,
   },
 ];
 

@@ -31,6 +31,7 @@ import RecentActivityPage from "./pages/RecentActivity";
 import AddInfant from "./pages/AddInfant";
 import Medications from "./pages/Medications";
 import Donate from "./pages/Donate";
+import Analytics from "./pages/Analytics";
 import { useProfile } from "./hooks/useProfile";
 import { useEffect } from "react";
 import { medicationNotificationService } from "./lib/medicationNotifications";
@@ -95,6 +96,7 @@ const AuthenticatedApp = () => {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/analytics" element={<Analytics />} />
           <Route path="/profile-setup" element={<ProfileSetup />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/journal" element={<Journal />} />
