@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from './useAuth';
-import { useProfile } from './useProfile';
 
 interface HealthAnalytics {
   pregnancy: {
@@ -52,67 +50,57 @@ interface HealthAnalytics {
   };
 }
 
-export function useHealthAnalytics() {
-  const { user } = useAuth();
-  const { profile } = useProfile();
-  const [analytics, setAnalytics] = useState<HealthAnalytics | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface UseHealthAnalyticsOptions {
+  analysisType?: 'comprehensive' | 'pregnancy_progress' | 'infant_growth' | 'risk_assessment';
+  useCache?: boolean;
+  refreshInterval?: number;
+}
 
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      if (!user || !profile?.id) {
-        setLoading(false);
-        return;
-      }
+export function useHealthAnalytics(
+  patientId: string,
+  options: UseHealthAnalyticsOptions = {}
+) {
+  const {
+    analysisType = 'comprehensive',
+    useCache = true,
+    refreshInterval = 0,
+  } = options;
 
-      try {
-        setLoading(true);
-        const { data, error } = await supabase.functions.invoke('health-analytics', {
-          body: {
-            patientId: profile.id,
-            analysisType: 'comprehensive'
-          }
-        });
+  const queryKey = ['health-analytics', patientId, analysisType];
 
-        if (error) throw error;
-
-        setAnalytics(data.data);
-        setError(null);
-      } catch (err) {
-        console.error('Failed to fetch analytics:', err);
-        setError('Failed to load analytics data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAnalytics();
-  }, [user, profile?.id]);
-
-  const refetch = async () => {
-    if (!user || !profile?.id) return;
-
-    try {
-      setLoading(true);
-      const { data, error } = await supabase.functions.invoke('health-analytics', {
-        body: {
-          patientId: profile.id,
-          analysisType: 'comprehensive'
-        }
-      });
-
-      if (error) throw error;
-
-      setAnalytics(data.data);
-      setError(null);
-    } catch (err) {
-      console.error('Failed to fetch analytics:', err);
-      setError('Failed to load analytics data');
-    } finally {
-      setLoading(false);
+  const fetchAnalytics = async (): Promise<HealthAnalytics> => {
+    if (!patientId) {
+      throw new Error('Patient ID is required');
     }
+
+    const { data, error } = await supabase.functions.invoke('health-analytics', {
+      body: {
+        patientId,
+        analysisType,
+      },
+    });
+
+    if (error) {
+      throw new Error(error.message || 'Failed to fetch analytics');
+    }
+
+    return data.data;
   };
 
-  return { analytics, loading, error, refetch };
+  const query = useQuery({
+    queryKey,
+    queryFn: fetchAnalytics,
+    enabled: !!patientId,
+    staleTime: useCache ? 5 * 60 * 1000 : 0, // 5 minutes if cache enabled
+    refetchInterval: refreshInterval > 0 ? refreshInterval : false,
+    retry: 2,
+  });
+
+  return {
+    data: query.data ?? null,
+    loading: query.isLoading,
+    error: query.error?.message ?? null,
+    refetch: query.refetch,
+    isStale: query.isStale,
+  };
 }

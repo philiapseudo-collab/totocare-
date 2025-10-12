@@ -1,4 +1,5 @@
 import { useHealthAnalytics } from "@/hooks/useHealthAnalytics";
+import { useProfile } from "@/hooks/useProfile";
 import { HealthScoreCard } from "@/components/analytics/HealthScoreCard";
 import { RiskAssessmentPanel } from "@/components/analytics/RiskAssessmentPanel";
 import { PregnancyProgressTracker } from "@/components/analytics/PregnancyProgressTracker";
@@ -12,7 +13,11 @@ import { RefreshCw, Download } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Analytics() {
-  const { analytics, loading, error, refetch } = useHealthAnalytics();
+  const { profile } = useProfile();
+  const { data: analytics, loading, error, refetch } = useHealthAnalytics(profile?.id || '', {
+    analysisType: 'comprehensive',
+    useCache: true,
+  });
 
   if (loading) {
     return (
@@ -38,7 +43,7 @@ export default function Analytics() {
       <div className="container mx-auto p-6">
         <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
           <p className="text-lg text-muted-foreground">{error || 'No analytics data available'}</p>
-          <Button onClick={refetch} variant="outline">
+          <Button onClick={() => refetch()} variant="outline">
             <RefreshCw className="h-4 w-4 mr-2" />
             Try Again
           </Button>
@@ -57,7 +62,7 @@ export default function Analytics() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={refetch} variant="outline" size="sm">
+          <Button onClick={() => refetch()} variant="outline" size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
