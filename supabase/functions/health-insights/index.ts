@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { pregnancyWeek, infantAgeMonths, recentConditions, upcomingEvents } = await req.json();
+    const { pregnancyWeek, infantAgeMonths, recentConditions, upcomingEvents, language = 'en' } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -46,7 +46,13 @@ serve(async (req) => {
     if (recentConditions?.length) context.push(`Active conditions: ${recentConditions.join(', ')}`);
     if (upcomingEvents?.length) context.push(`Upcoming: ${upcomingEvents.join(', ')}`);
 
-    const prompt = `Based on Kenya Ministry of Health guidelines, generate 3-4 actionable health insights for:
+    const languageInstruction = language === 'sw' 
+      ? 'IMPORTANT: Respond ONLY in Kiswahili (Swahili language). Use clear, simple Swahili that mothers can understand.'
+      : 'Respond in English.';
+
+    const prompt = `${languageInstruction}
+
+Based on Kenya Ministry of Health guidelines, generate 3-4 actionable health insights for:
 ${context.join('\n')}
 
 Reference Guidelines:

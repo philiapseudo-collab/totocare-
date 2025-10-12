@@ -8,7 +8,7 @@ import { useUpcomingEvents } from "@/hooks/useUpcomingEvents";
 import { useAppTranslation } from "@/hooks/useAppTranslation";
 
 export function AIInsightsPanel() {
-  const { t } = useAppTranslation();
+  const { t, language } = useAppTranslation();
   const { profile, pregnancy } = useProfile();
   const { conditions } = useConditions();
   const { events } = useUpcomingEvents();
@@ -23,7 +23,8 @@ export function AIInsightsPanel() {
             pregnancyWeek: pregnancy?.current_week,
             infantAgeMonths: null, // TODO: Calculate from infant data
             recentConditions: conditions.filter(c => c.is_active).map(c => c.condition_name).slice(0, 3),
-            upcomingEvents: events.slice(0, 3).map(e => e.title)
+            upcomingEvents: events.slice(0, 3).map(e => e.title),
+            language
           }
         });
 
@@ -31,14 +32,17 @@ export function AIInsightsPanel() {
         setInsights(data.insights || []);
       } catch (error) {
         console.error('Failed to fetch insights:', error);
-        setInsights(["Stay hydrated throughout the day", "Track your baby's movements daily", "Get adequate rest when possible"]);
+        const fallbackInsights = language === 'sw' 
+          ? ["Kunywa maji ya kutosha kila siku", "Fuatilia harakati za mtoto wako kila siku", "Pata mapumziko ya kutosha inapowezekana"]
+          : ["Stay hydrated throughout the day", "Track your baby's movements daily", "Get adequate rest when possible"];
+        setInsights(fallbackInsights);
       } finally {
         setLoading(false);
       }
     };
 
     fetchInsights();
-  }, [pregnancy?.current_week, conditions, events]);
+  }, [pregnancy?.current_week, conditions, events, language]);
 
   return (
     <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
