@@ -12,7 +12,7 @@ import {
   LogOut,
   Menu
 } from "lucide-react";
-import leaLogo from "@/assets/lea-baby-logo.png";
+import leaLogo from "@/assets/baby-avatar-logo.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
