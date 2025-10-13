@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bell, Volume2, TestTube, Clock, CheckCircle, XCircle } from "lucide-react";
+import { Bell, Volume2, TestTube, Clock, CheckCircle, XCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { medicationNotificationService } from "@/lib/medicationNotifications";
 import { useMedications } from "@/hooks/useMedications";
 import { format } from "date-fns";
+import BrowserInstructions from "@/components/BrowserInstructions";
 
 const NotificationSettings = () => {
   const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>("default");
@@ -17,12 +18,31 @@ const NotificationSettings = () => {
   }, []);
 
   const requestPermission = async () => {
+    const wasAlreadyDenied = Notification.permission === "denied";
     const granted = await medicationNotificationService.requestNotificationPermission();
-    setPermissionStatus(Notification.permission);
+    const newStatus = Notification.permission;
+    setPermissionStatus(newStatus);
+    
     if (granted) {
       toast.success("✅ Notification permission granted!");
+    } else if (wasAlreadyDenied) {
+      toast.error(`❌ Notifications were previously blocked. Please enable them in ${medicationNotificationService.getBrowserName()} settings.`);
+    } else if (newStatus === "denied") {
+      toast.error("❌ You clicked 'Block'. Please try again and click 'Allow' to enable notifications.");
     } else {
-      toast.error("❌ Notification permission denied");
+      toast.error("❌ Unable to enable notifications");
+    }
+  };
+
+  const checkPermissionStatus = () => {
+    const currentStatus = Notification.permission;
+    setPermissionStatus(currentStatus);
+    if (currentStatus === "granted") {
+      toast.success("✅ Notifications are enabled!");
+    } else if (currentStatus === "denied") {
+      toast.error("❌ Notifications are still blocked");
+    } else {
+      toast.info("⚠️ Notifications not yet enabled");
     }
   };
 
@@ -137,11 +157,16 @@ const NotificationSettings = () => {
             </div>
 
             {permissionStatus === "denied" && (
-              <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
-                <p className="text-sm text-destructive">
-                  ⚠️ Notifications are blocked. Please enable them in your browser settings
-                  to receive medication reminders.
-                </p>
+              <div className="space-y-3">
+                <BrowserInstructions />
+                <Button 
+                  variant="outline" 
+                  onClick={checkPermissionStatus}
+                  className="w-full"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Check Permission Status
+                </Button>
               </div>
             )}
           </CardContent>
