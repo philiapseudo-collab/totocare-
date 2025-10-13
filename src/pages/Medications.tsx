@@ -1,18 +1,29 @@
-import { useState } from "react";
-import { Plus, Bell, Clock, Pill } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, Bell, Clock, Pill, ExternalLink, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useMedications } from "@/hooks/useMedications";
 import { AddMedicationDialog } from "@/components/forms/AddMedicationDialog";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { isEmbeddedContext } from "@/lib/utils";
 
 const Medications = () => {
   const { medications, loading, refetch } = useMedications();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editingMedication, setEditingMedication] = useState<any>(null);
+  const [embedded, setEmbedded] = useState(false);
+
+  useEffect(() => {
+    setEmbedded(isEmbeddedContext());
+  }, []);
+
+  const openInNewTab = () => {
+    window.open(window.location.href, "_blank", "noopener,noreferrer");
+  };
 
   const handleSnooze = async (medicationId: string) => {
     const snoozeUntil = new Date();
@@ -65,6 +76,29 @@ const Medications = () => {
 
   return (
     <div className="p-4 sm:p-6 max-w-6xl mx-auto">
+      {/* Embedded Context Warning */}
+      {embedded && (
+        <Alert className="mb-6 border-orange-500/50 bg-orange-500/10">
+          <AlertCircle className="h-4 w-4 text-orange-500" />
+          <AlertTitle>Limited Functionality in Preview Mode</AlertTitle>
+          <AlertDescription className="space-y-3">
+            <p>
+              Browser notifications are restricted in embedded previews. For full notification support, open this page in a new tab.
+            </p>
+            <div className="flex gap-2">
+              <Button onClick={openInNewTab} variant="outline" size="sm" className="gap-2">
+                <ExternalLink className="h-4 w-4" />
+                Open in New Tab
+              </Button>
+              <Button onClick={() => window.location.href = '/notification-settings'} variant="outline" size="sm" className="gap-2">
+                <Bell className="h-4 w-4" />
+                Notification Settings
+              </Button>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">

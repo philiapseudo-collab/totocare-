@@ -1,23 +1,36 @@
 import { useState, useEffect } from "react";
-import { Bell, Volume2, TestTube, Clock, CheckCircle, XCircle, RefreshCw } from "lucide-react";
+import { Bell, Volume2, TestTube, Clock, CheckCircle, XCircle, RefreshCw, ExternalLink, AlertCircle, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { medicationNotificationService } from "@/lib/medicationNotifications";
 import { useMedications } from "@/hooks/useMedications";
 import { format } from "date-fns";
 import BrowserInstructions from "@/components/BrowserInstructions";
+import { isEmbeddedContext } from "@/lib/utils";
 
 const NotificationSettings = () => {
   const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>("default");
   const { medications } = useMedications();
+  const [embedded, setEmbedded] = useState(false);
+  const [envInfo, setEnvInfo] = useState<any>(null);
 
   useEffect(() => {
-    setPermissionStatus(Notification.permission);
+    if ("Notification" in window) {
+      setPermissionStatus(Notification.permission);
+    }
+    setEmbedded(isEmbeddedContext());
+    setEnvInfo(medicationNotificationService.getEnvironmentInfo());
   }, []);
 
   const requestPermission = async () => {
+    if (embedded) {
+      toast.error("❌ Cannot enable notifications in embedded preview. Please open this page in a new tab.");
+      return;
+    }
+
     const wasAlreadyDenied = Notification.permission === "denied";
     const granted = await medicationNotificationService.requestNotificationPermission();
     const newStatus = Notification.permission;
@@ -32,6 +45,10 @@ const NotificationSettings = () => {
     } else {
       toast.error("❌ Unable to enable notifications");
     }
+  };
+
+  const openInNewTab = () => {
+    window.open(window.location.href, "_blank", "noopener,noreferrer");
   };
 
   const checkPermissionStatus = () => {
@@ -111,6 +128,24 @@ const NotificationSettings = () => {
         </p>
       </div>
 
+      {/* Embedded Context Warning */}
+      {embedded && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Notifications Unavailable in Embedded Preview</AlertTitle>
+          <AlertDescription className="space-y-3">
+            <p>
+              Browser notifications cannot be enabled while viewing this app in an embedded preview (iframe).
+              This is a browser security restriction.
+            </p>
+            <Button onClick={openInNewTab} variant="outline" size="sm" className="gap-2">
+              <ExternalLink className="h-4 w-4" />
+              Open in New Tab
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="grid gap-4">
         {/* Permission Status */}
         <Card>
@@ -149,7 +184,11 @@ const NotificationSettings = () => {
                 </Badge>
               </div>
               {permissionStatus !== "granted" && (
-                <Button onClick={requestPermission}>
+                <Button 
+                  onClick={requestPermission}
+                  disabled={embedded}
+                  title={embedded ? "Cannot enable in embedded preview" : ""}
+                >
                   <Bell className="h-4 w-4 mr-2" />
                   Enable Notifications
                 </Button>
@@ -250,29 +289,55 @@ const NotificationSettings = () => {
           </CardContent>
         </Card>
 
-        {/* System Info */}
+        {/* Diagnostics */}
         <Card>
           <CardHeader>
-            <CardTitle>System Information</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Info className="h-5 w-5" />
+              Diagnostics
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Check Interval:</span>
-              <span className="font-medium">Every 1 minute</span>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Context</p>
+                <Badge variant={embedded ? "destructive" : "default"}>
+                  {embedded ? "Embedded (iframe)" : "Top-level window"}
+                </Badge>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Browser</p>
+                <Badge variant="outline">{envInfo?.browser || "Unknown"}</Badge>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Notification Permission</p>
+                <Badge variant={permissionStatus === "granted" ? "default" : "secondary"}>
+                  {permissionStatus}
+                </Badge>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Notification Support</p>
+                <Badge variant={envInfo?.notificationSupported ? "default" : "destructive"}>
+                  {envInfo?.notificationSupported ? "Supported" : "Not supported"}
+                </Badge>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Notification Window:</span>
-              <span className="font-medium">±5 minutes</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Cooldown Period:</span>
-              <span className="font-medium">1 hour</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Active Medications:</span>
-              <span className="font-medium">
-                {medications?.filter((m: any) => m.notification_enabled).length || 0}
-              </span>
+
+            <div className="pt-4 border-t space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Check Interval:</span>
+                <span className="font-medium">Every 1 minute</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Notification Window:</span>
+                <span className="font-medium">±5 minutes</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Active Medications:</span>
+                <span className="font-medium">
+                  {medications?.filter((m: any) => m.notification_enabled).length || 0}
+                </span>
+              </div>
             </div>
           </CardContent>
         </Card>

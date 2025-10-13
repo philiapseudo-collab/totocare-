@@ -1,4 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
+import { isEmbeddedContext } from "@/lib/utils";
+import { inAppAlertService } from "@/lib/inAppAlerts";
 
 export class MedicationNotificationService {
   private static instance: MedicationNotificationService;
@@ -38,6 +40,12 @@ export class MedicationNotificationService {
       return false;
     }
 
+    // Check if embedded - cannot request permissions in iframe
+    if (isEmbeddedContext()) {
+      console.warn("Cannot request notification permission in embedded context (iframe)");
+      return false;
+    }
+
     if (Notification.permission === "granted") {
       return true;
     }
@@ -50,7 +58,16 @@ export class MedicationNotificationService {
     return false;
   }
 
-  private playAlarmSound() {
+  getEnvironmentInfo() {
+    return {
+      embedded: isEmbeddedContext(),
+      browser: this.getBrowserName(),
+      notificationPermission: "Notification" in window ? Notification.permission : "unavailable",
+      notificationSupported: "Notification" in window,
+    };
+  }
+
+  playAlarmSound() {
     if (!this.audioContext || !this.hasUserInteraction) {
       console.warn("Cannot play alarm sound - waiting for user interaction");
       return;
@@ -103,9 +120,18 @@ export class MedicationNotificationService {
   }
 
   async showNotification(medication: any) {
-    const hasPermission = await this.requestNotificationPermission();
+    const envInfo = this.getEnvironmentInfo();
     
-    if (hasPermission) {
+    // If embedded or no permission, use fallback alert system
+    if (envInfo.embedded || envInfo.notificationPermission !== "granted") {
+      console.log("Using fallback in-app alert system");
+      inAppAlertService.showAlert(medication);
+      this.playAlarmSound();
+      return;
+    }
+
+    // Try to show browser notification
+    try {
       const notification = new Notification("💊 Medication Reminder", {
         body: `Time to take ${medication.medication_name} (${medication.dosage})`,
         icon: "/placeholder.svg",
@@ -125,6 +151,10 @@ export class MedicationNotificationService {
       setTimeout(() => {
         notification.close();
       }, 30000);
+    } catch (error) {
+      console.error("Failed to show notification, using fallback:", error);
+      inAppAlertService.showAlert(medication);
+      this.playAlarmSound();
     }
   }
 

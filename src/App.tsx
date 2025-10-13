@@ -36,6 +36,7 @@ import NotificationSettings from "./pages/NotificationSettings";
 import { useProfile } from "./hooks/useProfile";
 import { useEffect } from "react";
 import { medicationNotificationService } from "./lib/medicationNotifications";
+import { MedicationAlertModal } from "./components/MedicationAlertModal";
 
 const queryClient = new QueryClient();
 
@@ -47,7 +48,8 @@ const AuthenticatedApp = () => {
   // Initialize medication notifications when user is authenticated
   useEffect(() => {
     if (user && profile?.id) {
-      medicationNotificationService.requestNotificationPermission();
+      // Only start monitoring, don't auto-request permission
+      // User will explicitly enable notifications in settings
       medicationNotificationService.startMonitoring(profile.id);
       
       return () => {
@@ -121,6 +123,7 @@ const AuthenticatedApp = () => {
         </Routes>
       </main>
       {user && <QuickActionFAB />}
+      {user && <MedicationAlertModal />}
     </div>
   );
 };
