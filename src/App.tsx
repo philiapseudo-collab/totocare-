@@ -32,6 +32,7 @@ import AddInfant from "./pages/AddInfant";
 import Medications from "./pages/Medications";
 import Donate from "./pages/Donate";
 import Analytics from "./pages/Analytics";
+import NotificationSettings from "./pages/NotificationSettings";
 import { useProfile } from "./hooks/useProfile";
 import { useEffect } from "react";
 import { medicationNotificationService } from "./lib/medicationNotifications";
@@ -108,6 +109,7 @@ const AuthenticatedApp = () => {
           <Route path="/vaccinations" element={<Vaccinations />} />
           <Route path="/conditions" element={<Conditions />} />
           <Route path="/medications" element={<Medications />} />
+          <Route path="/notification-settings" element={<NotificationSettings />} />
           <Route path="/donate" element={<Donate />} />
           <Route path="/guides" element={<Guides />} />
           <Route path="/support" element={<Support />} />

@@ -44,7 +44,9 @@ export const AddMedicationDialog = ({ open, onOpenChange, medication, onSuccess 
     notes: "",
     notification_enabled: true,
   });
-  const [reminderTimes, setReminderTimes] = useState<Array<{ time: string; days: number[] }>>([]);
+  const [reminderTimes, setReminderTimes] = useState<Array<{ time: string; days: number[] }>>([
+    { time: "08:00", days: [1, 2, 3, 4, 5, 6, 7] }
+  ]);
   const [newReminderTime, setNewReminderTime] = useState("");
   const [selectedDays, setSelectedDays] = useState<number[]>([1, 2, 3, 4, 5, 6, 7]);
 
@@ -59,7 +61,9 @@ export const AddMedicationDialog = ({ open, onOpenChange, medication, onSuccess 
         notes: medication.notes || "",
         notification_enabled: medication.notification_enabled ?? true,
       });
-      setReminderTimes(medication.reminder_times || []);
+      setReminderTimes(medication.reminder_times && medication.reminder_times.length > 0 
+        ? medication.reminder_times 
+        : [{ time: "08:00", days: [1, 2, 3, 4, 5, 6, 7] }]);
     } else {
       setFormData({
         medication_name: "",
@@ -70,31 +74,35 @@ export const AddMedicationDialog = ({ open, onOpenChange, medication, onSuccess 
         notes: "",
         notification_enabled: true,
       });
-      setReminderTimes([]);
+      setReminderTimes([{ time: "08:00", days: [1, 2, 3, 4, 5, 6, 7] }]);
     }
   }, [medication]);
 
   const handleAddReminderTime = () => {
-    if (!newReminderTime || selectedDays.length === 0) {
-      toast.error("Please select a time and at least one day");
-      return;
-    }
-
-    setReminderTimes([...reminderTimes, { time: newReminderTime, days: [...selectedDays] }]);
-    setNewReminderTime("");
-    setSelectedDays([1, 2, 3, 4, 5, 6, 7]);
+    setReminderTimes([...reminderTimes, { time: "08:00", days: [1, 2, 3, 4, 5, 6, 7] }]);
   };
 
   const handleRemoveReminderTime = (index: number) => {
-    setReminderTimes(reminderTimes.filter((_, i) => i !== index));
+    if (reminderTimes.length > 1) {
+      setReminderTimes(reminderTimes.filter((_, i) => i !== index));
+    }
   };
 
-  const toggleDay = (day: number) => {
-    if (selectedDays.includes(day)) {
-      setSelectedDays(selectedDays.filter((d) => d !== day));
+  const handleReminderTimeChange = (index: number, time: string) => {
+    const newTimes = [...reminderTimes];
+    newTimes[index] = { ...newTimes[index], time };
+    setReminderTimes(newTimes);
+  };
+
+  const toggleDay = (index: number, day: number) => {
+    const newTimes = [...reminderTimes];
+    const days = newTimes[index].days;
+    if (days.includes(day)) {
+      newTimes[index] = { ...newTimes[index], days: days.filter((d) => d !== day) };
     } else {
-      setSelectedDays([...selectedDays, day].sort());
+      newTimes[index] = { ...newTimes[index], days: [...days, day].sort() };
     }
+    setReminderTimes(newTimes);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -227,64 +235,105 @@ export const AddMedicationDialog = ({ open, onOpenChange, medication, onSuccess 
           </div>
 
           <div className="space-y-3 border rounded-lg p-4">
-            <Label>⏰ Reminder Times</Label>
+            <Label>⏰ Reminder Times *</Label>
+            <p className="text-xs text-muted-foreground mb-2">
+              Set specific times to receive medication reminders
+            </p>
             
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="reminder_time">Time</Label>
-                  <Input
-                    id="reminder_time"
-                    type="time"
-                    value={newReminderTime}
-                    onChange={(e) => setNewReminderTime(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Days</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {DAYS_OF_WEEK.map((day) => (
-                      <Badge
-                        key={day.value}
-                        variant={selectedDays.includes(day.value) ? "default" : "outline"}
-                        className="cursor-pointer"
-                        onClick={() => toggleDay(day.value)}
-                      >
-                        {day.label}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <Button type="button" onClick={handleAddReminderTime} variant="outline" className="w-full">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Reminder Time
+            {/* Quick Presets */}
+            <div className="flex gap-2 mb-3 flex-wrap">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setReminderTimes([
+                    { time: "08:00", days: [1, 2, 3, 4, 5, 6, 7] }
+                  ]);
+                }}
+              >
+                Once Daily
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setReminderTimes([
+                    { time: "08:00", days: [1, 2, 3, 4, 5, 6, 7] },
+                    { time: "20:00", days: [1, 2, 3, 4, 5, 6, 7] }
+                  ]);
+                }}
+              >
+                Twice Daily
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setReminderTimes([
+                    { time: "08:00", days: [1, 2, 3, 4, 5, 6, 7] },
+                    { time: "14:00", days: [1, 2, 3, 4, 5, 6, 7] },
+                    { time: "20:00", days: [1, 2, 3, 4, 5, 6, 7] }
+                  ]);
+                }}
+              >
+                Three Times Daily
               </Button>
             </div>
 
-            {reminderTimes.length > 0 && (
-              <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">Scheduled Reminders:</Label>
-                <div className="space-y-2">
-                  {reminderTimes.map((reminder, index) => (
-                    <div key={index} className="flex items-center justify-between bg-muted p-2 rounded">
-                      <span className="text-sm">
-                        ⏰ {reminder.time} • {reminder.days.length === 7 ? "Daily" : `${reminder.days.length} days/week`}
-                      </span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemoveReminderTime(index)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
+            <div className="space-y-2">
+              {reminderTimes.map((reminder, index) => (
+                <div key={index} className="p-3 border rounded-lg space-y-2 bg-muted/30">
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      type="time"
+                      value={reminder.time}
+                      onChange={(e) => handleReminderTimeChange(index, e.target.value)}
+                      className="flex-1"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveReminderTime(index)}
+                      disabled={reminderTimes.length === 1}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Repeat on:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {DAYS_OF_WEEK.map((day) => (
+                        <Button
+                          key={day.value}
+                          type="button"
+                          variant={reminder.days.includes(day.value) ? "default" : "outline"}
+                          size="sm"
+                          className="h-8 w-10"
+                          onClick={() => toggleDay(index, day.value)}
+                        >
+                          {day.label}
+                        </Button>
+                      ))}
                     </div>
-                  ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAddReminderTime}
+                className="w-full"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Another Time
+              </Button>
+            </div>
           </div>
 
           <div className="flex items-center space-x-2">

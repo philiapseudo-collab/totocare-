@@ -3,12 +3,25 @@ import { supabase } from "@/integrations/supabase/client";
 export class MedicationNotificationService {
   private static instance: MedicationNotificationService;
   private checkInterval: number | null = null;
-  private audio: HTMLAudioElement | null = null;
+  private audioContext: AudioContext | null = null;
+  private hasUserInteraction: boolean = false;
 
   private constructor() {
-    this.audio = new Audio();
-    // Using a simple sine wave tone as alarm sound
-    this.createAlarmSound();
+    // Wait for user interaction before creating audio context
+    this.setupUserInteraction();
+  }
+
+  private setupUserInteraction() {
+    const initAudio = () => {
+      if (!this.hasUserInteraction) {
+        this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        this.hasUserInteraction = true;
+        document.removeEventListener('click', initAudio);
+        document.removeEventListener('touchstart', initAudio);
+      }
+    };
+    document.addEventListener('click', initAudio);
+    document.addEventListener('touchstart', initAudio);
   }
 
   static getInstance(): MedicationNotificationService {
@@ -18,21 +31,6 @@ export class MedicationNotificationService {
     return MedicationNotificationService.instance;
   }
 
-  private createAlarmSound() {
-    // Create a simple alarm tone using Web Audio API
-    const context = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const oscillator = context.createOscillator();
-    const gainNode = context.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(context.destination);
-    
-    oscillator.frequency.value = 800; // 800 Hz tone
-    oscillator.type = 'sine';
-    
-    gainNode.gain.setValueAtTime(0.3, context.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.5);
-  }
 
   async requestNotificationPermission(): Promise<boolean> {
     if (!("Notification" in window)) {
@@ -53,42 +51,46 @@ export class MedicationNotificationService {
   }
 
   private playAlarmSound() {
-    if (this.audio) {
-      try {
-        // Create beeping pattern
-        const context = new (window.AudioContext || (window as any).webkitAudioContext)();
-        const playBeep = () => {
-          const oscillator = context.createOscillator();
-          const gainNode = context.createGain();
-          
-          oscillator.connect(gainNode);
-          gainNode.connect(context.destination);
-          
-          oscillator.frequency.value = 800;
-          oscillator.type = 'sine';
-          
-          gainNode.gain.setValueAtTime(0.3, context.currentTime);
-          gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.3);
-          
-          oscillator.start(context.currentTime);
-          oscillator.stop(context.currentTime + 0.3);
-        };
+    if (!this.audioContext || !this.hasUserInteraction) {
+      console.warn("Cannot play alarm sound - waiting for user interaction");
+      return;
+    }
 
-        // Play 5 beeps
-        for (let i = 0; i < 5; i++) {
-          setTimeout(() => playBeep(), i * 500);
-        }
-      } catch (error) {
-        console.error("Error playing alarm sound:", error);
+    try {
+      const playBeep = (delay: number) => {
+        const oscillator = this.audioContext!.createOscillator();
+        const gainNode = this.audioContext!.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext!.destination);
+        
+        oscillator.frequency.value = 800;
+        oscillator.type = 'sine';
+        
+        const startTime = this.audioContext!.currentTime + delay;
+        gainNode.gain.setValueAtTime(0.5, startTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.3);
+        
+        oscillator.start(startTime);
+        oscillator.stop(startTime + 0.3);
+      };
+
+      // Play 5 beeps with 500ms intervals
+      for (let i = 0; i < 5; i++) {
+        playBeep(i * 0.5);
       }
+    } catch (error) {
+      console.error("Error playing alarm sound:", error);
     }
   }
 
-  private stopAlarmSound() {
-    if (this.audio) {
-      this.audio.pause();
-      this.audio.currentTime = 0;
-    }
+  testAlarmSound() {
+    console.log("Testing alarm sound...");
+    this.playAlarmSound();
+  }
+
+  getPermissionStatus(): NotificationPermission {
+    return Notification.permission;
   }
 
   async showNotification(medication: any) {
@@ -108,27 +110,33 @@ export class MedicationNotificationService {
       notification.onclick = () => {
         window.focus();
         notification.close();
-        this.stopAlarmSound();
       };
 
       // Auto-close after 30 seconds
       setTimeout(() => {
         notification.close();
-        this.stopAlarmSound();
       }, 30000);
     }
   }
 
   async checkDueMedications(profileId: string) {
     try {
+      console.log(`[${new Date().toLocaleTimeString()}] Checking due medications for profile: ${profileId}`);
+      
       const { data, error } = await supabase.rpc("get_due_medication_reminders", {
         user_profile_id: profileId,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching due medications:", error);
+        throw error;
+      }
+
+      console.log(`Found ${data?.length || 0} due medication(s)`);
 
       if (data && data.length > 0) {
         for (const medication of data) {
+          console.log(`Triggering notification for: ${medication.medication_name} at ${medication.reminder_time}`);
           await this.showNotification(medication);
           
           // Update last_notified_at
@@ -158,7 +166,6 @@ export class MedicationNotificationService {
       clearInterval(this.checkInterval);
       this.checkInterval = null;
     }
-    this.stopAlarmSound();
   }
 }
 

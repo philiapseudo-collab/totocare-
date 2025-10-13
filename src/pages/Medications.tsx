@@ -75,10 +75,16 @@ const Medications = () => {
             Manage medications and set reminder times
           </p>
         </div>
-        <Button onClick={() => setAddDialogOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Medication
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => window.location.href = '/notification-settings'}>
+            <Bell className="h-4 w-4 mr-2" />
+            Settings
+          </Button>
+          <Button onClick={() => setAddDialogOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Medication
+          </Button>
+        </div>
       </div>
 
       {medications && medications.length === 0 ? (
