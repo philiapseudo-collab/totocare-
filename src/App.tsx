@@ -13,6 +13,8 @@ import { LanguageProvider } from "@/i18n/LanguageContext";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import DashboardFamilyPlanning from "./pages/DashboardFamilyPlanning";
+import MyCycle from "./pages/MyCycle";
+import CycleOnboarding from "./pages/CycleOnboarding";
 import Onboarding from "./pages/Onboarding";
 import Auth from "./pages/Auth";
 import Vaccinations from "./pages/Vaccinations";
@@ -151,6 +153,8 @@ const AuthenticatedApp = () => {
           <Route path="/checklist-detail" element={<ChecklistDetail />} />
           <Route path="/symptom-checker" element={<SymptomChecker />} />
           <Route path="/medication-alert" element={<MedicationAlert />} />
+          <Route path="/my-cycle" element={<MyCycle />} />
+          <Route path="/cycle-onboarding" element={<CycleOnboarding />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
