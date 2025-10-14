@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useSymptomHistory } from '@/hooks/useSymptomHistory';
 import { Separator } from '@/components/ui/separator';
 import { formatDistanceToNow } from 'date-fns';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,6 +34,7 @@ interface AnalysisResult {
 export default function SymptomChecker() {
   const navigate = useNavigate();
   const [symptom, setSymptom] = useState('');
+  const [patientType, setPatientType] = useState<'pregnancy' | 'breastfeeding' | 'infant'>('pregnancy');
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [showHistory, setShowHistory] = useState(false);
@@ -49,7 +51,7 @@ export default function SymptomChecker() {
 
     try {
       const { data, error } = await supabase.functions.invoke('analyze-symptom', {
-        body: { symptomDescription: symptom }
+        body: { symptomDescription: symptom, patientType }
       });
 
       if (error) throw error;
@@ -108,7 +110,7 @@ export default function SymptomChecker() {
           <div>
             <h1 className="text-3xl font-bold text-foreground">Symptom Checker</h1>
             <p className="text-muted-foreground mt-1">
-              Get guidance on whether your symptoms need medical attention
+              Check symptoms for pregnancy, breastfeeding, or infant care
             </p>
           </div>
           <Button
@@ -137,12 +139,32 @@ export default function SymptomChecker() {
           <CardHeader>
             <CardTitle>Describe Your Symptom</CardTitle>
             <CardDescription>
-              Be as specific as possible. For example: "I have severe headaches with blurred vision" or "Mild nausea in the morning"
+              Be as specific as possible about the symptoms you're experiencing
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Patient Type</label>
+              <Select value={patientType} onValueChange={(value: any) => setPatientType(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pregnancy">During Pregnancy</SelectItem>
+                  <SelectItem value="breastfeeding">While Breastfeeding</SelectItem>
+                  <SelectItem value="infant">For Infant</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
             <Textarea
-              placeholder="Example: I'm experiencing heavy bleeding..."
+              placeholder={
+                patientType === 'pregnancy' 
+                  ? "Example: I'm experiencing heavy bleeding..." 
+                  : patientType === 'breastfeeding'
+                  ? "Example: I have breast pain and fever..."
+                  : "Example: Baby has a high fever and rash..."
+              }
               value={symptom}
               onChange={(e) => setSymptom(e.target.value)}
               className="min-h-[120px]"

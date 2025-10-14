@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { symptomDescription } = await req.json();
+    const { symptomDescription, patientType = 'pregnancy' } = await req.json();
 
     if (!symptomDescription) {
       return new Response(
@@ -25,11 +25,18 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Map patient type to database patient_type values
+    const patientTypeMap: Record<string, string> = {
+      pregnancy: 'pregnant_mother',
+      breastfeeding: 'postpartum_mother',
+      infant: 'infant'
+    };
+
     // Fetch danger signs from database for context
     const { data: dangerSigns } = await supabase
       .from('danger_signs')
       .select('*')
-      .eq('patient_type', 'pregnant_mother')
+      .eq('patient_type', patientTypeMap[patientType] || 'pregnant_mother')
       .order('severity', { ascending: false });
 
     const dangerSignsContext = dangerSigns?.map(sign => 
@@ -42,18 +49,28 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    const systemPrompt = `You are a caring pregnancy health assistant. Your role is to analyze symptoms reported by pregnant mothers and provide guidance based on Kenya Ministry of Health guidelines.
+    const contextMap: Record<string, string> = {
+      pregnancy: 'pregnant mothers',
+      breastfeeding: 'breastfeeding mothers',
+      infant: 'infants'
+    };
+
+    const audienceContext = contextMap[patientType] || 'pregnant mothers';
+
+    const systemPrompt = `You are a caring health assistant. Your role is to analyze symptoms reported for ${audienceContext} and provide guidance based on Kenya Ministry of Health guidelines.
 
 IMPORTANT GUIDELINES:
 - Be calm, caring, and reassuring in your tone
-- Always start by acknowledging the mother's concern
+- Always start by acknowledging the concern
 - Classify symptoms into three categories:
-  * normal: Common pregnancy symptoms that are typically not concerning
+  * normal: Common symptoms that are typically not concerning
   * monitor: Symptoms that should be watched but may not need immediate action
   * urgent: Symptoms that require immediate medical attention
-- Provide clear, actionable advice
+- Provide clear, actionable advice appropriate for ${audienceContext}
 - Always include the disclaimer that this is not a substitute for professional medical advice
 - Reference specific danger signs from the database when relevant
+${patientType === 'infant' ? '- Consider age-appropriate developmental milestones and typical infant concerns' : ''}
+${patientType === 'breastfeeding' ? '- Consider both mother and baby health in your assessment' : ''}
 
 DANGER SIGNS DATABASE (Kenya Ministry of Health):
 ${dangerSignsContext}
@@ -63,7 +80,7 @@ Your response should be in JSON format with these fields:
   "severity_level": "normal" | "monitor" | "urgent",
   "assessment": "Brief, reassuring statement about the symptom",
   "explanation": "Detailed explanation of why this symptom falls into this category",
-  "recommendation": "Clear next steps for the mother"
+  "recommendation": "Clear next steps"
 }`;
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
