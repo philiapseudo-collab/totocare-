@@ -10,7 +10,8 @@ import {
   AlertTriangle,
   Pill,
   Heart,
-  BarChart3
+  BarChart3,
+  Stethoscope
 } from "lucide-react";
 
 import {
@@ -64,6 +65,11 @@ const healthItems = [
     title: "Medications",
     url: "/medications",
     icon: Pill,
+  },
+  {
+    title: "Symptom Checker",
+    url: "/symptom-checker",
+    icon: Stethoscope,
   },
 ];
 

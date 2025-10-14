@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.healthcare-recommendations]
 verify_jwt = true
+
+[functions.analyze-symptom]
+verify_jwt = true

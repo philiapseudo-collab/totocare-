@@ -939,6 +939,39 @@ export type Database = {
           },
         ]
       }
+      symptom_history: {
+        Row: {
+          ai_assessment: string
+          ai_explanation: string | null
+          created_at: string
+          id: string
+          severity_level: string
+          symptom_description: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_assessment: string
+          ai_explanation?: string | null
+          created_at?: string
+          id?: string
+          severity_level: string
+          symptom_description: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_assessment?: string
+          ai_explanation?: string | null
+          created_at?: string
+          id?: string
+          severity_level?: string
+          symptom_description?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

@@ -33,6 +33,7 @@ import Medications from "./pages/Medications";
 import Donate from "./pages/Donate";
 import Analytics from "./pages/Analytics";
 import NotificationSettings from "./pages/NotificationSettings";
+import SymptomChecker from "./pages/SymptomChecker";
 import { useProfile } from "./hooks/useProfile";
 import { useEffect } from "react";
 import { medicationNotificationService } from "./lib/medicationNotifications";
@@ -128,6 +129,7 @@ const AuthenticatedApp = () => {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/about" element={<About />} />
           <Route path="/checklist-detail" element={<ChecklistDetail />} />
+          <Route path="/symptom-checker" element={<SymptomChecker />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
