@@ -8,14 +8,18 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, User } from "lucide-react";
+import { Loader2, User, Baby, Heart, Calendar, RefreshCw } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const { user } = useAuth();
   const { profile, pregnancy, loading: profileLoading } = useProfile();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [showJourneyDialog, setShowJourneyDialog] = useState(false);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -91,6 +95,45 @@ export default function Profile() {
       setLoading(false);
     }
   };
+
+  const handleJourneyChange = async (newJourney: string) => {
+    if (!user || !profile) return;
+    
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ user_journey: newJourney })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Journey updated!",
+        description: "Your dashboard has been switched successfully.",
+      });
+
+      setShowJourneyDialog(false);
+      // Reload to show new dashboard
+      setTimeout(() => navigate('/'), 500);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const journeyOptions = [
+    { value: 'pregnant', label: "I'm Pregnant", icon: Baby, color: 'text-pink-500' },
+    { value: 'infant', label: 'I Have a Baby/Infant', icon: Heart, color: 'text-blue-500' },
+    { value: 'family_planning', label: 'Family Planning & Cycle Tracking', icon: Calendar, color: 'text-purple-500' }
+  ];
+
+  const currentJourney = journeyOptions.find(j => j.value === (profile as any)?.user_journey);
 
   if (profileLoading) {
     return (
@@ -265,6 +308,64 @@ export default function Profile() {
             </form>
           </CardContent>
         </Card>
+
+        {/* Journey Switcher Card */}
+        {currentJourney && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <RefreshCw className="h-5 w-5" />
+                My Journey
+              </CardTitle>
+              <CardDescription>
+                Switch between different health tracking modes
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center gap-3">
+                  <currentJourney.icon className={`h-6 w-6 ${currentJourney.color}`} />
+                  <div>
+                    <p className="font-medium">{currentJourney.label}</p>
+                    <p className="text-sm text-muted-foreground">Current journey</p>
+                  </div>
+                </div>
+                <AlertDialog open={showJourneyDialog} onOpenChange={setShowJourneyDialog}>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      Change Journey
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Change Your Journey</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Switching will show you different features. Your previous data will be saved.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="grid gap-3 py-4">
+                      {journeyOptions.filter(j => j.value !== (profile as any)?.user_journey).map((journey) => (
+                        <Button
+                          key={journey.value}
+                          variant="outline"
+                          className="justify-start h-auto p-4"
+                          onClick={() => handleJourneyChange(journey.value)}
+                          disabled={loading}
+                        >
+                          <journey.icon className={`h-5 w-5 mr-3 ${journey.color}`} />
+                          <span>{journey.label}</span>
+                        </Button>
+                      ))}
+                    </div>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

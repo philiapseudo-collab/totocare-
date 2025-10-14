@@ -12,6 +12,10 @@ import i18n from "@/i18n/config";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import DashboardPregnancy from "./pages/DashboardPregnancy";
+import DashboardInfant from "./pages/DashboardInfant";
+import DashboardFamilyPlanning from "./pages/DashboardFamilyPlanning";
+import Onboarding from "./pages/Onboarding";
 import Auth from "./pages/Auth";
 import Vaccinations from "./pages/Vaccinations";
 import Conditions from "./pages/Conditions";
@@ -47,6 +51,9 @@ const AuthenticatedApp = () => {
   const location = useLocation();
   const { user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
+
+  // Check if user needs onboarding
+  const needsOnboarding = profile && !(profile as any).user_journey;
 
   // Register service worker on mount
   useEffect(() => {
@@ -93,6 +100,11 @@ const AuthenticatedApp = () => {
     );
   }
 
+  // Redirect to onboarding if user hasn't selected a journey yet
+  if (needsOnboarding && location.pathname !== '/onboarding') {
+    return <Navigate to="/onboarding" replace />;
+  }
+
   // Redirect to profile setup only if profile is incomplete AND user is trying to access dashboard
   // Allow access to all other pages even if profile is incomplete
   if (profile && !profile.profile_completed && (location.pathname === '/' || location.pathname === '/dashboard')) {
@@ -109,8 +121,19 @@ const AuthenticatedApp = () => {
       <AppHeader />
       <main className="container mx-auto px-4 py-4 sm:py-6">
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/" element={
+            (profile as any)?.user_journey === 'pregnant' ? <DashboardPregnancy /> :
+            (profile as any)?.user_journey === 'infant' ? <DashboardInfant /> :
+            (profile as any)?.user_journey === 'family_planning' ? <DashboardFamilyPlanning /> :
+            <Dashboard />
+          } />
+          <Route path="/dashboard" element={
+            (profile as any)?.user_journey === 'pregnant' ? <DashboardPregnancy /> :
+            (profile as any)?.user_journey === 'infant' ? <DashboardInfant /> :
+            (profile as any)?.user_journey === 'family_planning' ? <DashboardFamilyPlanning /> :
+            <Dashboard />
+          } />
+          <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/profile-setup" element={<ProfileSetup />} />
           <Route path="/profile" element={<Profile />} />
