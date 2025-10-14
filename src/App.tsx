@@ -37,6 +37,7 @@ import { useProfile } from "./hooks/useProfile";
 import { useEffect } from "react";
 import { medicationNotificationService } from "./lib/medicationNotifications";
 import { MedicationAlertModal } from "./components/MedicationAlertModal";
+import { registerServiceWorker } from "./lib/serviceWorkerRegistration";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,15 @@ const AuthenticatedApp = () => {
   const location = useLocation();
   const { user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
+
+  // Register service worker on mount
+  useEffect(() => {
+    registerServiceWorker().then((registration) => {
+      if (registration) {
+        console.log("[App] Service Worker registered successfully");
+      }
+    });
+  }, []);
 
   // Initialize medication notifications when user is authenticated
   useEffect(() => {
