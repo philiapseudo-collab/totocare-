@@ -44,8 +44,6 @@ export default function DashboardFamilyPlanning() {
     { icon: Droplets, label: 'My Cycle', href: '/my-cycle', color: 'text-pink-600', bg: 'bg-pink-50 dark:bg-pink-950/20' },
     { icon: Activity, label: 'Log Symptoms', href: '/symptom-checker', color: 'text-pink-500', bg: 'bg-pink-50 dark:bg-pink-950/20' },
     { icon: Pill, label: 'Medications', href: '/medications', color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/20' },
-    { icon: TrendingUp, label: 'Health Analytics', href: '/analytics', color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-950/20' },
-    { icon: BookOpen, label: 'Health Guides', href: '/guides', color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-950/20' },
     { icon: Calendar, label: 'Calendar', href: '/profile', color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-950/20' }
   ];
 
