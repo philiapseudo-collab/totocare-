@@ -15,6 +15,7 @@ import Dashboard from "./pages/Dashboard";
 import DashboardFamilyPlanning from "./pages/DashboardFamilyPlanning";
 import MyCycle from "./pages/MyCycle";
 import CycleOnboarding from "./pages/CycleOnboarding";
+import CycleCalendar from "./pages/CycleCalendar";
 import Onboarding from "./pages/Onboarding";
 import Auth from "./pages/Auth";
 import Vaccinations from "./pages/Vaccinations";
@@ -155,6 +156,7 @@ const AuthenticatedApp = () => {
           <Route path="/medication-alert" element={<MedicationAlert />} />
           <Route path="/my-cycle" element={<MyCycle />} />
           <Route path="/cycle-onboarding" element={<CycleOnboarding />} />
+          <Route path="/cycle-calendar" element={<CycleCalendar />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
