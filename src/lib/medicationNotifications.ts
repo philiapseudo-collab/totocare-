@@ -54,12 +54,12 @@ export class MedicationNotificationService {
 
       // Save subscription to database
       const { error } = await supabase
-        .from("push_subscriptions")
+        .from("push_subscriptions" as any)
         .upsert({
           user_id: (await supabase.auth.getUser()).data.user?.id,
           subscription: this.pushSubscription.toJSON(),
           updated_at: new Date().toISOString(),
-        });
+        } as any);
 
       if (error) {
         console.error("Error saving push subscription:", error);
@@ -82,7 +82,7 @@ export class MedicationNotificationService {
         
         // Remove subscription from database
         const { error } = await supabase
-          .from("push_subscriptions")
+          .from("push_subscriptions" as any)
           .delete()
           .eq("user_id", (await supabase.auth.getUser()).data.user?.id);
 

@@ -109,7 +109,7 @@ export async function subscribeToPushNotifications(): Promise<PushSubscription |
     // Subscribe to push notifications
     subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey) as any,
     });
 
     console.log('Subscribed to push notifications:', subscription);
@@ -160,5 +160,5 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   for (let i = 0; i < rawData.length; ++i) {
     outputArray[i] = rawData.charCodeAt(i);
   }
-  return outputArray;
+  return outputArray as any; // Type assertion for compatibility
 }

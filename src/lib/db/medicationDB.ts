@@ -1,64 +1,52 @@
-import { openDB, DBSchema, IDBPDatabase } from 'idb';
+import { openDB, IDBPDatabase } from 'idb';
 
-interface MedicationDBSchema extends DBSchema {
-  medications: {
-    key: string;
-    value: {
-      id: string;
-      patient_id: string;
-      medication_name: string;
-      dosage: string;
-      frequency: string;
-      reminder_times: any[];
-      notification_enabled: boolean;
-      is_active: boolean;
-      start_date: string;
-      end_date: string | null;
-      notes: string | null;
-      snooze_until: string | null;
-      last_notified_at: string | null;
-      created_at: string;
-      updated_at: string;
-    };
-    indexes: { 'by-patient': string; 'by-active': boolean };
-  };
-  medication_actions: {
-    key: number;
-    value: {
-      id?: number;
-      medication_id: string;
-      status: 'taken' | 'skipped' | 'missed' | 'snoozed';
-      timestamp: string;
-      synced: boolean;
-      notes?: string;
-    };
-    indexes: { 'by-synced': boolean; 'by-medication': string };
-  };
-  sync_queue: {
-    key: number;
-    value: {
-      id?: number;
-      type: 'medication' | 'action';
-      operation: 'create' | 'update' | 'delete';
-      data: any;
-      timestamp: string;
-      synced: boolean;
-    };
-    indexes: { 'by-synced': boolean };
-  };
+interface Medication {
+  id: string;
+  patient_id: string;
+  medication_name: string;
+  dosage: string;
+  frequency: string;
+  reminder_times: any[];
+  notification_enabled: boolean;
+  is_active: boolean;
+  start_date: string;
+  end_date: string | null;
+  notes: string | null;
+  snooze_until: string | null;
+  last_notified_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface MedicationAction {
+  id?: number;
+  medication_id: string;
+  status: 'taken' | 'skipped' | 'missed' | 'snoozed';
+  timestamp: string;
+  synced: boolean;
+  notes?: string;
+}
+
+interface SyncQueueItem {
+  id?: number;
+  type: 'medication' | 'action';
+  operation: 'create' | 'update' | 'delete';
+  data: any;
+  timestamp: string;
+  synced: boolean;
 }
 
 const DB_NAME = 'MedicationReminderDB';
 const DB_VERSION = 1;
 
-let dbInstance: IDBPDatabase<MedicationDBSchema> | null = null;
+let dbInstance: IDBPDatabase | null = null;
 
-export async function getMedicationDB(): Promise<IDBPDatabase<MedicationDBSchema>> {
+export async function getMedicationDB(): Promise<IDBPDatabase> {
   if (dbInstance) {
     return dbInstance;
   }
 
-  dbInstance = await openDB<MedicationDBSchema>(DB_NAME, DB_VERSION, {
+  dbInstance = await openDB(DB_NAME, DB_VERSION, {
     upgrade(db, oldVersion, newVersion, transaction) {
       console.log(`Upgrading IndexedDB from version ${oldVersion} to ${newVersion}`);
 
@@ -122,7 +110,8 @@ export async function getMedicationsFromCache(patientId?: string): Promise<any[]
 
 export async function getActiveMedicationsFromCache(): Promise<any[]> {
   const db = await getMedicationDB();
-  return await db.getAllFromIndex('medications', 'by-active', true);
+  const allMeds = await db.getAll('medications');
+  return allMeds.filter(med => med.is_active === true);
 }
 
 export async function getMedicationFromCache(id: string): Promise<any | undefined> {
@@ -148,7 +137,7 @@ export async function logMedicationAction(action: {
   status: 'taken' | 'skipped' | 'missed' | 'snoozed';
   timestamp?: string;
   notes?: string;
-}): Promise<number> {
+}): Promise<any> {
   const db = await getMedicationDB();
   
   const actionRecord = {
@@ -167,10 +156,11 @@ export async function logMedicationAction(action: {
 
 export async function getUnsyncedActions(): Promise<any[]> {
   const db = await getMedicationDB();
-  return await db.getAllFromIndex('medication_actions', 'by-synced', false);
+  const allActions = await db.getAll('medication_actions');
+  return allActions.filter(action => action.synced === false);
 }
 
-export async function markActionAsSynced(id: number): Promise<void> {
+export async function markActionAsSynced(id: any): Promise<void> {
   const db = await getMedicationDB();
   const action = await db.get('medication_actions', id);
   
@@ -191,7 +181,7 @@ export async function addToSyncQueue(item: {
   type: 'medication' | 'action';
   operation: 'create' | 'update' | 'delete';
   data: any;
-}): Promise<number> {
+}): Promise<any> {
   const db = await getMedicationDB();
   
   const queueItem = {
@@ -207,10 +197,11 @@ export async function addToSyncQueue(item: {
 
 export async function getUnsyncedQueueItems(): Promise<any[]> {
   const db = await getMedicationDB();
-  return await db.getAllFromIndex('sync_queue', 'by-synced', false);
+  const allItems = await db.getAll('sync_queue');
+  return allItems.filter(item => item.synced === false);
 }
 
-export async function markQueueItemAsSynced(id: number): Promise<void> {
+export async function markQueueItemAsSynced(id: any): Promise<void> {
   const db = await getMedicationDB();
   const item = await db.get('sync_queue', id);
   
@@ -222,7 +213,8 @@ export async function markQueueItemAsSynced(id: number): Promise<void> {
 
 export async function clearSyncedQueueItems(): Promise<void> {
   const db = await getMedicationDB();
-  const syncedItems = await db.getAllFromIndex('sync_queue', 'by-synced', true);
+  const allItems = await db.getAll('sync_queue');
+  const syncedItems = allItems.filter(item => item.synced === true);
   
   const tx = db.transaction('sync_queue', 'readwrite');
   for (const item of syncedItems) {
