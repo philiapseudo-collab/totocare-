@@ -12,8 +12,8 @@ serve(async (req) => {
   }
 
   try {
-    const { drugName } = await req.json();
-    console.log('Checking drug safety for:', drugName);
+    const { drugName, patientType = 'pregnancy' } = await req.json();
+    console.log('Checking drug safety for:', drugName, 'Patient type:', patientType);
 
     if (!drugName || drugName.trim() === '') {
       return new Response(
@@ -27,11 +27,17 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    const systemPrompt = `You are a medication safety advisor for pregnant mothers. Analyze the drug or substance provided and return information in the following JSON format:
+    const contextMap = {
+      pregnancy: 'pregnant mothers during pregnancy',
+      breastfeeding: 'breastfeeding mothers',
+      infant: 'infants and young children'
+    };
+
+    const systemPrompt = `You are a medication safety advisor for ${contextMap[patientType as keyof typeof contextMap]}. Analyze the drug or substance provided and return information in the following JSON format:
 {
   "category": "Prescription" | "Over-the-counter" | "Substance/abuse",
   "risk_level": "Low risk" | "Moderate caution" | "High risk",
-  "alert_message": "A clear, friendly message about the safety of this drug during pregnancy"
+  "alert_message": "A clear, friendly message about the safety of this drug for ${contextMap[patientType as keyof typeof contextMap]}"
 }
 
 Guidelines:
@@ -39,7 +45,9 @@ Guidelines:
 - Keep messages concise (1-2 sentences)
 - Always recommend consulting a healthcare professional for specific medical advice
 - For substances like alcohol, tobacco, recreational drugs: Always mark as "High risk"
-- For common OTC medications, be specific about trimester concerns
+- For pregnancy: Be specific about trimester concerns
+- For breastfeeding: Consider drug transfer to breast milk
+- For infants: Consider age-appropriate dosing and safety
 - If unsure about a drug, mark as "Moderate caution" and recommend professional consultation`;
 
     const userPrompt = `Analyze this drug/substance for pregnancy safety: ${drugName}`;

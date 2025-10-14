@@ -8,9 +8,11 @@ import { useMedicationAlerts } from "@/hooks/useMedicationAlerts";
 import { Loader2, AlertTriangle, CheckCircle2, AlertCircle, Bookmark, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const MedicationAlert = () => {
   const [drugName, setDrugName] = useState("");
+  const [patientType, setPatientType] = useState<"pregnancy" | "breastfeeding" | "infant">("pregnancy");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{
     category: string;
@@ -28,7 +30,7 @@ const MedicationAlert = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('check-drug-safety', {
-        body: { drugName: drugName.trim() }
+        body: { drugName: drugName.trim(), patientType }
       });
 
       if (error) throw error;
@@ -42,6 +44,7 @@ const MedicationAlert = () => {
         risk_level: data.risk_level,
         alert_message: data.alert_message,
         is_bookmarked: false,
+        patient_type: patientType,
       });
     } catch (error) {
       console.error('Error checking drug safety:', error);
@@ -84,7 +87,7 @@ const MedicationAlert = () => {
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Drug Safety Alert</h1>
         <p className="text-muted-foreground">
-          Check whether a drug or substance may pose a risk during pregnancy
+          Check drug safety for pregnancy, breastfeeding, or infant care
         </p>
       </div>
 
@@ -93,7 +96,7 @@ const MedicationAlert = () => {
         <AlertTriangle className="h-4 w-4 text-amber-600" />
         <AlertDescription className="text-amber-800 dark:text-amber-200">
           <strong>Disclaimer:</strong> Information provided is for awareness purposes only. 
-          Always consult a healthcare professional before taking any medication during pregnancy.
+          Always consult a healthcare professional before taking any medication.
         </AlertDescription>
       </Alert>
 
@@ -106,24 +109,40 @@ const MedicationAlert = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex gap-2">
-            <Input
-              placeholder="e.g., Paracetamol, Ibuprofen, Alcohol"
-              value={drugName}
-              onChange={(e) => setDrugName(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleCheck()}
-              disabled={loading}
-            />
-            <Button onClick={handleCheck} disabled={loading || !drugName.trim()}>
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Checking
-                </>
-              ) : (
-                'Check'
-              )}
-            </Button>
+          <div className="space-y-3">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Patient Type</label>
+              <Select value={patientType} onValueChange={(value: any) => setPatientType(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pregnancy">During Pregnancy</SelectItem>
+                  <SelectItem value="breastfeeding">While Breastfeeding</SelectItem>
+                  <SelectItem value="infant">For Infant</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="flex gap-2">
+              <Input
+                placeholder="e.g., Paracetamol, Ibuprofen, Alcohol"
+                value={drugName}
+                onChange={(e) => setDrugName(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleCheck()}
+                disabled={loading}
+              />
+              <Button onClick={handleCheck} disabled={loading || !drugName.trim()}>
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Checking
+                  </>
+                ) : (
+                  'Check'
+                )}
+              </Button>
+            </div>
           </div>
 
           {/* Result Display */}
@@ -169,10 +188,13 @@ const MedicationAlert = () => {
                   <CardContent className="pt-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
                           <h4 className="font-semibold">{alert.drug_name}</h4>
                           <Badge variant="outline" className="text-xs">{alert.category}</Badge>
                           <Badge variant="secondary" className="text-xs">{alert.risk_level}</Badge>
+                          <Badge variant="outline" className="text-xs capitalize">
+                            {alert.patient_type === "pregnancy" ? "Pregnancy" : alert.patient_type === "breastfeeding" ? "Breastfeeding" : "Infant"}
+                          </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">{alert.alert_message}</p>
                       </div>
@@ -217,10 +239,13 @@ const MedicationAlert = () => {
                   <CardContent className="pt-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
                           <h4 className="font-semibold">{alert.drug_name}</h4>
                           <Badge variant="outline" className="text-xs">{alert.category}</Badge>
                           <Badge variant="secondary" className="text-xs">{alert.risk_level}</Badge>
+                          <Badge variant="outline" className="text-xs capitalize">
+                            {alert.patient_type === "pregnancy" ? "Pregnancy" : alert.patient_type === "breastfeeding" ? "Breastfeeding" : "Infant"}
+                          </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">{alert.alert_message}</p>
                         <p className="text-xs text-muted-foreground mt-2">

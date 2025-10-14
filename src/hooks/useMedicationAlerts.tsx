@@ -10,6 +10,7 @@ export interface MedicationAlert {
   risk_level: string;
   alert_message: string;
   is_bookmarked: boolean;
+  patient_type: string;
   created_at: string;
   updated_at: string;
 }

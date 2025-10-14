@@ -599,6 +599,7 @@ export type Database = {
           drug_name: string
           id: string
           is_bookmarked: boolean | null
+          patient_type: string
           risk_level: string
           updated_at: string
           user_id: string
@@ -610,6 +611,7 @@ export type Database = {
           drug_name: string
           id?: string
           is_bookmarked?: boolean | null
+          patient_type?: string
           risk_level: string
           updated_at?: string
           user_id: string
@@ -621,6 +623,7 @@ export type Database = {
           drug_name?: string
           id?: string
           is_bookmarked?: boolean | null
+          patient_type?: string
           risk_level?: string
           updated_at?: string
           user_id?: string
