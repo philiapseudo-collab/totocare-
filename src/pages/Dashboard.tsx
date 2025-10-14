@@ -11,7 +11,7 @@ import { HealthAnalytics } from "@/components/dashboard/HealthAnalytics";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, CheckSquare, Plus, Calendar, AlertCircle, Activity, Pill, Heart, Stethoscope } from "lucide-react";
+import { BookOpen, CheckSquare, Plus, Calendar, AlertCircle, Activity, Pill, Heart, Stethoscope, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const Dashboard = () => {
@@ -23,11 +23,11 @@ const Dashboard = () => {
     { title: "Journal", icon: BookOpen, path: "/journal", color: "bg-primary", emoji: "📝" },
     { title: "Medications", icon: Pill, path: "/medications", color: "bg-pink-600", emoji: "💊" },
     { title: "Symptom Check", icon: Stethoscope, path: "/symptom-checker", color: "bg-teal-600", emoji: "🩺" },
+    { title: "Drug Safety", icon: Shield, path: "/medication-alert", color: "bg-indigo-600", emoji: "🛡️" },
     { title: "Checklist", icon: CheckSquare, path: "/checklist", color: "bg-green-600", emoji: "✅" },
     { title: "Donate", icon: Heart, path: "/donate", color: "bg-red-600", emoji: "❤️" },
     { title: "Add Entry", icon: Plus, path: "/quick-add", color: "bg-blue-600", emoji: "➕" },
     { title: "Coming Up", icon: Calendar, path: "/upcoming", color: "bg-purple-600", emoji: "📅" },
-    { title: "Health Issues", icon: AlertCircle, path: "/conditions", color: "bg-orange-600", emoji: "🔴" },
   ];
 
   if (isMobile) {
@@ -108,6 +108,25 @@ const Dashboard = () => {
               <div className="pt-2">
                 <span className="inline-flex items-center gap-2 text-teal-600 dark:text-teal-400 font-semibold">
                   Check Symptoms <Stethoscope className="h-4 w-4" />
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Drug Safety Alert Card */}
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 border-2 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/20 dark:to-purple-950/20"
+            onClick={() => navigate('/medication-alert')}
+          >
+            <CardContent className="p-6 text-center space-y-4">
+              <div className="text-6xl mb-2">🛡️</div>
+              <h3 className="font-bold text-xl">Drug Safety Alert</h3>
+              <p className="text-sm text-muted-foreground">
+                Check if a drug is safe during pregnancy
+              </p>
+              <div className="pt-2">
+                <span className="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold">
+                  Check Drug Safety <Shield className="h-4 w-4" />
                 </span>
               </div>
             </CardContent>

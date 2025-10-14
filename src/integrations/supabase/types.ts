@@ -591,6 +591,42 @@ export type Database = {
         }
         Relationships: []
       }
+      medication_alerts: {
+        Row: {
+          alert_message: string
+          category: string
+          created_at: string
+          drug_name: string
+          id: string
+          is_bookmarked: boolean | null
+          risk_level: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alert_message: string
+          category: string
+          created_at?: string
+          drug_name: string
+          id?: string
+          is_bookmarked?: boolean | null
+          risk_level: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alert_message?: string
+          category?: string
+          created_at?: string
+          drug_name?: string
+          id?: string
+          is_bookmarked?: boolean | null
+          risk_level?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       medications: {
         Row: {
           created_at: string

@@ -11,7 +11,8 @@ import {
   Pill,
   Heart,
   BarChart3,
-  Stethoscope
+  Stethoscope,
+  Shield
 } from "lucide-react";
 
 import {
@@ -70,6 +71,11 @@ const healthItems = [
     title: "Symptom Checker",
     url: "/symptom-checker",
     icon: Stethoscope,
+  },
+  {
+    title: "Drug Safety Alert",
+    url: "/medication-alert",
+    icon: Shield,
   },
 ];
 
