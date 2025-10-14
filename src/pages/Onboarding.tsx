@@ -20,6 +20,10 @@ export default function Onboarding() {
     if (!user) return;
     
     setLoading(true);
+    
+    // Navigate immediately for better UX
+    navigate('/');
+    
     try {
       const { data: profile } = await supabase
         .from('profiles')
@@ -29,6 +33,7 @@ export default function Onboarding() {
 
       if (!profile) {
         toast.error('Profile not found');
+        setLoading(false);
         return;
       }
 
@@ -42,11 +47,11 @@ export default function Onboarding() {
 
       if (error) throw error;
 
-      toast.success('Welcome! Your dashboard is ready.');
-      navigate('/');
+      toast.success('Welcome to your personalized dashboard!');
     } catch (error) {
       console.error('Error setting journey:', error);
       toast.error('Failed to set up your journey. Please try again.');
+      navigate('/onboarding');
     } finally {
       setLoading(false);
     }
