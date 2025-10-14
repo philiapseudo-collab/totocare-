@@ -12,9 +12,6 @@ import i18n from "@/i18n/config";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
-import DashboardPregnancy from "./pages/DashboardPregnancy";
-import DashboardInfant from "./pages/DashboardInfant";
-import DashboardFamilyPlanning from "./pages/DashboardFamilyPlanning";
 import Onboarding from "./pages/Onboarding";
 import Auth from "./pages/Auth";
 import Vaccinations from "./pages/Vaccinations";
@@ -121,18 +118,8 @@ const AuthenticatedApp = () => {
       <AppHeader />
       <main className="container mx-auto px-4 py-4 sm:py-6">
         <Routes>
-          <Route path="/" element={
-            (profile as any)?.user_journey === 'pregnant' ? <DashboardPregnancy /> :
-            (profile as any)?.user_journey === 'infant' ? <DashboardInfant /> :
-            (profile as any)?.user_journey === 'family_planning' ? <DashboardFamilyPlanning /> :
-            <Dashboard />
-          } />
-          <Route path="/dashboard" element={
-            (profile as any)?.user_journey === 'pregnant' ? <DashboardPregnancy /> :
-            (profile as any)?.user_journey === 'infant' ? <DashboardInfant /> :
-            (profile as any)?.user_journey === 'family_planning' ? <DashboardFamilyPlanning /> :
-            <Dashboard />
-          } />
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/profile-setup" element={<ProfileSetup />} />
