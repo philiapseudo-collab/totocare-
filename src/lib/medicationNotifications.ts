@@ -182,7 +182,7 @@ export class MedicationNotificationService {
     return "your browser";
   }
 
-  async showNotification(medication: any) {
+  async showNotification(medication: any, isPreNotification: boolean = false) {
     const envInfo = this.getEnvironmentInfo();
     
     // If embedded or no permission, use fallback alert system
@@ -195,12 +195,19 @@ export class MedicationNotificationService {
 
     // Try to show browser notification
     try {
-      const notification = new Notification("💊 Medication Reminder", {
-        body: `Time to take ${medication.medication_name} (${medication.dosage})`,
+      const title = isPreNotification 
+        ? "⏰ Upcoming Medication Reminder" 
+        : "💊 Medication Reminder";
+      const body = isPreNotification
+        ? `Coming up: ${medication.medication_name} (${medication.dosage}) at ${medication.reminder_time}`
+        : `Time to take ${medication.medication_name} (${medication.dosage})`;
+
+      const notification = new Notification(title, {
+        body,
         icon: "/placeholder.svg",
         badge: "/placeholder.svg",
         tag: medication.id,
-        requireInteraction: true,
+        requireInteraction: !isPreNotification, // Pre-notifications don't require interaction
       });
 
       this.playAlarmSound();
@@ -210,10 +217,10 @@ export class MedicationNotificationService {
         notification.close();
       };
 
-      // Auto-close after 30 seconds
+      // Auto-close after 30 seconds for regular, 10 seconds for pre-notifications
       setTimeout(() => {
         notification.close();
-      }, 30000);
+      }, isPreNotification ? 10000 : 30000);
     } catch (error) {
       console.error("Failed to show notification, using fallback:", error);
       inAppAlertService.showAlert(medication);
@@ -238,13 +245,17 @@ export class MedicationNotificationService {
 
       if (data && data.length > 0) {
         for (const medication of data) {
-          console.log(`Triggering notification for: ${medication.medication_name} at ${medication.reminder_time}`);
-          await this.showNotification(medication);
+          const isPreNotification = medication.is_pre_notification || false;
+          const notificationType = isPreNotification ? "pre-notification" : "regular notification";
+          console.log(`Triggering ${notificationType} for: ${medication.medication_name} at ${medication.reminder_time}`);
           
-          // Update last_notified_at
+          await this.showNotification(medication, isPreNotification);
+          
+          // Update the appropriate timestamp based on notification type
+          const updateField = isPreNotification ? 'pre_notified_at' : 'last_notified_at';
           await supabase
             .from("medications")
-            .update({ last_notified_at: new Date().toISOString() })
+            .update({ [updateField]: new Date().toISOString() })
             .eq("id", medication.medication_id);
         }
       }

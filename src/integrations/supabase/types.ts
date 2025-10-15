@@ -644,6 +644,7 @@ export type Database = {
           notification_enabled: boolean | null
           patient_id: string
           pre_notification_minutes: number | null
+          pre_notified_at: string | null
           prescribed_by: string | null
           reminder_sound: string | null
           reminder_times: Json | null
@@ -664,6 +665,7 @@ export type Database = {
           notification_enabled?: boolean | null
           patient_id: string
           pre_notification_minutes?: number | null
+          pre_notified_at?: string | null
           prescribed_by?: string | null
           reminder_sound?: string | null
           reminder_times?: Json | null
@@ -684,6 +686,7 @@ export type Database = {
           notification_enabled?: boolean | null
           patient_id?: string
           pre_notification_minutes?: number | null
+          pre_notified_at?: string | null
           prescribed_by?: string | null
           reminder_sound?: string | null
           reminder_times?: Json | null
@@ -1105,6 +1108,7 @@ export type Database = {
         Args: { user_profile_id: string }
         Returns: {
           dosage: string
+          is_pre_notification: boolean
           medication_id: string
           medication_name: string
           patient_type: string
