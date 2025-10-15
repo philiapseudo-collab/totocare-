@@ -2,15 +2,18 @@ import { useState, useEffect } from "react";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Pill, Bell } from "lucide-react";
+import { Clock, Pill, Bell, ChevronDown } from "lucide-react";
 import { inAppAlertService, type MedicationAlert } from "@/lib/inAppAlerts";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { medicationNotificationService } from "@/lib/medicationNotifications";
+import { logMedicationAction } from "@/lib/db/medicationDB";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export const MedicationAlertModal = () => {
   const [currentAlert, setCurrentAlert] = useState<MedicationAlert | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [isLogging, setIsLogging] = useState(false);
 
   useEffect(() => {
     const handleAlert = (alert: MedicationAlert) => {
@@ -23,42 +26,91 @@ export const MedicationAlertModal = () => {
   }, []);
 
   const handleTakeNow = async () => {
-    if (!currentAlert) return;
+    if (!currentAlert || isLogging) return;
     
-    toast.success("✅ Medication marked as taken");
-    inAppAlertService.dismissAlert(currentAlert.id);
-    setIsOpen(false);
-    setCurrentAlert(null);
-  };
+    setIsLogging(true);
+    try {
+      // Log the action to IndexedDB for tracking
+      await logMedicationAction({
+        medication_id: currentAlert.medicationId,
+        status: 'taken',
+        timestamp: new Date().toISOString(),
+        notes: `Taken at scheduled time: ${currentAlert.reminderTime}`
+      });
 
-  const handleSnooze = async () => {
-    if (!currentAlert) return;
-
-    const snoozeUntil = new Date();
-    snoozeUntil.setMinutes(snoozeUntil.getMinutes() + 10);
-
-    const { error } = await supabase
-      .from("medications")
-      .update({ snooze_until: snoozeUntil.toISOString() })
-      .eq("id", currentAlert.medicationId);
-
-    if (error) {
-      toast.error("Failed to snooze reminder");
-    } else {
-      toast.success("⏰ Reminder snoozed for 10 minutes");
+      toast.success("✅ Medication marked as taken");
       inAppAlertService.dismissAlert(currentAlert.id);
       setIsOpen(false);
       setCurrentAlert(null);
+    } catch (error) {
+      console.error("Error logging medication:", error);
+      toast.error("Failed to log medication, but marked as taken");
+    } finally {
+      setIsLogging(false);
     }
   };
 
-  const handleSkip = () => {
-    if (!currentAlert) return;
+  const handleSnooze = async (minutes: number) => {
+    if (!currentAlert || isLogging) return;
+
+    setIsLogging(true);
+    try {
+      const snoozeUntil = new Date();
+      snoozeUntil.setMinutes(snoozeUntil.getMinutes() + minutes);
+
+      const { error } = await supabase
+        .from("medications")
+        .update({ snooze_until: snoozeUntil.toISOString() })
+        .eq("id", currentAlert.medicationId);
+
+      if (error) {
+        toast.error("Failed to snooze reminder");
+        return;
+      }
+
+      // Log the snooze action
+      await logMedicationAction({
+        medication_id: currentAlert.medicationId,
+        status: 'snoozed',
+        timestamp: new Date().toISOString(),
+        notes: `Snoozed for ${minutes} minutes until ${snoozeUntil.toLocaleTimeString()}`
+      });
+
+      toast.success(`⏰ Reminder snoozed for ${minutes} minutes`);
+      inAppAlertService.dismissAlert(currentAlert.id);
+      setIsOpen(false);
+      setCurrentAlert(null);
+    } catch (error) {
+      console.error("Error snoozing medication:", error);
+      toast.error("Failed to snooze reminder");
+    } finally {
+      setIsLogging(false);
+    }
+  };
+
+  const handleSkip = async () => {
+    if (!currentAlert || isLogging) return;
     
-    toast.info("Medication reminder skipped");
-    inAppAlertService.dismissAlert(currentAlert.id);
-    setIsOpen(false);
-    setCurrentAlert(null);
+    setIsLogging(true);
+    try {
+      // Log the skip action
+      await logMedicationAction({
+        medication_id: currentAlert.medicationId,
+        status: 'skipped',
+        timestamp: new Date().toISOString(),
+        notes: `Skipped scheduled time: ${currentAlert.reminderTime}`
+      });
+
+      toast.info("Medication reminder skipped");
+      inAppAlertService.dismissAlert(currentAlert.id);
+      setIsOpen(false);
+      setCurrentAlert(null);
+    } catch (error) {
+      console.error("Error logging skip:", error);
+      toast.info("Medication reminder skipped");
+    } finally {
+      setIsLogging(false);
+    }
   };
 
   if (!currentAlert) return null;
@@ -105,14 +157,49 @@ export const MedicationAlertModal = () => {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-col sm:flex-col gap-2">
-          <Button onClick={handleTakeNow} className="w-full" size="lg">
+          <Button 
+            onClick={handleTakeNow} 
+            className="w-full" 
+            size="lg"
+            disabled={isLogging}
+          >
             ✅ I Took It
           </Button>
           <div className="flex gap-2 w-full">
-            <Button onClick={handleSnooze} variant="secondary" className="flex-1">
-              ⏰ Snooze 10 min
-            </Button>
-            <Button onClick={handleSkip} variant="outline" className="flex-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="secondary" 
+                  className="flex-1"
+                  disabled={isLogging}
+                >
+                  ⏰ Snooze <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                <DropdownMenuItem onClick={() => handleSnooze(5)}>
+                  5 minutes
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSnooze(10)}>
+                  10 minutes
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSnooze(15)}>
+                  15 minutes
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSnooze(30)}>
+                  30 minutes
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSnooze(60)}>
+                  1 hour
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button 
+              onClick={handleSkip} 
+              variant="outline" 
+              className="flex-1"
+              disabled={isLogging}
+            >
               Skip
             </Button>
           </div>
