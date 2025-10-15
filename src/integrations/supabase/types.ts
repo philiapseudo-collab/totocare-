@@ -643,6 +643,7 @@ export type Database = {
           notes: string | null
           notification_enabled: boolean | null
           patient_id: string
+          pre_notification_minutes: number | null
           prescribed_by: string | null
           reminder_sound: string | null
           reminder_times: Json | null
@@ -662,6 +663,7 @@ export type Database = {
           notes?: string | null
           notification_enabled?: boolean | null
           patient_id: string
+          pre_notification_minutes?: number | null
           prescribed_by?: string | null
           reminder_sound?: string | null
           reminder_times?: Json | null
@@ -681,6 +683,7 @@ export type Database = {
           notes?: string | null
           notification_enabled?: boolean | null
           patient_id?: string
+          pre_notification_minutes?: number | null
           prescribed_by?: string | null
           reminder_sound?: string | null
           reminder_times?: Json | null

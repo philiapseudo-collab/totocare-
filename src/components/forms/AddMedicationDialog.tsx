@@ -8,6 +8,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CalendarIcon, Plus, X } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -43,6 +44,7 @@ export const AddMedicationDialog = ({ open, onOpenChange, medication, onSuccess 
     end_date: null as Date | null,
     notes: "",
     notification_enabled: true,
+    pre_notification_minutes: 0,
   });
   const [reminderTimes, setReminderTimes] = useState<Array<{ time: string; days: number[] }>>([
     { time: "08:00", days: [1, 2, 3, 4, 5, 6, 7] }
@@ -60,6 +62,7 @@ export const AddMedicationDialog = ({ open, onOpenChange, medication, onSuccess 
         end_date: medication.end_date ? new Date(medication.end_date) : null,
         notes: medication.notes || "",
         notification_enabled: medication.notification_enabled ?? true,
+        pre_notification_minutes: medication.pre_notification_minutes || 0,
       });
       setReminderTimes(medication.reminder_times && medication.reminder_times.length > 0 
         ? medication.reminder_times 
@@ -73,6 +76,7 @@ export const AddMedicationDialog = ({ open, onOpenChange, medication, onSuccess 
         end_date: null,
         notes: "",
         notification_enabled: true,
+        pre_notification_minutes: 0,
       });
       setReminderTimes([{ time: "08:00", days: [1, 2, 3, 4, 5, 6, 7] }]);
     }
@@ -344,6 +348,31 @@ export const AddMedicationDialog = ({ open, onOpenChange, medication, onSuccess 
             />
             <Label htmlFor="notifications">🔔 Enable Notifications</Label>
           </div>
+
+          {formData.notification_enabled && (
+            <div className="space-y-2 pl-6">
+              <Label htmlFor="pre-notification">⏰ Remind Me Before</Label>
+              <Select
+                value={formData.pre_notification_minutes.toString()}
+                onValueChange={(value) => setFormData({ ...formData, pre_notification_minutes: parseInt(value) })}
+              >
+                <SelectTrigger id="pre-notification">
+                  <SelectValue placeholder="No early reminder" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">No early reminder</SelectItem>
+                  <SelectItem value="5">5 minutes before</SelectItem>
+                  <SelectItem value="10">10 minutes before</SelectItem>
+                  <SelectItem value="15">15 minutes before</SelectItem>
+                  <SelectItem value="30">30 minutes before</SelectItem>
+                  <SelectItem value="60">1 hour before</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Get an early reminder before your scheduled medication time
+              </p>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="notes">📝 Notes (Optional)</Label>
