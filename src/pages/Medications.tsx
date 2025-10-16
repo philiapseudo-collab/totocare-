@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Bell, Clock, Pill, ExternalLink, AlertCircle } from "lucide-react";
+import { Plus, Bell, Clock, Pill, ExternalLink, AlertCircle, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -110,6 +110,10 @@ const Medications = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={() => window.location.href = '/medication-analytics'}>
+            <BarChart3 className="h-4 w-4 mr-2" />
+            Analytics
+          </Button>
           <Button variant="outline" onClick={() => window.location.href = '/notification-settings'}>
             <Bell className="h-4 w-4 mr-2" />
             Settings

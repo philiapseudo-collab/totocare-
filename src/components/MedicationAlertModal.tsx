@@ -30,7 +30,21 @@ export const MedicationAlertModal = () => {
     
     setIsLogging(true);
     try {
-      // Log the action to IndexedDB for tracking
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      // Log to Supabase for analytics
+      if (user) {
+        await supabase.from('medication_actions').insert({
+          medication_id: currentAlert.medicationId,
+          user_id: user.id,
+          action_type: 'taken',
+          scheduled_time: new Date().toISOString(),
+          action_time: new Date().toISOString(),
+          notes: `Taken at scheduled time: ${currentAlert.reminderTime}`
+        });
+      }
+
+      // Also log to IndexedDB for offline support
       await logMedicationAction({
         medication_id: currentAlert.medicationId,
         status: 'taken',
@@ -68,7 +82,21 @@ export const MedicationAlertModal = () => {
         return;
       }
 
-      // Log the snooze action
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      // Log to Supabase for analytics
+      if (user) {
+        await supabase.from('medication_actions').insert({
+          medication_id: currentAlert.medicationId,
+          user_id: user.id,
+          action_type: 'snoozed',
+          scheduled_time: new Date().toISOString(),
+          action_time: new Date().toISOString(),
+          notes: `Snoozed for ${minutes} minutes until ${snoozeUntil.toLocaleTimeString()}`
+        });
+      }
+
+      // Also log to IndexedDB
       await logMedicationAction({
         medication_id: currentAlert.medicationId,
         status: 'snoozed',
@@ -93,7 +121,21 @@ export const MedicationAlertModal = () => {
     
     setIsLogging(true);
     try {
-      // Log the skip action
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      // Log to Supabase for analytics
+      if (user) {
+        await supabase.from('medication_actions').insert({
+          medication_id: currentAlert.medicationId,
+          user_id: user.id,
+          action_type: 'skipped',
+          scheduled_time: new Date().toISOString(),
+          action_time: new Date().toISOString(),
+          notes: `Skipped scheduled time: ${currentAlert.reminderTime}`
+        });
+      }
+
+      // Also log to IndexedDB
       await logMedicationAction({
         medication_id: currentAlert.medicationId,
         status: 'skipped',

@@ -40,6 +40,7 @@ import Analytics from "./pages/Analytics";
 import NotificationSettings from "./pages/NotificationSettings";
 import SymptomChecker from "./pages/SymptomChecker";
 import MedicationAlert from "./pages/MedicationAlert";
+import MedicationAnalytics from "./pages/MedicationAnalytics";
 import { useProfile } from "./hooks/useProfile";
 import { useEffect } from "react";
 import { medicationNotificationService } from "./lib/medicationNotifications";
@@ -154,6 +155,7 @@ const AuthenticatedApp = () => {
           <Route path="/checklist-detail" element={<ChecklistDetail />} />
           <Route path="/symptom-checker" element={<SymptomChecker />} />
           <Route path="/medication-alert" element={<MedicationAlert />} />
+          <Route path="/medication-analytics" element={<MedicationAnalytics />} />
           <Route path="/my-cycle" element={<MyCycle />} />
           <Route path="/cycle-onboarding" element={<CycleOnboarding />} />
           <Route path="/cycle-calendar" element={<CycleCalendar />} />

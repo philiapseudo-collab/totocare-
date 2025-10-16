@@ -591,6 +591,47 @@ export type Database = {
         }
         Relationships: []
       }
+      medication_actions: {
+        Row: {
+          action_time: string
+          action_type: string
+          created_at: string
+          id: string
+          medication_id: string
+          notes: string | null
+          scheduled_time: string
+          user_id: string
+        }
+        Insert: {
+          action_time?: string
+          action_type: string
+          created_at?: string
+          id?: string
+          medication_id: string
+          notes?: string | null
+          scheduled_time: string
+          user_id: string
+        }
+        Update: {
+          action_time?: string
+          action_type?: string
+          created_at?: string
+          id?: string
+          medication_id?: string
+          notes?: string | null
+          scheduled_time?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medication_actions_medication_id_fkey"
+            columns: ["medication_id"]
+            isOneToOne: false
+            referencedRelation: "medications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       medication_alerts: {
         Row: {
           alert_message: string
