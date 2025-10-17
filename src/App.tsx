@@ -1,7 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AppHeader } from "@/components/AppHeader";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
@@ -55,17 +54,7 @@ const SymptomChecker = lazy(() => import("./pages/SymptomChecker"));
 const MedicationAlert = lazy(() => import("./pages/MedicationAlert"));
 const MedicationAnalytics = lazy(() => import("./pages/MedicationAnalytics"));
 
-// Query client for the app
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000,
-      gcTime: 10 * 60 * 1000,
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+// QueryClient is provided in main.tsx, no need to create it here
 
 const AuthenticatedApp = () => {
   const location = useLocation();
@@ -205,19 +194,17 @@ const AuthenticatedApp = () => {
 const App = () => (
   <I18nextProvider i18n={i18n}>
     <LanguageProvider>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <ThemeProvider defaultTheme="system" storageKey="lea-maternease-ui-theme">
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <AuthenticatedApp />
-              </BrowserRouter>
-            </TooltipProvider>
-          </ThemeProvider>
-        </AuthProvider>
-      </QueryClientProvider>
+      <AuthProvider>
+        <ThemeProvider defaultTheme="system" storageKey="lea-maternease-ui-theme">
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AuthenticatedApp />
+            </BrowserRouter>
+          </TooltipProvider>
+        </ThemeProvider>
+      </AuthProvider>
     </LanguageProvider>
   </I18nextProvider>
 );
