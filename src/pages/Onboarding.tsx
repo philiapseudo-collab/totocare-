@@ -21,9 +21,6 @@ export default function Onboarding() {
     
     setLoading(true);
     
-    // Navigate immediately for better UX
-    navigate('/');
-    
     try {
       const { data: profile } = await supabase
         .from('profiles')
@@ -48,10 +45,12 @@ export default function Onboarding() {
       if (error) throw error;
 
       toast.success('Welcome to your personalized dashboard!');
+      
+      // Navigate AFTER successful database update
+      navigate('/');
     } catch (error) {
       console.error('Error setting journey:', error);
       toast.error('Failed to set up your journey. Please try again.');
-      navigate('/onboarding');
     } finally {
       setLoading(false);
     }
