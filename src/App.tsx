@@ -17,6 +17,10 @@ import { MedicationAlertModal } from "./components/MedicationAlertModal";
 import { registerServiceWorker } from "./lib/serviceWorkerRegistration";
 import { PageLoader } from "@/components/PageLoader";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { SmartBackButton } from "@/components/SmartBackButton";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { PullToRefresh } from "@/components/PullToRefresh";
 
 // Lazy load all pages
 const Index = lazy(() => import("./pages/Index"));
@@ -128,11 +132,16 @@ const AuthenticatedApp = () => {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-background">
-        <AppHeader />
-        <main className="container mx-auto px-4 py-4 sm:py-6">
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
+      <PullToRefresh>
+        <div className="min-h-screen bg-background pb-20 md:pb-6">
+          <AppHeader />
+          <main className="container mx-auto px-4 py-4 sm:py-6">
+            <div className="flex items-center gap-2 mb-4">
+              <SmartBackButton />
+            </div>
+            <Breadcrumbs />
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
               <Route path="/" element={
                 (profile as any)?.user_journey === 'family_planning' 
                   ? <DashboardFamilyPlanning /> 
@@ -172,11 +181,13 @@ const AuthenticatedApp = () => {
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </Suspense>
-        </main>
-        {user && <QuickActionFAB />}
-        {user && <MedicationAlertModal />}
-      </div>
+            </Suspense>
+          </main>
+          {user && <QuickActionFAB />}
+          {user && <MedicationAlertModal />}
+          <MobileBottomNav />
+        </div>
+      </PullToRefresh>
     </ErrorBoundary>
   );
 };
