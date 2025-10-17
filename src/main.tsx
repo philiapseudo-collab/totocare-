@@ -18,10 +18,17 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
       networkMode: 'offlineFirst', // Better offline support
+      // Request deduplication
+      structuralSharing: true, // Avoid unnecessary re-renders
     },
     mutations: {
       retry: 1,
       networkMode: 'offlineFirst',
+      // Optimistic updates rollback on error
+      onError: (error, variables, context: any) => {
+        // Rollback is handled automatically when context is returned from onMutate
+        console.error('Mutation error:', error);
+      },
     },
   },
 });

@@ -55,7 +55,17 @@ const SymptomChecker = lazy(() => import("./pages/SymptomChecker"));
 const MedicationAlert = lazy(() => import("./pages/MedicationAlert"));
 const MedicationAnalytics = lazy(() => import("./pages/MedicationAnalytics"));
 
-const queryClient = new QueryClient();
+// Query client for the app
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const AuthenticatedApp = () => {
   const location = useLocation();

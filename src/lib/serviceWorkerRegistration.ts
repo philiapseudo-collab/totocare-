@@ -7,11 +7,21 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
   }
 
   try {
-    const registration = await navigator.serviceWorker.register('/sw.js', {
-      scope: '/',
-    });
-
-    console.log('Service Worker registered successfully:', registration);
+    // Try to register enhanced service worker first
+    let registration;
+    try {
+      registration = await navigator.serviceWorker.register('/sw-enhanced.js', {
+        scope: '/',
+      });
+      console.log('[ServiceWorker] Enhanced SW registered with scope:', registration.scope);
+    } catch (error) {
+      // Fallback to basic service worker
+      console.warn('[ServiceWorker] Enhanced SW failed, using basic SW');
+      registration = await navigator.serviceWorker.register('/sw.js', {
+        scope: '/',
+      });
+      console.log('[ServiceWorker] Basic SW registered with scope:', registration.scope);
+    }
 
     // Handle updates
     registration.addEventListener('updatefound', () => {
@@ -21,15 +31,28 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
       newWorker.addEventListener('statechange', () => {
         if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
           // New service worker available, prompt user to reload
-          console.log('New Service Worker available, reloading...');
-          newWorker.postMessage({ type: 'SKIP_WAITING' });
-          window.location.reload();
+          console.log('New Service Worker available');
+          if (window.confirm('New version available! Reload to update?')) {
+            newWorker.postMessage({ type: 'SKIP_WAITING' });
+            window.location.reload();
+          }
         }
       });
     });
 
     // Listen for messages from service worker
     navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+    
+    // Check for updates periodically
+    setInterval(() => {
+      registration.update();
+    }, 60 * 60 * 1000); // Check every hour
+    
+    // Request persistent storage
+    if (navigator.storage && navigator.storage.persist) {
+      const isPersisted = await navigator.storage.persist();
+      console.log(`[ServiceWorker] Persistent storage: ${isPersisted}`);
+    }
 
     return registration;
   } catch (error) {
