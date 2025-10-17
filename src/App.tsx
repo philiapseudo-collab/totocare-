@@ -10,42 +10,46 @@ import { QuickActionFAB } from "@/components/QuickActionFAB";
 import { I18nextProvider } from "react-i18next";
 import i18n from "@/i18n/config";
 import { LanguageProvider } from "@/i18n/LanguageContext";
-import Index from "./pages/Index";
-import Dashboard from "./pages/Dashboard";
-import DashboardFamilyPlanning from "./pages/DashboardFamilyPlanning";
-import MyCycle from "./pages/MyCycle";
-import CycleOnboarding from "./pages/CycleOnboarding";
-import CycleCalendar from "./pages/CycleCalendar";
-import Onboarding from "./pages/Onboarding";
-import Auth from "./pages/Auth";
-import Vaccinations from "./pages/Vaccinations";
-import Conditions from "./pages/Conditions";
-import Journal from "./pages/Journal";
-import Guides from "./pages/Guides";
-import Support from "./pages/Support";
-import FAQ from "./pages/FAQ";
-import About from "./pages/About";
-import ChecklistDetail from "./pages/ChecklistDetail";
-import NotFound from "./pages/NotFound";
-import ProfileSetup from "./pages/ProfileSetup";
-import Profile from "./pages/Profile";
-import Checklist from "./pages/Checklist";
-import QuickAdd from "./pages/QuickAdd";
-import Upcoming from "./pages/Upcoming";
-import RecentActivityPage from "./pages/RecentActivity";
-import AddInfant from "./pages/AddInfant";
-import Medications from "./pages/Medications";
-import Donate from "./pages/Donate";
-import Analytics from "./pages/Analytics";
-import NotificationSettings from "./pages/NotificationSettings";
-import SymptomChecker from "./pages/SymptomChecker";
-import MedicationAlert from "./pages/MedicationAlert";
-import MedicationAnalytics from "./pages/MedicationAnalytics";
 import { useProfile } from "./hooks/useProfile";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { medicationNotificationService } from "./lib/medicationNotifications";
 import { MedicationAlertModal } from "./components/MedicationAlertModal";
 import { registerServiceWorker } from "./lib/serviceWorkerRegistration";
+import { PageLoader } from "@/components/PageLoader";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+
+// Lazy load all pages
+const Index = lazy(() => import("./pages/Index"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const DashboardFamilyPlanning = lazy(() => import("./pages/DashboardFamilyPlanning"));
+const MyCycle = lazy(() => import("./pages/MyCycle"));
+const CycleOnboarding = lazy(() => import("./pages/CycleOnboarding"));
+const CycleCalendar = lazy(() => import("./pages/CycleCalendar"));
+const Onboarding = lazy(() => import("./pages/Onboarding"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Vaccinations = lazy(() => import("./pages/Vaccinations"));
+const Conditions = lazy(() => import("./pages/Conditions"));
+const Journal = lazy(() => import("./pages/Journal"));
+const Guides = lazy(() => import("./pages/Guides"));
+const Support = lazy(() => import("./pages/Support"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const About = lazy(() => import("./pages/About"));
+const ChecklistDetail = lazy(() => import("./pages/ChecklistDetail"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const ProfileSetup = lazy(() => import("./pages/ProfileSetup"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Checklist = lazy(() => import("./pages/Checklist"));
+const QuickAdd = lazy(() => import("./pages/QuickAdd"));
+const Upcoming = lazy(() => import("./pages/Upcoming"));
+const RecentActivityPage = lazy(() => import("./pages/RecentActivity"));
+const AddInfant = lazy(() => import("./pages/AddInfant"));
+const Medications = lazy(() => import("./pages/Medications"));
+const Donate = lazy(() => import("./pages/Donate"));
+const Analytics = lazy(() => import("./pages/Analytics"));
+const NotificationSettings = lazy(() => import("./pages/NotificationSettings"));
+const SymptomChecker = lazy(() => import("./pages/SymptomChecker"));
+const MedicationAlert = lazy(() => import("./pages/MedicationAlert"));
+const MedicationAnalytics = lazy(() => import("./pages/MedicationAnalytics"));
 
 const queryClient = new QueryClient();
 
@@ -89,16 +93,20 @@ const AuthenticatedApp = () => {
 
   if (!user) {
     return (
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/guides" element={<Guides />} />
-        <Route path="/support" element={<Support />} />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/donate" element={<Donate />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <ErrorBoundary>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/guides" element={<Guides />} />
+            <Route path="/support" element={<Support />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/donate" element={<Donate />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 
@@ -119,53 +127,57 @@ const AuthenticatedApp = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader />
-      <main className="container mx-auto px-4 py-4 sm:py-6">
-        <Routes>
-          <Route path="/" element={
-            (profile as any)?.user_journey === 'family_planning' 
-              ? <DashboardFamilyPlanning /> 
-              : <Dashboard />
-          } />
-          <Route path="/dashboard" element={
-            (profile as any)?.user_journey === 'family_planning' 
-              ? <DashboardFamilyPlanning /> 
-              : <Dashboard />
-          } />
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/profile-setup" element={<ProfileSetup />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/journal" element={<Journal />} />
-          <Route path="/checklist" element={<Checklist />} />
-          <Route path="/quick-add" element={<QuickAdd />} />
-          <Route path="/upcoming" element={<Upcoming />} />
-          <Route path="/recent-activity" element={<RecentActivityPage />} />
-          <Route path="/add-infant" element={<AddInfant />} />
-          <Route path="/vaccinations" element={<Vaccinations />} />
-          <Route path="/conditions" element={<Conditions />} />
-          <Route path="/medications" element={<Medications />} />
-          <Route path="/notification-settings" element={<NotificationSettings />} />
-          <Route path="/donate" element={<Donate />} />
-          <Route path="/guides" element={<Guides />} />
-          <Route path="/support" element={<Support />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/checklist-detail" element={<ChecklistDetail />} />
-          <Route path="/symptom-checker" element={<SymptomChecker />} />
-          <Route path="/medication-alert" element={<MedicationAlert />} />
-          <Route path="/medication-analytics" element={<MedicationAnalytics />} />
-          <Route path="/my-cycle" element={<MyCycle />} />
-          <Route path="/cycle-onboarding" element={<CycleOnboarding />} />
-          <Route path="/cycle-calendar" element={<CycleCalendar />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
-      {user && <QuickActionFAB />}
-      {user && <MedicationAlertModal />}
-    </div>
+    <ErrorBoundary>
+      <div className="min-h-screen bg-background">
+        <AppHeader />
+        <main className="container mx-auto px-4 py-4 sm:py-6">
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={
+                (profile as any)?.user_journey === 'family_planning' 
+                  ? <DashboardFamilyPlanning /> 
+                  : <Dashboard />
+              } />
+              <Route path="/dashboard" element={
+                (profile as any)?.user_journey === 'family_planning' 
+                  ? <DashboardFamilyPlanning /> 
+                  : <Dashboard />
+              } />
+              <Route path="/onboarding" element={<Onboarding />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/profile-setup" element={<ProfileSetup />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/journal" element={<Journal />} />
+              <Route path="/checklist" element={<Checklist />} />
+              <Route path="/quick-add" element={<QuickAdd />} />
+              <Route path="/upcoming" element={<Upcoming />} />
+              <Route path="/recent-activity" element={<RecentActivityPage />} />
+              <Route path="/add-infant" element={<AddInfant />} />
+              <Route path="/vaccinations" element={<Vaccinations />} />
+              <Route path="/conditions" element={<Conditions />} />
+              <Route path="/medications" element={<Medications />} />
+              <Route path="/notification-settings" element={<NotificationSettings />} />
+              <Route path="/donate" element={<Donate />} />
+              <Route path="/guides" element={<Guides />} />
+              <Route path="/support" element={<Support />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/checklist-detail" element={<ChecklistDetail />} />
+              <Route path="/symptom-checker" element={<SymptomChecker />} />
+              <Route path="/medication-alert" element={<MedicationAlert />} />
+              <Route path="/medication-analytics" element={<MedicationAnalytics />} />
+              <Route path="/my-cycle" element={<MyCycle />} />
+              <Route path="/cycle-onboarding" element={<CycleOnboarding />} />
+              <Route path="/cycle-calendar" element={<CycleCalendar />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </main>
+        {user && <QuickActionFAB />}
+        {user && <MedicationAlertModal />}
+      </div>
+    </ErrorBoundary>
   );
 };
 
