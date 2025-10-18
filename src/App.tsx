@@ -1,7 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AppHeader } from "@/components/AppHeader";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -20,6 +19,7 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { NetworkStatus } from "@/components/NetworkStatus";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 // Lazy load all pages
 const Index = lazy(() => import("./pages/Index"));
@@ -202,9 +202,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
-            <AuthenticatedApp />
-          </BrowserRouter>
+          <AuthenticatedApp />
         </TooltipProvider>
       </ThemeProvider>
     </AuthProvider>
