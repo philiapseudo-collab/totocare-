@@ -6,8 +6,6 @@ import { AppHeader } from "@/components/AppHeader";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { QuickActionFAB } from "@/components/QuickActionFAB";
-import { I18nextProvider } from "react-i18next";
-import i18n from "@/i18n/config";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import { useProfile } from "./hooks/useProfile";
 import { useEffect, lazy, Suspense } from "react";
@@ -197,22 +195,20 @@ const AuthenticatedApp = () => {
 };
 
 const App = () => (
-  <I18nextProvider i18n={i18n}>
-    <LanguageProvider>
-      <AuthProvider>
-        <ThemeProvider defaultTheme="system" storageKey="lea-maternease-ui-theme">
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <NetworkStatus />
-            <BrowserRouter>
-              <AuthenticatedApp />
-            </BrowserRouter>
-          </TooltipProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    </LanguageProvider>
-  </I18nextProvider>
+  <LanguageProvider>
+    <AuthProvider>
+      <ThemeProvider defaultTheme="system" storageKey="lea-maternease-ui-theme">
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <NetworkStatus />
+          <BrowserRouter>
+            <AuthenticatedApp />
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
+    </AuthProvider>
+  </LanguageProvider>
 );
 
 export default App;
