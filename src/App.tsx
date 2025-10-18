@@ -20,6 +20,8 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { SmartBackButton } from "@/components/SmartBackButton";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { PullToRefresh } from "@/components/PullToRefresh";
+import { NetworkStatus } from "@/components/NetworkStatus";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 // Lazy load all pages
 const Index = lazy(() => import("./pages/Index"));
@@ -60,6 +62,9 @@ const AuthenticatedApp = () => {
   const location = useLocation();
   const { user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
+  
+  // Enable keyboard shortcuts
+  useKeyboardShortcuts();
 
   // Check if user needs onboarding
   const needsOnboarding = profile && !(profile as any).user_journey;
@@ -199,6 +204,7 @@ const App = () => (
           <TooltipProvider>
             <Toaster />
             <Sonner />
+            <NetworkStatus />
             <BrowserRouter>
               <AuthenticatedApp />
             </BrowserRouter>
