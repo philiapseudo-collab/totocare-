@@ -134,6 +134,7 @@ const AuthenticatedApp = () => {
 
   return (
     <ErrorBoundary>
+      <NetworkStatus />
       <PullToRefresh>
         <div className="min-h-screen bg-background pb-20 md:pb-6">
           <AppHeader />
@@ -201,7 +202,6 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <NetworkStatus />
           <BrowserRouter>
             <AuthenticatedApp />
           </BrowserRouter>
