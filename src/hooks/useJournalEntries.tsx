@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
+import { queryKeys } from '@/lib/queryKeys';
 
 export interface JournalEntry {
   id: string;
@@ -17,17 +18,15 @@ export interface JournalEntry {
 
 const PAGE_SIZE = 20;
 
-export const useJournalEntries = (page: number = 0) => {
+export const useJournalEntries = (userId?: string, page: number = 0) => {
   const { user } = useAuth();
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [hasMore, setHasMore] = useState(true);
-  const [totalCount, setTotalCount] = useState(0);
+  const queryClient = useQueryClient();
 
-  const fetchEntries = async () => {
-    if (!user) return;
-    
-    try {
+  const { data, isLoading, error } = useQuery({
+    queryKey: queryKeys.journal.list(userId || user?.id || ''),
+    queryFn: async () => {
+      if (!user) throw new Error('Not authenticated');
+      
       const from = page * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
 
@@ -35,8 +34,6 @@ export const useJournalEntries = (page: number = 0) => {
       const { count } = await supabase
         .from('journal_entries')
         .select('*', { count: 'exact', head: true });
-
-      setTotalCount(count || 0);
 
       // Fetch page data with only required columns
       const { data, error } = await supabase
@@ -47,51 +44,55 @@ export const useJournalEntries = (page: number = 0) => {
 
       if (error) throw error;
       
-      setEntries(data || []);
-      setHasMore((data?.length || 0) === PAGE_SIZE);
-    } catch (error: any) {
-      toast.error('Failed to load journal entries');
-      console.error('Error fetching entries:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return {
+        entries: data || [],
+        hasMore: (data?.length || 0) === PAGE_SIZE,
+        totalCount: count || 0,
+      };
+    },
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
 
-  const addEntry = async (entry: Omit<JournalEntry, 'id' | 'created_at' | 'updated_at' | 'user_id'>) => {
-    if (!user) {
-      toast.error('You must be logged in to add entries');
-      return;
-    }
+  const addEntry = useMutation({
+    mutationFn: async (entry: Omit<JournalEntry, 'id' | 'created_at' | 'updated_at'>) => {
+      if (!user) throw new Error('Not authenticated');
 
-    try {
       const { data, error } = await supabase
         .from('journal_entries')
-        .insert([{
-          user_id: user.id,
-          ...entry
-        }])
+        .insert([{ ...entry, user_id: user.id }])
         .select()
         .single();
 
       if (error) throw error;
-      
-      setEntries(prev => [data, ...prev]);
-      toast.success('Entry added successfully');
       return data;
-    } catch (error: any) {
+    },
+    onMutate: async (newEntry) => {
+      const queryKey = queryKeys.journal.list(userId || user?.id || '');
+      await queryClient.cancelQueries({ queryKey });
+      const previousData = queryClient.getQueryData(queryKey);
+
+      queryClient.setQueryData(queryKey, (old: any) => ({
+        ...old,
+        entries: [{ ...newEntry, id: 'temp-id', created_at: new Date().toISOString(), updated_at: new Date().toISOString() }, ...(old?.entries || [])],
+      }));
+
+      return { previousData };
+    },
+    onError: (err, newEntry, context) => {
+      queryClient.setQueryData(queryKeys.journal.list(userId || user?.id || ''), context?.previousData);
       toast.error('Failed to add entry');
-      console.error('Error adding entry:', error);
-      throw error;
-    }
-  };
+    },
+    onSuccess: () => {
+      toast.success('Entry added successfully');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.journal.list(userId || user?.id || '') });
+    },
+  });
 
-  const updateEntry = async (id: string, updates: Partial<Omit<JournalEntry, 'id' | 'created_at' | 'updated_at' | 'user_id'>>) => {
-    if (!user) {
-      toast.error('You must be logged in to update entries');
-      return;
-    }
-
-    try {
+  const updateEntry = useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Omit<JournalEntry, 'id' | 'created_at' | 'updated_at'>> }) => {
       const { data, error } = await supabase
         .from('journal_entries')
         .update(updates)
@@ -100,52 +101,94 @@ export const useJournalEntries = (page: number = 0) => {
         .single();
 
       if (error) throw error;
-      
-      setEntries(prev => prev.map(entry => entry.id === id ? data : entry));
-      toast.success('Entry updated successfully');
       return data;
-    } catch (error: any) {
+    },
+    onMutate: async ({ id, updates }) => {
+      const queryKey = queryKeys.journal.list(userId || user?.id || '');
+      await queryClient.cancelQueries({ queryKey });
+      const previousData = queryClient.getQueryData(queryKey);
+
+      queryClient.setQueryData(queryKey, (old: any) => ({
+        ...old,
+        entries: old?.entries?.map((e: JournalEntry) => 
+          e.id === id ? { ...e, ...updates } : e
+        ) || [],
+      }));
+
+      return { previousData };
+    },
+    onError: (err, variables, context) => {
+      queryClient.setQueryData(queryKeys.journal.list(userId || user?.id || ''), context?.previousData);
       toast.error('Failed to update entry');
-      console.error('Error updating entry:', error);
-      throw error;
-    }
-  };
+    },
+    onSuccess: () => {
+      toast.success('Entry updated successfully');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.journal.list(userId || user?.id || '') });
+    },
+  });
 
-  const deleteEntry = async (id: string) => {
-    if (!user) {
-      toast.error('You must be logged in to delete entries');
-      return;
-    }
-
-    try {
+  const deleteEntry = useMutation({
+    mutationFn: async (id: string) => {
       const { error } = await supabase
         .from('journal_entries')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
-      
-      setEntries(prev => prev.filter(entry => entry.id !== id));
-      toast.success('Entry deleted successfully');
-    } catch (error: any) {
-      toast.error('Failed to delete entry');
-      console.error('Error deleting entry:', error);
-      throw error;
-    }
-  };
+    },
+    onMutate: async (id) => {
+      const queryKey = queryKeys.journal.list(userId || user?.id || '');
+      await queryClient.cancelQueries({ queryKey });
+      const previousData = queryClient.getQueryData(queryKey);
 
-  useEffect(() => {
-    fetchEntries();
-  }, [user, page]);
+      queryClient.setQueryData(queryKey, (old: any) => ({
+        ...old,
+        entries: old?.entries?.filter((e: JournalEntry) => e.id !== id) || [],
+      }));
+
+      return { previousData };
+    },
+    onError: (err, id, context) => {
+      queryClient.setQueryData(queryKeys.journal.list(userId || user?.id || ''), context?.previousData);
+      toast.error('Failed to delete entry');
+    },
+    onSuccess: () => {
+      toast.success('Entry deleted successfully');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.journal.list(userId || user?.id || '') });
+    },
+  });
 
   return { 
-    entries, 
-    loading, 
-    hasMore, 
-    totalCount,
-    addEntry, 
-    updateEntry, 
-    deleteEntry, 
-    refetch: fetchEntries 
+    entries: data?.entries || [],
+    loading: isLoading,
+    hasMore: data?.hasMore || false,
+    totalCount: data?.totalCount || 0,
+    error,
+    addEntry: (entry: Omit<JournalEntry, 'id' | 'created_at' | 'updated_at'>) => 
+      new Promise((resolve, reject) => {
+        addEntry.mutate(entry, {
+          onSuccess: resolve,
+          onError: reject,
+        });
+      }),
+    updateEntry: async (id: string, updates: Partial<Omit<JournalEntry, 'id' | 'created_at' | 'updated_at'>>) => 
+      new Promise((resolve, reject) => {
+        updateEntry.mutate({ id, updates }, {
+          onSuccess: resolve,
+          onError: reject,
+        });
+      }),
+    deleteEntry: async (id: string) => 
+      new Promise<void>((resolve, reject) => {
+        deleteEntry.mutate(id, {
+          onSuccess: () => resolve(),
+          onError: reject,
+        });
+      }),
+    refetch: () => queryClient.invalidateQueries({ queryKey: queryKeys.journal.list(userId || user?.id || '') }),
   };
 };

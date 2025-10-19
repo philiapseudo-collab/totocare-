@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
@@ -199,7 +199,7 @@ export function DueDateCountdown() {
     );
   }
 
-  const formatDaysRemaining = (days: number) => {
+  const formatDaysRemaining = useCallback((days: number) => {
     if (days === 0) return "Due today!";
     if (days < 0) return "Overdue";
     
@@ -209,7 +209,12 @@ export function DueDateCountdown() {
     if (weeks === 0) return `${days} day${days === 1 ? '' : 's'}`;
     if (remainingDays === 0) return `${weeks} week${weeks === 1 ? '' : 's'}`;
     return `${weeks}w ${remainingDays}d`;
-  };
+  }, []);
+
+  const formattedDueDate = useMemo(() => {
+    if (!pregnancy) return '';
+    return new Date(pregnancy.due_date + 'T00:00:00').toLocaleDateString();
+  }, [pregnancy?.due_date]);
 
   return (
     <Card>
@@ -312,7 +317,7 @@ export function DueDateCountdown() {
           <div className="flex items-center gap-2">
             <CalendarDays className="h-4 w-4 text-primary" />
             <span className="font-medium" data-i18n="babyDevelopment.dueDate">{t("babyDevelopment.dueDate")}</span>
-            <span>{new Date(pregnancy.due_date + 'T00:00:00').toLocaleDateString()}</span>
+            <span>{formattedDueDate}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-lg">🤰</span>

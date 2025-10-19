@@ -3,19 +3,26 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { TrendingUp } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
 import { useAppTranslation } from "@/hooks/useAppTranslation";
+import { useMemo } from "react";
 
 export function HealthAnalytics() {
   const { t } = useAppTranslation();
   const { profile, pregnancy } = useProfile();
 
   // Mock data for demonstration - in production, fetch from actual records
-  const weightData = [
+  const weightData = useMemo(() => [
     { week: 8, weight: 65 },
     { week: 12, weight: 67 },
     { week: 16, weight: 69 },
     { week: 20, weight: 72 },
     { week: 24, weight: 75 },
-  ];
+  ], []);
+
+  const tooltipStyle = useMemo(() => ({ 
+    backgroundColor: 'hsl(var(--card))',
+    border: '1px solid hsl(var(--border))',
+    borderRadius: '8px'
+  }), []);
 
   return (
     <Card>
@@ -39,11 +46,7 @@ export function HealthAnalytics() {
               className="text-xs"
             />
             <Tooltip 
-              contentStyle={{ 
-                backgroundColor: 'hsl(var(--card))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '8px'
-              }}
+              contentStyle={tooltipStyle}
             />
             <Line 
               type="monotone" 

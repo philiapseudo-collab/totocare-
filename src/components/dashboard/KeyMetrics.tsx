@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useProfile } from "@/hooks/useProfile";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Calendar, Droplet } from "lucide-react";
 import { VisualHealthCard } from "@/components/VisualHealthCard";
@@ -42,7 +42,7 @@ export function KeyMetrics() {
     fetchFetalDevelopment();
   }, [pregnancy?.current_week]);
 
-  const metrics: Metric[] = [
+  const metrics: Metric[] = useMemo(() => [
     ...(pregnancy ? [{
       id: "gestational-age",
       value: pregnancy.current_week?.toString() || "-",
@@ -55,7 +55,7 @@ export function KeyMetrics() {
       unit: "",
       label: "Blood group"
     }] : [])
-  ];
+  ], [pregnancy?.current_week, profile?.blood_group]);
 
   return (
     <Card>
