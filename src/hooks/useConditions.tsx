@@ -15,23 +15,42 @@ export interface Condition {
   healthcare_provider_id: string | null;
 }
 
-export const useConditions = () => {
+const PAGE_SIZE = 20;
+
+export const useConditions = (page: number = 0) => {
   const { user } = useAuth();
   const [conditions, setConditions] = useState<Condition[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
 
   const fetchConditions = async () => {
     if (!user) return;
     
     try {
+      const from = page * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+
+      // Get total count
+      const { count } = await supabase
+        .from('conditions')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', true);
+
+      setTotalCount(count || 0);
+
+      // Fetch page data with only required columns
       const { data, error } = await supabase
         .from('conditions')
-        .select('*')
+        .select('id, patient_id, condition_name, diagnosed_date, severity, is_active, treatment, notes, healthcare_provider_id')
         .eq('is_active', true)
-        .order('diagnosed_date', { ascending: false });
+        .order('diagnosed_date', { ascending: false })
+        .range(from, to);
 
       if (error) throw error;
+      
       setConditions(data || []);
+      setHasMore((data?.length || 0) === PAGE_SIZE);
     } catch (error: any) {
       toast.error('Failed to load conditions');
       console.error('Error fetching conditions:', error);
@@ -42,7 +61,13 @@ export const useConditions = () => {
 
   useEffect(() => {
     fetchConditions();
-  }, [user]);
+  }, [user, page]);
 
-  return { conditions, loading, refetch: fetchConditions };
+  return { 
+    conditions, 
+    loading, 
+    hasMore, 
+    totalCount,
+    refetch: fetchConditions 
+  };
 };

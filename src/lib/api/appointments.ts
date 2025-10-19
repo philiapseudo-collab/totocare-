@@ -29,7 +29,7 @@ export const appointmentsApi = {
 
     const { data, error } = await supabase
       .from('appointments')
-      .select('*')
+      .select('id, patient_id, healthcare_provider_id, appointment_date, appointment_type, status, duration_minutes, notes, reminder_sent, created_at, updated_at')
       .eq('patient_id', profile.id)
       .order('appointment_date', { ascending: true });
 
@@ -106,7 +106,7 @@ export const appointmentsApi = {
 
     const { data, error } = await supabase
       .from('appointments')
-      .select('*')
+      .select('id, patient_id, appointment_date, appointment_type, status, notes')
       .eq('patient_id', profile.id)
       .eq('status', 'scheduled')
       .gte('appointment_date', new Date().toISOString())

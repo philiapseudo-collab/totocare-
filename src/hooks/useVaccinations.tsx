@@ -15,22 +15,40 @@ export interface Vaccination {
   patient_type: string;
 }
 
-export const useVaccinations = () => {
+const PAGE_SIZE = 20;
+
+export const useVaccinations = (page: number = 0) => {
   const { user } = useAuth();
   const [vaccinations, setVaccinations] = useState<Vaccination[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
 
   const fetchVaccinations = async () => {
     if (!user) return;
     
     try {
+      const from = page * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+
+      // Get total count
+      const { count } = await supabase
+        .from('vaccinations')
+        .select('*', { count: 'exact', head: true });
+
+      setTotalCount(count || 0);
+
+      // Fetch page data with only required columns
       const { data, error } = await supabase
         .from('vaccinations')
-        .select('*')
-        .order('scheduled_date', { ascending: true });
+        .select('id, patient_id, vaccine_name, scheduled_date, administered_date, status, healthcare_provider_id, notes, patient_type')
+        .order('scheduled_date', { ascending: true })
+        .range(from, to);
 
       if (error) throw error;
+      
       setVaccinations(data || []);
+      setHasMore((data?.length || 0) === PAGE_SIZE);
     } catch (error: any) {
       toast.error('Failed to load vaccinations');
       console.error('Error fetching vaccinations:', error);
@@ -63,7 +81,13 @@ export const useVaccinations = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, page]);
 
-  return { vaccinations, loading, refetch: fetchVaccinations };
+  return { 
+    vaccinations, 
+    loading, 
+    hasMore, 
+    totalCount,
+    refetch: fetchVaccinations 
+  };
 };

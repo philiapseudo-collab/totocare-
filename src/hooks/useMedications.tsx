@@ -14,8 +14,9 @@ export const useMedications = () => {
     try {
       const { data, error } = await supabase
         .from("medications")
-        .select("*")
+        .select("id, patient_id, medication_name, dosage, frequency, start_date, end_date, is_active, reminder_times, notification_enabled, notes, created_at")
         .eq("patient_id", profile.id)
+        .eq("is_active", true)
         .order("created_at", { ascending: false });
 
       if (error) throw error;

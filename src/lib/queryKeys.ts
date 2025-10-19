@@ -64,4 +64,10 @@ export const queryKeys = {
     data: (userId: string) => ['cycle', 'data', userId] as const,
     prediction: (userId: string) => ['cycle', 'prediction', userId] as const,
   },
+
+  // Immunization Schedule (static data)
+  immunizationSchedule: {
+    all: ['immunizationSchedule'] as const,
+    list: (patientType?: string) => ['immunizationSchedule', 'list', patientType] as const,
+  },
 } as const;

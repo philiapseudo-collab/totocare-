@@ -15,22 +15,40 @@ export interface JournalEntry {
   updated_at: string;
 }
 
-export const useJournalEntries = () => {
+const PAGE_SIZE = 20;
+
+export const useJournalEntries = (page: number = 0) => {
   const { user } = useAuth();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
 
   const fetchEntries = async () => {
     if (!user) return;
     
     try {
+      const from = page * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+
+      // Get total count
+      const { count } = await supabase
+        .from('journal_entries')
+        .select('*', { count: 'exact', head: true });
+
+      setTotalCount(count || 0);
+
+      // Fetch page data with only required columns
       const { data, error } = await supabase
         .from('journal_entries')
-        .select('*')
-        .order('entry_date', { ascending: false });
+        .select('id, entry_type, title, content, who, entry_date, tags, created_at, updated_at')
+        .order('entry_date', { ascending: false })
+        .range(from, to);
 
       if (error) throw error;
+      
       setEntries(data || []);
+      setHasMore((data?.length || 0) === PAGE_SIZE);
     } catch (error: any) {
       toast.error('Failed to load journal entries');
       console.error('Error fetching entries:', error);
@@ -118,7 +136,16 @@ export const useJournalEntries = () => {
 
   useEffect(() => {
     fetchEntries();
-  }, [user]);
+  }, [user, page]);
 
-  return { entries, loading, addEntry, updateEntry, deleteEntry, refetch: fetchEntries };
+  return { 
+    entries, 
+    loading, 
+    hasMore, 
+    totalCount,
+    addEntry, 
+    updateEntry, 
+    deleteEntry, 
+    refetch: fetchEntries 
+  };
 };
