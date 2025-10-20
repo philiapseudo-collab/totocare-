@@ -39,6 +39,8 @@ export const useProfile = () => {
     },
     enabled: !!user,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    retry: 3, // Retry failed requests 3 times
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
   });
 
   const { data: pregnancy, isLoading: pregnancyLoading } = useQuery({
@@ -58,6 +60,8 @@ export const useProfile = () => {
     },
     enabled: !!profile?.id,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   // Subscribe to realtime updates for profile changes

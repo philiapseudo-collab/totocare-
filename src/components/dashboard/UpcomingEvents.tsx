@@ -1,10 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Syringe, Calendar, FlaskConical } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { useUpcomingEvents } from "@/hooks/useUpcomingEvents";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useAppTranslation } from "@/hooks/useAppTranslation";
 import { useCallback } from "react";
+import { EmptyState } from "@/components/EmptyState";
+import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 
 export function UpcomingEvents() {
   const { t } = useAppTranslation();
@@ -28,24 +29,6 @@ export function UpcomingEvents() {
     return <Badge variant="outline">{statusText}</Badge>;
   }, []);
 
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader className="pb-4">
-          <CardTitle className="text-lg font-semibold" data-i18n="comingUp.title">{t("comingUp.title")}</CardTitle>
-          <p className="text-sm text-muted-foreground" data-i18n="comingUp.next7Days">{t("comingUp.next7Days")}</p>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="py-3">
-              <Skeleton className="h-16 w-full" />
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card>
       <CardHeader className="pb-4">
@@ -56,11 +39,15 @@ export function UpcomingEvents() {
         <p className="text-sm text-muted-foreground" data-i18n="comingUp.next7Days">{t("comingUp.next7Days")}</p>
       </CardHeader>
       <CardContent className="space-y-4">
-        {events.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p data-i18n="comingUp.noUpcomingEvents">{t("comingUp.noUpcomingEvents")}</p>
-          </div>
+        {loading ? (
+          <LoadingSkeleton type="list" count={3} />
+        ) : events.length === 0 ? (
+          <EmptyState
+            icon={Calendar}
+            title={t("comingUp.noUpcomingEvents")}
+            description="You're all caught up! No upcoming events in the next 7 days."
+            iconClassName="text-primary"
+          />
         ) : (
           events.map((event) => (
             <div key={event.id} className="flex flex-col sm:flex-row sm:items-start justify-between py-3 border-b border-border last:border-0 gap-3">
