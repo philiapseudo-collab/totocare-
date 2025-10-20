@@ -6,19 +6,22 @@ import { Link } from "react-router-dom";
 import { useUpcomingEvents } from "@/hooks/useUpcomingEvents";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppTranslation } from "@/hooks/useAppTranslation";
+import { useMemo, useCallback } from "react";
 
 export function TodaysChecklist() {
   const { t } = useAppTranslation();
   const { events, loading } = useUpcomingEvents();
   
-  // Filter to show only today's events
-  const today = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-  const todaysItems = events.filter(event => event.date === today);
+  // Filter to show only today's events - memoized for performance
+  const todaysItems = useMemo(() => {
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    return events.filter(event => event.date === today);
+  }, [events]);
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = useCallback((status: string) => {
     const statusText = status.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     return <Badge variant="outline">{statusText}</Badge>;
-  };
+  }, []);
 
   if (loading) {
     return (

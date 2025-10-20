@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-import { toast } from 'sonner';
+import { queryKeys } from '@/lib/queryKeys';
 
 export interface UpcomingEvent {
   id: string;
@@ -15,13 +15,13 @@ export interface UpcomingEvent {
 
 export const useUpcomingEvents = () => {
   const { user } = useAuth();
-  const [events, setEvents] = useState<UpcomingEvent[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  const fetchEvents = async () => {
-    if (!user) return;
-    
-    try {
+  const { data: events = [], isLoading } = useQuery({
+    queryKey: queryKeys.upcomingEvents(user?.id),
+    queryFn: async () => {
+      if (!user) return [];
+      
       const now = new Date();
       const weekFromNow = new Date();
       weekFromNow.setDate(now.getDate() + 7);
@@ -29,7 +29,7 @@ export const useUpcomingEvents = () => {
       // Fetch upcoming appointments
       const { data: appointments, error: apptError } = await supabase
         .from('appointments')
-        .select('*')
+        .select('id, appointment_type, appointment_date, status, notes')
         .gte('appointment_date', now.toISOString())
         .lte('appointment_date', weekFromNow.toISOString())
         .order('appointment_date', { ascending: true });
@@ -39,7 +39,7 @@ export const useUpcomingEvents = () => {
       // Fetch upcoming vaccinations
       const { data: vaccinations, error: vaccError } = await supabase
         .from('vaccinations')
-        .select('*')
+        .select('id, vaccine_name, scheduled_date, status, notes')
         .gte('scheduled_date', now.toISOString().split('T')[0])
         .lte('scheduled_date', weekFromNow.toISOString().split('T')[0])
         .order('scheduled_date', { ascending: true });
@@ -65,18 +65,15 @@ export const useUpcomingEvents = () => {
         }))
       ];
 
-      setEvents(allEvents);
-    } catch (error: any) {
-      toast.error('Failed to load upcoming events');
-      console.error('Error fetching upcoming events:', error);
-    } finally {
-      setLoading(false);
-    }
+      return allEvents;
+    },
+    enabled: !!user,
+    staleTime: 1000 * 60 * 2, // Cache for 2 minutes
+  });
+
+  return { 
+    events, 
+    loading: isLoading, 
+    refetch: () => queryClient.invalidateQueries({ queryKey: queryKeys.upcomingEvents(user?.id) })
   };
-
-  useEffect(() => {
-    fetchEvents();
-  }, [user]);
-
-  return { events, loading, refetch: fetchEvents };
 };

@@ -4,12 +4,13 @@ import { Syringe, Calendar, FlaskConical } from "lucide-react";
 import { useUpcomingEvents } from "@/hooks/useUpcomingEvents";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppTranslation } from "@/hooks/useAppTranslation";
+import { useCallback } from "react";
 
 export function UpcomingEvents() {
   const { t } = useAppTranslation();
   const { events, loading } = useUpcomingEvents();
 
-  const getIcon = (type: string) => {
+  const getIcon = useCallback((type: string) => {
     switch (type) {
       case "vaccination":
         return <span className="text-2xl">💉</span>;
@@ -20,14 +21,12 @@ export function UpcomingEvents() {
       default:
         return <span className="text-2xl">📅</span>;
     }
-  };
+  }, []);
 
-  const getStatusBadge = (status: string) => {
-    const statusLower = status.toLowerCase();
+  const getStatusBadge = useCallback((status: string) => {
     const statusText = status.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    
     return <Badge variant="outline">{statusText}</Badge>;
-  };
+  }, []);
 
   if (loading) {
     return (

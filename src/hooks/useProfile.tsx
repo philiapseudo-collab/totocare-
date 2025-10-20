@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { queryKeys } from '@/lib/queryKeys';
+import { useEffect } from 'react';
 
-interface Profile {
+export interface Profile {
   id: string;
   first_name: string;
   last_name: string;
@@ -12,56 +14,56 @@ interface Profile {
   profile_completed: boolean;
 }
 
-interface Pregnancy {
+export interface Pregnancy {
   current_week: number;
   due_date: string;
 }
 
 export const useProfile = () => {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [pregnancy, setPregnancy] = useState<Pregnancy | null>(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
+  const { data: profile, isLoading: profileLoading } = useQuery({
+    queryKey: queryKeys.profile(user?.id),
+    queryFn: async () => {
+      if (!user) return null;
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, date_of_birth, blood_group, current_weight, profile_completed')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) throw error;
+      return data as Profile;
+    },
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
+
+  const { data: pregnancy, isLoading: pregnancyLoading } = useQuery({
+    queryKey: queryKeys.pregnancies.active(profile?.id),
+    queryFn: async () => {
+      if (!profile?.id) return null;
+
+      const { data, error } = await supabase
+        .from('pregnancies')
+        .select('current_week, due_date')
+        .eq('mother_id', profile.id)
+        .eq('status', 'pregnant')
+        .maybeSingle();
+
+      if (error) throw error;
+      return data as Pregnancy | null;
+    },
+    enabled: !!profile?.id,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
+
+  // Subscribe to realtime updates for profile changes
   useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+    if (!user) return;
 
-    const fetchProfile = async () => {
-      try {
-        // Fetch profile
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-
-        if (profileError) throw profileError;
-        setProfile(profileData);
-
-        // Fetch pregnancy if exists
-        if (profileData?.id) {
-          const { data: pregnancyData } = await supabase
-            .from('pregnancies')
-            .select('current_week, due_date')
-            .eq('mother_id', profileData.id)
-            .eq('status', 'pregnant')
-            .maybeSingle();
-
-          setPregnancy(pregnancyData);
-        }
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-
-    // Subscribe to realtime updates for profile changes
     const channel = supabase
       .channel('profile-changes')
       .on(
@@ -72,8 +74,8 @@ export const useProfile = () => {
           table: 'profiles',
           filter: `user_id=eq.${user.id}`,
         },
-        (payload) => {
-          setProfile(payload.new as Profile);
+        () => {
+          queryClient.invalidateQueries({ queryKey: queryKeys.profile(user.id) });
         }
       )
       .subscribe();
@@ -81,7 +83,11 @@ export const useProfile = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, queryClient]);
 
-  return { profile, pregnancy, loading };
+  return { 
+    profile, 
+    pregnancy, 
+    loading: profileLoading || pregnancyLoading 
+  };
 };

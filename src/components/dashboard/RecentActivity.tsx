@@ -4,27 +4,30 @@ import { useJournalEntries } from "@/hooks/useJournalEntries";
 import { useVaccinations } from "@/hooks/useVaccinations";
 import { format } from "date-fns";
 import { useAppTranslation } from "@/hooks/useAppTranslation";
+import { useMemo } from "react";
 
 export function RecentActivity() {
   const { t } = useAppTranslation();
   const { entries } = useJournalEntries();
   const { vaccinations } = useVaccinations();
 
-  // Combine all activities and sort by date
-  const activities = [
-    ...entries.map(e => ({ 
-      type: t("recentActivity.journal"), 
-      title: e.title, 
-      date: new Date(e.entry_date),
-      icon: '📝'
-    })),
-    ...vaccinations.map(v => ({ 
-      type: t("recentActivity.vaccination"), 
-      title: v.vaccine_name, 
-      date: new Date(v.scheduled_date),
-      icon: '💉'
-    }))
-  ].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 5);
+  // Combine all activities and sort by date - memoized for performance
+  const activities = useMemo(() => {
+    return [
+      ...entries.map(e => ({ 
+        type: t("recentActivity.journal"), 
+        title: e.title, 
+        date: new Date(e.entry_date),
+        icon: '📝'
+      })),
+      ...vaccinations.map(v => ({ 
+        type: t("recentActivity.vaccination"), 
+        title: v.vaccine_name, 
+        date: new Date(v.scheduled_date),
+        icon: '💉'
+      }))
+    ].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 5);
+  }, [entries, vaccinations, t]);
 
   return (
     <Card>

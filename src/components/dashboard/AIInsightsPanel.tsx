@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +14,13 @@ export function AIInsightsPanel() {
   const { events } = useUpcomingEvents();
   const [insights, setInsights] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Memoize fallback insights to avoid recalculation
+  const fallbackInsights = useMemo(() => {
+    return language === 'sw' 
+      ? ["Kunywa maji ya kutosha kila siku", "Fuatilia harakati za mtoto wako kila siku", "Pata mapumziko ya kutosha inapowezekana"]
+      : ["Stay hydrated throughout the day", "Track your baby's movements daily", "Get adequate rest when possible"];
+  }, [language]);
 
   useEffect(() => {
     const fetchInsights = async () => {
@@ -32,9 +39,6 @@ export function AIInsightsPanel() {
         setInsights(data.insights || []);
       } catch (error) {
         console.error('Failed to fetch insights:', error);
-        const fallbackInsights = language === 'sw' 
-          ? ["Kunywa maji ya kutosha kila siku", "Fuatilia harakati za mtoto wako kila siku", "Pata mapumziko ya kutosha inapowezekana"]
-          : ["Stay hydrated throughout the day", "Track your baby's movements daily", "Get adequate rest when possible"];
         setInsights(fallbackInsights);
       } finally {
         setLoading(false);
@@ -42,7 +46,7 @@ export function AIInsightsPanel() {
     };
 
     fetchInsights();
-  }, [pregnancy?.current_week, conditions, events, language]);
+  }, [pregnancy?.current_week, conditions, events, language, fallbackInsights]);
 
   return (
     <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">

@@ -41,6 +41,14 @@ export const queryKeys = {
     analytics: (motherId: string) => ['pregnancy', 'analytics', motherId] as const,
   },
   
+  // Pregnancies (alternate naming)
+  pregnancies: {
+    active: (motherId?: string) => ['pregnancies', 'active', motherId] as const,
+  },
+  
+  // Upcoming Events (consolidated)
+  upcomingEvents: (userId?: string) => ['upcomingEvents', userId] as const,
+  
   // Analytics
   analytics: {
     health: (profileId: string) => ['analytics', 'health', profileId] as const,
