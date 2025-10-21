@@ -67,6 +67,9 @@ const AuthenticatedApp = () => {
   // Enable keyboard shortcuts
   useKeyboardShortcuts();
 
+  // Check if user needs journey selection
+  const needsJourneySelection = profile && !(profile as any).user_journey;
+
   // Register service worker on mount
   useEffect(() => {
     registerServiceWorker().then((registration) => {
@@ -116,9 +119,14 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Redirect to profile setup only if profile is incomplete AND user is trying to access dashboard
+  // Redirect to onboarding (journey selection) if user hasn't selected a journey yet
+  if (needsJourneySelection && location.pathname !== '/onboarding') {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  // Redirect to profile setup only if profile is incomplete AND user has selected a journey
   // Allow access to all other pages even if profile is incomplete
-  if (profile && !profile.profile_completed && (location.pathname === '/' || location.pathname === '/dashboard')) {
+  if (profile && (profile as any).user_journey && !profile.profile_completed && (location.pathname === '/' || location.pathname === '/dashboard')) {
     return <Navigate to="/profile-setup" replace />;
   }
 
@@ -140,8 +148,17 @@ const AuthenticatedApp = () => {
             <Breadcrumbs />
             <Suspense fallback={<PageLoader />}>
               <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/" element={
+                (profile as any)?.user_journey === 'family_planning' 
+                  ? <DashboardFamilyPlanning /> 
+                  : <Dashboard />
+              } />
+              <Route path="/dashboard" element={
+                (profile as any)?.user_journey === 'family_planning' 
+                  ? <DashboardFamilyPlanning /> 
+                  : <Dashboard />
+              } />
+              <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/profile-setup" element={<ProfileSetup />} />
               <Route path="/profile" element={<Profile />} />

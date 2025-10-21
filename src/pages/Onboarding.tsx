@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/queryKeys';
+import leaLogo from '@/assets/lea-baby-logo.png';
 
 type JourneyType = 'pregnant' | 'infant' | 'family_planning';
 
@@ -40,8 +41,7 @@ export default function Onboarding() {
       const { error } = await supabase
         .from('profiles')
         .update({ 
-          user_journey: journey,
-          profile_completed: true 
+          user_journey: journey
         })
         .eq('user_id', user.id);
 
@@ -50,11 +50,11 @@ export default function Onboarding() {
       // Invalidate profile query to refetch with new data
       await queryClient.invalidateQueries({ queryKey: queryKeys.profile(user.id) });
 
-      toast.success('Welcome to your personalized dashboard!');
+      toast.success('Welcome! Please complete your profile to continue.');
       
       // Small delay to ensure cache is updated
       setTimeout(() => {
-        navigate('/');
+        navigate('/profile-setup');
       }, 100);
     } catch (error) {
       console.error('Error setting journey:', error);
@@ -101,8 +101,8 @@ export default function Onboarding() {
         <div className="text-center space-y-4">
           <div className="flex justify-center mb-6">
             <img 
-              src="/src/assets/lea-baby-logo.png" 
-              alt="NurtureCare Logo" 
+              src={leaLogo} 
+              alt="LEA - Maternease Logo" 
               className="h-20 w-auto"
             />
           </div>

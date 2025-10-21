@@ -12,6 +12,7 @@ export interface Profile {
   blood_group: string | null;
   current_weight: number | null;
   profile_completed: boolean;
+  user_journey: string | null;
 }
 
 export interface Pregnancy {
@@ -30,7 +31,7 @@ export const useProfile = () => {
       
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, date_of_birth, blood_group, current_weight, profile_completed')
+        .select('id, first_name, last_name, date_of_birth, blood_group, current_weight, profile_completed, user_journey')
         .eq('user_id', user.id)
         .single();
 
