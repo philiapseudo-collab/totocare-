@@ -21,15 +21,18 @@ import { NetworkStatus } from "@/components/NetworkStatus";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
-// Lazy load all pages
+// Core pages imported directly to avoid dynamic import issues
+import Onboarding from "./pages/Onboarding";
+import Auth from "./pages/Auth";
+
+// Lazy load the rest of pages
 const Index = lazy(() => import("./pages/Index"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const DashboardFamilyPlanning = lazy(() => import("./pages/DashboardFamilyPlanning"));
 const MyCycle = lazy(() => import("./pages/MyCycle"));
 const CycleOnboarding = lazy(() => import("./pages/CycleOnboarding"));
 const CycleCalendar = lazy(() => import("./pages/CycleCalendar"));
-const Onboarding = lazy(() => import("./pages/Onboarding"));
-const Auth = lazy(() => import("./pages/Auth"));
+// Onboarding and Auth are imported statically above
 const Vaccinations = lazy(() => import("./pages/Vaccinations"));
 const Conditions = lazy(() => import("./pages/Conditions"));
 const Journal = lazy(() => import("./pages/Journal"));

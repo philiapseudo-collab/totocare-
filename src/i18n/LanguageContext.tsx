@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, PropsWithChildren } from "react";
 import i18n from "./config";
 
 export type Language = "en" | "sw";
@@ -10,7 +10,7 @@ type LanguageContextType = {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const LanguageProvider = ({ children }: PropsWithChildren) => {
   const [language, setLanguageState] = useState<Language>(() => {
     const stored = (localStorage.getItem("appLang") as Language) || (localStorage.getItem("i18nextLng") as Language);
     return stored === "en" || stored === "sw" ? stored : "en";
