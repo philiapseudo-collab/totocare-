@@ -1,53 +1,26 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useProfile } from '@/hooks/useProfile';
+import { useCycleTracking } from '@/hooks/useCycleTracking';
 import { Calendar, Heart, Pill, TrendingUp, Activity, Sun, Moon, Droplets, Bell, BookOpen } from 'lucide-react';
 import { UpcomingEvents } from '@/components/dashboard/UpcomingEvents';
 import { RecentActivity } from '@/components/dashboard/RecentActivity';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { differenceInDays, format } from 'date-fns';
+import { differenceInDays, format, parseISO } from 'date-fns';
 
 export default function DashboardFamilyPlanning() {
   const { profile } = useProfile();
+  const { getCurrentCycleInfo, loading } = useCycleTracking();
 
-  // Fetch latest reproductive health data
-  const { data: latestCycle, isLoading } = useQuery({
-    queryKey: ['cycle', profile?.id],
-    queryFn: async () => {
-      if (!profile?.id) return null;
-      const { data } = await supabase
-        .from('reproductive_health')
-        .select('*')
-        .eq('mother_id', profile.id)
-        .order('record_date', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      return data;
-    },
-    enabled: !!profile?.id
-  });
-
-  // Calculate current cycle day based on last period date
-  const cycleDay = latestCycle?.record_date 
-    ? differenceInDays(new Date(), new Date(latestCycle.record_date)) + 1
-    : 1;
-
-  const cycleLength = latestCycle?.cycle_length || 28;
-
-  const cyclePhase = 
-    cycleDay <= 5 ? 'Menstrual' :
-    cycleDay <= 13 ? 'Follicular' :
-    cycleDay <= 17 ? 'Ovulation' : 'Luteal';
+  const currentInfo = getCurrentCycleInfo();
 
   const phaseColor = 
-    cyclePhase === 'Menstrual' ? 'text-red-500' :
-    cyclePhase === 'Follicular' ? 'text-green-500' :
-    cyclePhase === 'Ovulation' ? 'text-purple-500' : 'text-blue-500';
+    currentInfo?.phase === 'Menstrual' ? 'text-red-500' :
+    currentInfo?.phase === 'Follicular' ? 'text-green-500' :
+    currentInfo?.phase === 'Ovulation' ? 'text-purple-500' : 'text-blue-500';
 
   // Show loading state
-  if (isLoading) {
+  if (loading || !currentInfo) {
     return (
       <div className="container mx-auto p-4">
         <div className="animate-pulse space-y-6">
@@ -61,6 +34,15 @@ export default function DashboardFamilyPlanning() {
       </div>
     );
   }
+
+  const daysUntilPeriod = currentInfo.predictions 
+    ? differenceInDays(parseISO(currentInfo.predictions.nextPeriodDate), new Date())
+    : null;
+
+  const isInFertileWindow = currentInfo.predictions
+    ? differenceInDays(new Date(), parseISO(currentInfo.predictions.fertileWindowStart)) >= 0 &&
+      differenceInDays(parseISO(currentInfo.predictions.fertileWindowEnd), new Date()) >= 0
+    : false;
 
   const quickActions = [
     { icon: Droplets, label: 'My Cycle', href: '/my-cycle', color: 'text-pink-600', bg: 'bg-pink-50 dark:bg-pink-950/20' },
@@ -90,15 +72,13 @@ export default function DashboardFamilyPlanning() {
               Cycle Day
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold mb-1">{cycleDay}</p>
-            <p className={`text-sm font-medium ${phaseColor}`}>{cyclePhase} Phase</p>
-            {latestCycle?.record_date && (
+            <CardContent>
+              <p className="text-4xl font-bold mb-1">{currentInfo.cycleDay}</p>
+              <p className={`text-sm font-medium ${phaseColor}`}>{currentInfo.phase} Phase</p>
               <p className="text-xs text-muted-foreground mt-2">
-                Last updated {format(new Date(latestCycle.record_date), 'MMM dd')}
+                Last updated {format(parseISO(currentInfo.lastPeriodStart), 'MMM dd')}
               </p>
-            )}
-          </CardContent>
+            </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-950/20 dark:to-yellow-950/20 border-orange-200 dark:border-orange-800">
@@ -110,14 +90,14 @@ export default function DashboardFamilyPlanning() {
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-bold mb-1">
-              {cycleLength - cycleDay > 0 ? cycleLength - cycleDay : 'Due today'}
+              {daysUntilPeriod !== null && daysUntilPeriod > 0 ? daysUntilPeriod : 'Due today'}
             </p>
             <p className="text-sm text-muted-foreground">
-              {cycleLength - cycleDay > 0 ? 'days away' : ''}
+              {daysUntilPeriod !== null && daysUntilPeriod > 0 ? 'days away' : ''}
             </p>
-            {latestCycle?.record_date && (
+            {currentInfo.predictions && (
               <p className="text-xs text-muted-foreground mt-2">
-                Based on {cycleLength}-day cycle
+                Expected: {format(parseISO(currentInfo.predictions.nextPeriodDate), 'MMM dd')}
               </p>
             )}
           </CardContent>
@@ -132,16 +112,17 @@ export default function DashboardFamilyPlanning() {
           </CardHeader>
           <CardContent>
             <p className="text-lg font-semibold mb-1">
-              {cycleDay >= 10 && cycleDay <= 17 ? (
+              {isInFertileWindow ? (
                 <span className="text-green-600 dark:text-green-400">Active Now</span>
               ) : (
                 <span className="text-muted-foreground">Not Active</span>
               )}
             </p>
-            <p className="text-xs text-muted-foreground">
-              {cycleDay < 10 ? `Starts in ${10 - cycleDay} days` : 
-               cycleDay > 17 ? 'Passed this cycle' : `Day ${cycleDay - 9} of 8`}
-            </p>
+            {currentInfo.predictions && (
+              <p className="text-xs text-muted-foreground">
+                {format(parseISO(currentInfo.predictions.fertileWindowStart), 'MMM dd')} - {format(parseISO(currentInfo.predictions.fertileWindowEnd), 'MMM dd')}
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -159,27 +140,27 @@ export default function DashboardFamilyPlanning() {
             <div className="space-y-1">
               <p className="font-semibold text-muted-foreground">Energy Level</p>
               <p>{
-                cyclePhase === 'Follicular' ? '⚡ High - Great time for exercise' :
-                cyclePhase === 'Ovulation' ? '🔥 Peak - Most energetic phase' :
-                cyclePhase === 'Luteal' ? '💫 Moderate - Focus on self-care' :
+                currentInfo.phase === 'Follicular' ? '⚡ High - Great time for exercise' :
+                currentInfo.phase === 'Ovulation' ? '🔥 Peak - Most energetic phase' :
+                currentInfo.phase === 'Luteal' ? '💫 Moderate - Focus on self-care' :
                 '💤 Lower - Rest and recover'
               }</p>
             </div>
             <div className="space-y-1">
               <p className="font-semibold text-muted-foreground">Mood</p>
               <p>{
-                cyclePhase === 'Follicular' ? '😊 Optimistic and motivated' :
-                cyclePhase === 'Ovulation' ? '🌟 Social and confident' :
-                cyclePhase === 'Luteal' ? '🤔 May feel more introspective' :
+                currentInfo.phase === 'Follicular' ? '😊 Optimistic and motivated' :
+                currentInfo.phase === 'Ovulation' ? '🌟 Social and confident' :
+                currentInfo.phase === 'Luteal' ? '🤔 May feel more introspective' :
                 '💝 May need extra support'
               }</p>
             </div>
             <div className="space-y-1">
               <p className="font-semibold text-muted-foreground">Focus Areas</p>
               <p>{
-                cyclePhase === 'Follicular' ? '🎯 Planning & new projects' :
-                cyclePhase === 'Ovulation' ? '🤝 Social connections' :
-                cyclePhase === 'Luteal' ? '🧘 Self-reflection & rest' :
+                currentInfo.phase === 'Follicular' ? '🎯 Planning & new projects' :
+                currentInfo.phase === 'Ovulation' ? '🤝 Social connections' :
+                currentInfo.phase === 'Luteal' ? '🧘 Self-reflection & rest' :
                 '💆 Gentle activities & comfort'
               }</p>
             </div>

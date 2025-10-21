@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarIcon, Heart, Settings, Plus, Droplets, Moon, Sun } from 'lucide-react';
-import { useCycleData } from '@/hooks/useCycleData';
+import { useCycleTracking } from '@/hooks/useCycleTracking';
 import { differenceInDays, format, parseISO } from 'date-fns';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Calendar } from '@/components/ui/calendar';
@@ -13,19 +13,14 @@ export default function MyCycle() {
   const navigate = useNavigate();
   const { 
     cycles, 
-    predictions, 
-    settings,
     loading, 
     isFirstTime, 
-    addCycle, 
-    updateCycle,
+    addCycle,
     getCurrentCycleInfo 
-  } = useCycleData();
+  } = useCycleTracking();
 
   const [showStartPeriodDialog, setShowStartPeriodDialog] = useState(false);
-  const [showEndPeriodDialog, setShowEndPeriodDialog] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState<Date>();
-  const [selectedEndDate, setSelectedEndDate] = useState<Date>();
 
   useEffect(() => {
     if (!loading && isFirstTime) {
@@ -40,45 +35,13 @@ export default function MyCycle() {
     const dateString = format(periodDate, 'yyyy-MM-dd');
 
     try {
-      await addCycle({
-        periodStartDate: dateString,
-        periodEndDate: null,
-        periodDuration: null,
-        cycleLength: null,
-        ovulationDate: null,
-        notes: ''
+      addCycle({
+        periodStartDate: dateString
       });
       toast.success('Period started logged successfully');
       setShowStartPeriodDialog(false);
     } catch (error) {
       toast.error('Failed to log period start');
-      console.error(error);
-    }
-  };
-
-  const handleEndPeriod = async (date?: Date) => {
-    if (cycles.length === 0) return;
-    
-    const lastCycle = cycles[cycles.length - 1];
-    if (lastCycle.periodEndDate) {
-      toast.error('Period already ended');
-      return;
-    }
-
-    const endDate = date || new Date();
-    const endDateString = format(endDate, 'yyyy-MM-dd');
-    const startDate = parseISO(lastCycle.periodStartDate);
-    const duration = differenceInDays(endDate, startDate) + 1;
-
-    try {
-      await updateCycle(lastCycle.id, {
-        periodEndDate: endDateString,
-        periodDuration: duration
-      });
-      toast.success(`Period ended - lasted ${duration} days`);
-      setShowEndPeriodDialog(false);
-    } catch (error) {
-      toast.error('Failed to log period end');
       console.error(error);
     }
   };
@@ -94,13 +57,13 @@ export default function MyCycle() {
     );
   }
 
-  const daysUntilPeriod = predictions 
-    ? differenceInDays(parseISO(predictions.nextPeriodDate), new Date())
+  const daysUntilPeriod = currentInfo?.predictions 
+    ? differenceInDays(parseISO(currentInfo.predictions.nextPeriodDate), new Date())
     : null;
 
-  const isInFertileWindow = predictions && currentInfo
-    ? differenceInDays(new Date(), parseISO(predictions.fertileWindowStart)) >= 0 &&
-      differenceInDays(parseISO(predictions.fertileWindowEnd), new Date()) >= 0
+  const isInFertileWindow = currentInfo?.predictions
+    ? differenceInDays(new Date(), parseISO(currentInfo.predictions.fertileWindowStart)) >= 0 &&
+      differenceInDays(parseISO(currentInfo.predictions.fertileWindowEnd), new Date()) >= 0
     : false;
 
   const phaseColor = 
@@ -149,9 +112,9 @@ export default function MyCycle() {
                 {daysUntilPeriod !== null ? daysUntilPeriod : '?'}
               </p>
               <p className="text-sm text-muted-foreground">days away</p>
-              {predictions && (
+              {currentInfo?.predictions && (
                 <p className="text-xs text-muted-foreground mt-2">
-                  Expected: {format(parseISO(predictions.nextPeriodDate), 'MMM dd')}
+                  Expected: {format(parseISO(currentInfo.predictions.nextPeriodDate), 'MMM dd')}
                 </p>
               )}
             </CardContent>
@@ -172,9 +135,9 @@ export default function MyCycle() {
                   <span className="text-muted-foreground">Not Active</span>
                 )}
               </p>
-              {predictions && (
+              {currentInfo?.predictions && (
                 <p className="text-xs text-muted-foreground">
-                  {format(parseISO(predictions.fertileWindowStart), 'MMM dd')} - {format(parseISO(predictions.fertileWindowEnd), 'MMM dd')}
+                  {format(parseISO(currentInfo.predictions.fertileWindowStart), 'MMM dd')} - {format(parseISO(currentInfo.predictions.fertileWindowEnd), 'MMM dd')}
                 </p>
               )}
             </CardContent>
@@ -231,47 +194,6 @@ export default function MyCycle() {
             </DialogContent>
           </Dialog>
 
-          {/* End Period */}
-          {currentInfo?.onPeriod && (
-            <Dialog open={showEndPeriodDialog} onOpenChange={setShowEndPeriodDialog}>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="w-full" size="lg">
-                  My Period Ended
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>When did your period end?</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <Calendar
-                    mode="single"
-                    selected={selectedEndDate}
-                    onSelect={setSelectedEndDate}
-                    disabled={(date) => date > new Date() || (cycles.length > 0 && date < parseISO(cycles[cycles.length - 1].periodStartDate))}
-                    className="rounded-md border mx-auto"
-                  />
-                  <div className="flex gap-3">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => handleEndPeriod(new Date())}
-                      className="flex-1"
-                    >
-                      Ended Today
-                    </Button>
-                    <Button 
-                      onClick={() => handleEndPeriod(selectedEndDate)}
-                      disabled={!selectedEndDate}
-                      className="flex-1"
-                    >
-                      Confirm Date
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-          )}
-
           <Button 
             variant="outline" 
             className="w-full"
@@ -291,15 +213,15 @@ export default function MyCycle() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {cycles.slice(-5).reverse().map((cycle) => (
+              {cycles.filter(c => c.menstrual_cycle_day === 1).slice(-5).reverse().map((cycle) => (
                 <div key={cycle.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                   <div>
                     <p className="font-medium">
-                      {format(parseISO(cycle.periodStartDate), 'MMM dd, yyyy')}
+                      {format(parseISO(cycle.record_date), 'MMM dd, yyyy')}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {cycle.periodDuration ? `${cycle.periodDuration} days` : 'Ongoing'}
-                      {cycle.cycleLength && ` • ${cycle.cycleLength}-day cycle`}
+                      Period start
+                      {cycle.cycle_length && ` • ${cycle.cycle_length}-day cycle`}
                     </p>
                   </div>
                   <Droplets className="h-5 w-5 text-pink-500" />
