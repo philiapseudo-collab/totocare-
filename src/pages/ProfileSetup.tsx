@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,21 +11,38 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ArrowRight, ArrowLeft, Check, Baby, Calendar, User } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { ArrowRight, ArrowLeft, Check, Baby, Calendar, User, Activity } from "lucide-react";
 
-const STEPS = [
-  { id: 1, title: "Personal Info", icon: User },
-  { id: 2, title: "Health Details", icon: Calendar },
-  { id: 3, title: "Pregnancy Info", icon: Baby },
-];
+// Dynamic steps based on journey
+const getStepsForJourney = (journey: string | null) => {
+  const baseSteps = [
+    { id: 1, title: "Personal Info", icon: User },
+    { id: 2, title: "Health Details", icon: Calendar },
+  ];
+
+  if (journey === "family_planning") {
+    return [...baseSteps, { id: 3, title: "Cycle Tracking", icon: Activity }];
+  } else if (journey === "pregnant") {
+    return [...baseSteps, { id: 3, title: "Pregnancy Info", icon: Baby }];
+  } else if (journey === "infant") {
+    return [...baseSteps, { id: 3, title: "Infant Details", icon: Baby }];
+  }
+
+  return baseSteps;
+};
 
 export default function ProfileSetup() {
   const { user } = useAuth();
+  const { profile } = useProfile();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [calculatedData, setCalculatedData] = useState<any>(null);
+  
+  const userJourney = profile?.user_journey;
+  const STEPS = getStepsForJourney(userJourney);
   
   const [formData, setFormData] = useState({
     first_name: "",
@@ -32,15 +50,23 @@ export default function ProfileSetup() {
     date_of_birth: "",
     blood_group: "",
     current_weight: "",
-    role: "mother",
+    // Pregnancy journey fields
     pregnancy_method: "gestational", // or "lmp"
     gestational_weeks: "",
     gestational_days: "0",
     last_menstrual_period: "",
+    // Family planning journey fields
+    cycle_last_period: "",
+    cycle_length: "28",
+    period_duration: "5",
+    // Infant journey fields
+    infant_name: "",
+    infant_birth_date: "",
+    infant_gender: "",
   });
 
   const calculatePregnancyData = async () => {
-    if (formData.role !== "mother") return null;
+    if (userJourney !== "pregnant") return null;
 
     try {
       // Get user's current date in their timezone
@@ -100,41 +126,67 @@ export default function ProfileSetup() {
       return;
     }
 
-    if (currentStep === 3 && formData.role === "mother") {
-      // Validate pregnancy data is provided
-      if (formData.pregnancy_method === "gestational" && !formData.gestational_weeks) {
-        toast({
-          title: "Missing information",
-          description: "Please enter your gestational age",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      if (formData.pregnancy_method === "lmp" && !formData.last_menstrual_period) {
-        toast({
-          title: "Missing information",
-          description: "Please enter your last menstrual period date",
-          variant: "destructive",
-        });
-        return;
-      }
+    // Step 3 validation based on journey
+    if (currentStep === 3) {
+      if (userJourney === "pregnant") {
+        // Validate pregnancy data
+        if (formData.pregnancy_method === "gestational" && !formData.gestational_weeks) {
+          toast({
+            title: "Missing information",
+            description: "Please enter your gestational age",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        if (formData.pregnancy_method === "lmp" && !formData.last_menstrual_period) {
+          toast({
+            title: "Missing information",
+            description: "Please enter your last menstrual period date",
+            variant: "destructive",
+          });
+          return;
+        }
 
-      // Calculate pregnancy data before submission
-      const data = await calculatePregnancyData();
-      if (!data) {
-        toast({
-          title: "Error",
-          description: "Failed to calculate pregnancy data. Please check your inputs.",
-          variant: "destructive",
-        });
+        // Calculate pregnancy data before submission
+        const data = await calculatePregnancyData();
+        if (!data) {
+          toast({
+            title: "Error",
+            description: "Failed to calculate pregnancy data. Please check your inputs.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        setCalculatedData(data);
+        handleSubmit();
+        return;
+      } else if (userJourney === "family_planning") {
+        // Validate cycle data
+        if (!formData.cycle_last_period) {
+          toast({
+            title: "Missing information",
+            description: "Please enter your last menstrual period date",
+            variant: "destructive",
+          });
+          return;
+        }
+        handleSubmit();
+        return;
+      } else if (userJourney === "infant") {
+        // Validate infant data
+        if (!formData.infant_name || !formData.infant_birth_date) {
+          toast({
+            title: "Missing information",
+            description: "Please fill in infant details",
+            variant: "destructive",
+          });
+          return;
+        }
+        handleSubmit();
         return;
       }
-      
-      setCalculatedData(data);
-      // Proceed to submit
-      handleSubmit();
-      return;
     }
 
     if (currentStep < STEPS.length) {
@@ -151,22 +203,11 @@ export default function ProfileSetup() {
   };
 
   const handleSubmit = async () => {
-    if (!user) return;
+    if (!user || !profile) return;
 
     setLoading(true);
     try {
-      // Get the profile id
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
-
-      if (!profile) {
-        throw new Error("Profile not found");
-      }
-
-      // Update profile with all info
+      // Update profile with basic info
       const { error: profileError } = await supabase
         .from("profiles")
         .update({
@@ -181,16 +222,16 @@ export default function ProfileSetup() {
 
       if (profileError) throw profileError;
 
-      // If pregnant mother, calculate and create pregnancy record
-      if (formData.role === "mother") {
-        // Ensure we have calculated data
+      // Journey-specific data handling
+      if (userJourney === "pregnant") {
+        // Create pregnancy record
         let pregnancyData = calculatedData;
         if (!pregnancyData) {
           pregnancyData = await calculatePregnancyData();
         }
         
         if (!pregnancyData) {
-          throw new Error("Failed to calculate pregnancy data. Please enter your gestational age or last menstrual period.");
+          throw new Error("Failed to calculate pregnancy data.");
         }
 
         const { error: pregnancyError } = await supabase
@@ -205,6 +246,31 @@ export default function ProfileSetup() {
           });
 
         if (pregnancyError) throw pregnancyError;
+      } else if (userJourney === "family_planning") {
+        // Create cycle tracking record
+        const { error: cycleError } = await supabase
+          .from("reproductive_health")
+          .insert({
+            mother_id: profile.id,
+            record_date: formData.cycle_last_period,
+            menstrual_cycle_day: 1,
+            cycle_length: parseInt(formData.cycle_length),
+            notes: `Period duration: ${formData.period_duration} days`,
+          });
+
+        if (cycleError) throw cycleError;
+      } else if (userJourney === "infant") {
+        // Create infant record
+        const { error: infantError } = await supabase
+          .from("infants")
+          .insert({
+            mother_id: profile.id,
+            first_name: formData.infant_name,
+            birth_date: formData.infant_birth_date,
+            gender: formData.infant_gender || null,
+          });
+
+        if (infantError) throw infantError;
       }
 
       toast({
@@ -295,22 +361,6 @@ export default function ProfileSetup() {
                   />
                 </div>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="role">I am a</Label>
-                <Select
-                  value={formData.role}
-                  onValueChange={(value) => setFormData({ ...formData, role: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="mother">Pregnant Mother</SelectItem>
-                    <SelectItem value="infant">Parent of Infant</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
           )}
 
@@ -364,10 +414,10 @@ export default function ProfileSetup() {
             </div>
           )}
 
-          {/* Step 3: Pregnancy Info */}
+          {/* Step 3: Journey-specific Info */}
           {currentStep === 3 && (
             <div className="space-y-4 animate-in fade-in duration-300">
-              {formData.role === "mother" ? (
+              {userJourney === "pregnant" ? (
                 <>
                   <div className="space-y-3">
                     <Label>How would you like to provide pregnancy information?</Label>
@@ -485,40 +535,134 @@ export default function ProfileSetup() {
                   )}
 
                   {calculatedData && (
-                    <Card className="bg-primary/5 border-primary/20">
-                      <CardContent className="pt-4 space-y-2">
-                        <h4 className="font-semibold text-sm">Calculated Information:</h4>
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                          <div>
-                            <span className="text-muted-foreground">Due Date:</span>
-                            <p className="font-medium">{new Date(calculatedData.dueDate + 'T00:00:00').toLocaleDateString()}</p>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Current Week:</span>
-                            <p className="font-medium">{calculatedData.currentWeek}w {calculatedData.currentDay}d</p>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Trimester:</span>
-                            <p className="font-medium capitalize">{calculatedData.trimester === 1 ? 'First' : calculatedData.trimester === 2 ? 'Second' : 'Third'}</p>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Weeks Remaining:</span>
-                            <p className="font-medium">{calculatedData.weeksRemaining} weeks</p>
-                          </div>
+                    <div className="mt-6 p-4 bg-primary/10 rounded-lg space-y-2">
+                      <h3 className="font-semibold text-lg">Pregnancy Information</h3>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Current Week</p>
+                          <p className="font-semibold">{calculatedData.currentWeek} weeks</p>
                         </div>
-                      </CardContent>
-                    </Card>
+                        <div>
+                          <p className="text-muted-foreground">Trimester</p>
+                          <p className="font-semibold">
+                            {calculatedData.trimester === 1 ? 'First' : 
+                             calculatedData.trimester === 2 ? 'Second' : 'Third'}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Due Date</p>
+                          <p className="font-semibold">
+                            {new Date(calculatedData.dueDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Days Until Due</p>
+                          <p className="font-semibold">{calculatedData.daysUntilDue} days</p>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </>
-              ) : (
-                <div className="text-center py-8">
-                  <Baby className="w-12 h-12 mx-auto mb-4 text-primary" />
-                  <h3 className="font-semibold mb-2">All Set!</h3>
-                  <p className="text-muted-foreground text-sm">
-                    You can add infant profiles from your dashboard after completing setup.
+              ) : userJourney === "family_planning" ? (
+                <>
+                  <h3 className="font-semibold text-lg">Start Cycle Tracking</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Help us understand your cycle to provide personalized insights.
                   </p>
-                </div>
-              )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="cycle_last_period">Last Menstrual Period Date *</Label>
+                    <Input
+                      id="cycle_last_period"
+                      type="date"
+                      value={formData.cycle_last_period}
+                      onChange={(e) => setFormData({ ...formData, cycle_last_period: e.target.value })}
+                      max={new Date().toISOString().split('T')[0]}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="cycle_length">
+                      Average Cycle Length: {formData.cycle_length} days
+                    </Label>
+                    <Slider
+                      id="cycle_length"
+                      min={21}
+                      max={35}
+                      step={1}
+                      value={[parseInt(formData.cycle_length)]}
+                      onValueChange={(value) => setFormData({ ...formData, cycle_length: value[0].toString() })}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Typical range: 21-35 days
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="period_duration">
+                      Period Duration: {formData.period_duration} days
+                    </Label>
+                    <Slider
+                      id="period_duration"
+                      min={2}
+                      max={10}
+                      step={1}
+                      value={[parseInt(formData.period_duration)]}
+                      onValueChange={(value) => setFormData({ ...formData, period_duration: value[0].toString() })}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Typical range: 2-10 days
+                    </p>
+                  </div>
+                </>
+              ) : userJourney === "infant" ? (
+                <>
+                  <h3 className="font-semibold text-lg">Infant Details</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Tell us about your little one.
+                  </p>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="infant_name">Infant's Name *</Label>
+                    <Input
+                      id="infant_name"
+                      value={formData.infant_name}
+                      onChange={(e) => setFormData({ ...formData, infant_name: e.target.value })}
+                      placeholder="Enter infant's name"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="infant_birth_date">Birth Date *</Label>
+                    <Input
+                      id="infant_birth_date"
+                      type="date"
+                      value={formData.infant_birth_date}
+                      onChange={(e) => setFormData({ ...formData, infant_birth_date: e.target.value })}
+                      max={new Date().toISOString().split('T')[0]}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="infant_gender">Gender (Optional)</Label>
+                    <Select
+                      value={formData.infant_gender}
+                      onValueChange={(value) => setFormData({ ...formData, infant_gender: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
+              ) : null}
             </div>
           )}
 
