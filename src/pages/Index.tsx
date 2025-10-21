@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Calendar, FileText, Activity, Shield, Users, AlertTriangle, Clock, BookOpen, TrendingDown, Brain, Bell, BarChart3, Baby, Pill, LineChart } from "lucide-react";
+import { Heart, Calendar, FileText, Activity, AlertTriangle, Clock, BookOpen, TrendingDown, Brain, Bell, BarChart3, Baby, Pill, LineChart, Droplet, Moon, Sun, Sparkles, Target, Shield, Zap, CheckCircle2, CalendarDays, HeartPulse, BellRing, ClipboardList } from "lucide-react";
 import heroImage from "@/assets/hero-healthcare.jpg";
 
 const Index = () => {
@@ -13,78 +13,143 @@ const Index = () => {
     {
       icon: AlertTriangle,
       title: "Fragmented Health Information",
-      description: "Medical records scattered across different facilities, making it difficult to track maternal and infant health comprehensively."
+      description: "Medical records scattered across facilities - pregnancy data, cycle history, and infant health tracking all in different places.",
+      gradient: "from-red-500 to-orange-500"
     },
     {
       icon: Clock,
-      title: "Missed Appointments & Vaccinations",
-      description: "Busy schedules and lack of reminders lead to missed critical checkups, putting mother and baby at risk."
+      title: "Missed Critical Events",
+      description: "Forgotten fertility windows, missed vaccinations, skipped antenatal visits - busy lives lead to overlooked health milestones.",
+      gradient: "from-orange-500 to-amber-500"
+    },
+    {
+      icon: Droplet,
+      title: "Unpredictable Cycles",
+      description: "Irregular periods, unknown fertile days, and difficulty planning pregnancies without proper cycle tracking tools.",
+      gradient: "from-pink-500 to-rose-500"
     },
     {
       icon: BookOpen,
-      title: "Limited Health Education Access",
-      description: "Inadequate information about pregnancy stages, infant care, and warning signs of complications."
+      title: "Limited Health Education",
+      description: "Inadequate information about menstrual health, pregnancy stages, infant care, and family planning options.",
+      gradient: "from-purple-500 to-violet-500"
     },
     {
       icon: TrendingDown,
       title: "Poor Health Monitoring",
-      description: "Difficulty tracking symptoms, medications, and growth milestones without proper tools and guidance."
+      description: "Difficulty tracking symptoms, cycle patterns, fetal development, and infant growth without integrated tools.",
+      gradient: "from-blue-500 to-cyan-500"
+    },
+    {
+      icon: Moon,
+      title: "Lack of Personalization",
+      description: "Generic advice that doesn't account for your unique cycle, pregnancy journey, or family planning goals.",
+      gradient: "from-indigo-500 to-blue-500"
     }
   ];
 
   const solutions = [
     {
       icon: Brain,
-      title: "AI-Powered Health Insights",
-      description: "Get personalized recommendations and early warning signs through intelligent symptom analysis and health tracking."
+      title: "AI-Powered Cycle Predictions",
+      description: "Advanced algorithms learn your unique patterns to accurately predict periods, ovulation, and fertile windows for better family planning.",
+      gradient: "from-primary to-primary/60"
     },
     {
-      icon: Bell,
-      title: "Smart Reminder System",
-      description: "Never miss medications, appointments, or vaccinations with customizable notifications and pre-alerts."
+      icon: Target,
+      title: "Personalized Health Tracking",
+      description: "Track everything from menstrual symptoms to pregnancy milestones and infant development with intelligent insights tailored to you.",
+      gradient: "from-primary to-accent"
+    },
+    {
+      icon: BellRing,
+      title: "Smart Multi-Event Reminders",
+      description: "Never miss fertility windows, medication doses, antenatal visits, or vaccinations with context-aware notifications.",
+      gradient: "from-accent to-primary"
     },
     {
       icon: BarChart3,
-      title: "Comprehensive Analytics",
-      description: "Visualize pregnancy progress, infant growth curves, and health trends with intuitive charts and reports."
+      title: "Visual Health Analytics",
+      description: "Beautiful charts showing cycle patterns, pregnancy progress, infant growth curves, and comprehensive health trends.",
+      gradient: "from-primary/80 to-primary"
+    },
+    {
+      icon: Sparkles,
+      title: "Intelligent Symptom Analysis",
+      description: "AI-powered assessment of symptoms across all phases - from menstrual tracking to pregnancy monitoring and infant care.",
+      gradient: "from-primary to-secondary"
     },
     {
       icon: FileText,
-      title: "Centralized Health Records",
-      description: "All medical information in one secure place, accessible anytime and shareable with healthcare providers."
+      title: "Unified Health Records",
+      description: "One secure place for all your data: cycle history, pregnancy records, infant milestones, medications, and appointments.",
+      gradient: "from-secondary to-primary"
     }
   ];
 
   const features = [
     {
+      icon: Droplet,
+      title: "Advanced Cycle Tracking",
+      description: "Track periods, ovulation, fertile windows, and symptoms with AI-powered predictions that learn your unique patterns.",
+      color: "text-pink-500",
+      bgColor: "bg-pink-500/10"
+    },
+    {
+      icon: CalendarDays,
+      title: "Family Planning Tools",
+      description: "Plan or prevent pregnancy with accurate fertility tracking, ovulation predictions, and personalized insights.",
+      color: "text-purple-500",
+      bgColor: "bg-purple-500/10"
+    },
+    {
       icon: Baby,
-      title: "Pregnancy & Infant Tracking",
-      description: "Monitor due date countdown, gestational age, trimester milestones, and infant development stages."
+      title: "Pregnancy Journey Tracking",
+      description: "Monitor due date countdown, gestational age, trimester milestones, fetal development, and maternal health.",
+      color: "text-blue-500",
+      bgColor: "bg-blue-500/10"
+    },
+    {
+      icon: HeartPulse,
+      title: "Infant Development Monitor",
+      description: "Track growth curves, developmental milestones, feeding patterns, and sleep schedules for your little one.",
+      color: "text-green-500",
+      bgColor: "bg-green-500/10"
     },
     {
       icon: Calendar,
-      title: "Appointment Management",
-      description: "Schedule and track antenatal visits, vaccinations, and follow-up appointments with intelligent reminders."
+      title: "Smart Appointment System",
+      description: "Manage antenatal visits, gynecology appointments, pediatric checkups, and vaccinations in one place.",
+      color: "text-indigo-500",
+      bgColor: "bg-indigo-500/10"
     },
     {
       icon: Pill,
-      title: "Medication Adherence",
-      description: "Set custom medication schedules with multiple daily reminders and track adherence patterns over time."
+      title: "Medication Management",
+      description: "Track birth control, prenatal vitamins, medications, and supplements with customizable reminder schedules.",
+      color: "text-cyan-500",
+      bgColor: "bg-cyan-500/10"
     },
     {
       icon: Activity,
-      title: "Symptom Checker",
-      description: "AI-powered symptom analysis to assess severity and provide guidance on when to seek medical attention."
+      title: "AI Symptom Checker",
+      description: "Analyze menstrual symptoms, pregnancy concerns, and infant health issues with intelligent severity assessment.",
+      color: "text-orange-500",
+      bgColor: "bg-orange-500/10"
     },
     {
       icon: LineChart,
-      title: "Growth & Health Analytics",
-      description: "Track weight, height, blood pressure, and other vital signs with visual progress charts and insights."
+      title: "Comprehensive Analytics",
+      description: "Visualize cycle patterns, pregnancy progress, infant growth, and health trends with interactive charts.",
+      color: "text-teal-500",
+      bgColor: "bg-teal-500/10"
     },
     {
-      icon: Heart,
-      title: "Journal & Community",
-      description: "Document your journey, share experiences, and support maternal health campaigns through donations."
+      icon: ClipboardList,
+      title: "Health Journal",
+      description: "Document your menstrual experiences, pregnancy journey, birth story, and parenting moments.",
+      color: "text-violet-500",
+      bgColor: "bg-violet-500/10"
     }
   ];
 
@@ -95,65 +160,102 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative h-[600px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[700px] flex items-center justify-center overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center z-0"
           style={{ backgroundImage: `url(${heroImage})` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
+          <div className="absolute inset-0 bg-gradient-to-br from-background/98 via-primary/10 to-background/95" />
         </div>
         
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground">
-            Your Family's Health Journey,
-            <span className="text-primary block mt-2">All in One Place</span>
+        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6 animate-fade-in">
+            <Sparkles className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium">Your Complete Women's Health Companion</span>
+          </div>
+          
+          <h1 className="text-6xl md:text-7xl font-bold mb-6 animate-fade-in" style={{ animationDelay: "100ms" }}>
+            <span className="bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
+              Track Your Cycle,
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+              Plan Your Family,
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-foreground via-secondary to-foreground bg-clip-text text-transparent">
+              Nurture Your Baby
+            </span>
           </h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            LEA - Maternease helps you track, manage, and understand your maternal and infant health with confidence and ease.
+          
+          <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto animate-fade-in leading-relaxed" style={{ animationDelay: "200ms" }}>
+            LEA - Maternease is your all-in-one platform for menstrual tracking, family planning, pregnancy monitoring, and infant care. 
+            <span className="text-primary font-semibold block mt-2">Empowering every stage of your journey.</span>
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" onClick={() => navigate("/auth")} className="text-lg px-8">
-              Get Started Free
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: "300ms" }}>
+            <Button size="lg" onClick={() => navigate("/auth")} className="text-lg px-10 py-6 shadow-lg hover:shadow-xl transition-all hover:scale-105">
+              <Zap className="w-5 h-5 mr-2" />
+              Start Free Today
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate("/about")} className="text-lg px-8">
-              Learn More
+            <Button size="lg" variant="outline" onClick={() => navigate("/about")} className="text-lg px-10 py-6 border-2 hover:scale-105 transition-all">
+              Explore Features
             </Button>
+          </div>
+          
+          <div className="flex items-center justify-center gap-8 mt-12 text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: "400ms" }}>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-primary" />
+              <span>Free Forever</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-primary" />
+              <span>AI-Powered</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-primary" />
+              <span>100% Private</span>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Problems Section */}
-      <section className="py-20 px-6 bg-muted/30">
+      <section className="py-24 px-6 bg-gradient-to-b from-background via-destructive/5 to-background">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16 animate-fade-in">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-destructive to-destructive/60 bg-clip-text text-transparent">
-              The Challenges Women Face
+          <div className="text-center mb-20 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-destructive/10 border border-destructive/20 mb-6">
+              <AlertTriangle className="w-4 h-4 text-destructive" />
+              <span className="text-sm font-medium text-destructive">Real Challenges Women Face</span>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-destructive via-destructive/80 to-destructive bg-clip-text text-transparent">
+                You Deserve Better
+              </span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Navigating maternal and infant healthcare shouldn't be complicated. Yet, millions of women struggle with these critical issues daily.
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              From menstrual tracking to motherhood, women face unique health challenges that shouldn't be managed alone. 
+              <span className="text-foreground font-semibold block mt-2">These obstacles stand in your way:</span>
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {problems.map((problem, index) => {
               const Icon = problem.icon;
               return (
                 <Card 
                   key={index} 
-                  className="border-2 border-destructive/20 hover:border-destructive/40 transition-all duration-300 hover:shadow-lg animate-fade-in hover-scale"
+                  className="group border-2 border-destructive/20 hover:border-destructive/40 transition-all duration-500 hover:shadow-2xl hover:shadow-destructive/10 animate-fade-in hover-scale cursor-pointer overflow-hidden relative"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <CardHeader>
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-destructive/10 rounded-lg flex items-center justify-center shrink-0">
-                        <Icon className="w-6 h-6 text-destructive" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-xl mb-2">{problem.title}</CardTitle>
-                        <p className="text-muted-foreground">{problem.description}</p>
-                      </div>
+                  <div className={`absolute inset-0 bg-gradient-to-br ${problem.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
+                  <CardContent className="p-6 relative">
+                    <div className={`w-14 h-14 bg-gradient-to-br ${problem.gradient} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                      <Icon className="w-7 h-7 text-white" />
                     </div>
-                  </CardHeader>
+                    <h3 className="text-xl font-bold mb-3 group-hover:text-destructive transition-colors">{problem.title}</h3>
+                    <p className="text-muted-foreground leading-relaxed">{problem.description}</p>
+                  </CardContent>
                 </Card>
               );
             })}
@@ -162,36 +264,43 @@ const Index = () => {
       </section>
 
       {/* Solutions Section */}
-      <section className="py-20 px-6 bg-gradient-to-b from-background to-primary/5">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16 animate-fade-in">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              LEA's Smart Solutions
+      <section className="py-24 px-6 bg-gradient-to-b from-background via-primary/5 to-background relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,hsl(var(--primary)/0.1),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,hsl(var(--accent)/0.1),transparent_50%)]" />
+        
+        <div className="max-w-7xl mx-auto relative">
+          <div className="text-center mb-20 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">Powered by Advanced AI</span>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                LEA Has The Answers
+              </span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              We've built powerful tools to address every challenge, giving you confidence and control over your family's health journey.
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Intelligent, personalized solutions designed for every phase of your reproductive health journey.
+              <span className="text-foreground font-semibold block mt-2">From your first period to your baby's first steps.</span>
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {solutions.map((solution, index) => {
               const Icon = solution.icon;
               return (
                 <Card 
                   key={index} 
-                  className="border-2 border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 animate-fade-in hover-scale"
+                  className="group border-2 border-primary/20 hover:border-primary transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 animate-fade-in hover-scale cursor-pointer overflow-hidden relative"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary/60 rounded-xl flex items-center justify-center shrink-0">
-                        <Icon className="w-7 h-7 text-primary-foreground" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-semibold mb-2">{solution.title}</h3>
-                        <p className="text-muted-foreground">{solution.description}</p>
-                      </div>
+                  <div className={`absolute inset-0 bg-gradient-to-br ${solution.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+                  <CardContent className="p-6 relative">
+                    <div className={`w-16 h-16 bg-gradient-to-br ${solution.gradient} rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg`}>
+                      <Icon className="w-8 h-8 text-white" />
                     </div>
+                    <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">{solution.title}</h3>
+                    <p className="text-muted-foreground leading-relaxed">{solution.description}</p>
                   </CardContent>
                 </Card>
               );
@@ -201,14 +310,20 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-6 bg-gradient-to-b from-primary/5 to-background">
+      <section className="py-24 px-6 bg-gradient-to-b from-background via-muted/30 to-background">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16 animate-fade-in">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Powerful Features for Complete Care
+          <div className="text-center mb-20 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-6">
+              <Zap className="w-4 h-4 text-accent" />
+              <span className="text-sm font-medium">Everything You Need, Beautifully Integrated</span>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+                Comprehensive Features
+              </span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Everything you need to track, manage, and understand maternal and infant health — all in one beautifully designed platform.
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Track your cycle, plan your family, monitor your pregnancy, and nurture your baby—all with powerful tools designed for women.
             </p>
           </div>
 
@@ -218,17 +333,41 @@ const Index = () => {
               return (
                 <Card 
                   key={index} 
-                  className="border-2 hover:border-primary transition-all duration-300 hover:shadow-lg animate-fade-in hover-scale group"
+                  className="group border-2 hover:border-primary transition-all duration-500 hover:shadow-2xl animate-fade-in hover-scale cursor-pointer overflow-hidden relative"
                   style={{ animationDelay: `${index * 80}ms` }}
                 >
-                  <CardContent className="p-6">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                      <Icon className="w-6 h-6 text-primary" />
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <CardContent className="p-6 relative">
+                    <div className={`w-14 h-14 ${feature.bgColor} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                      <Icon className={`w-7 h-7 ${feature.color}`} />
                     </div>
-                    <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                    <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">{feature.title}</h3>
                     <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
                   </CardContent>
                 </Card>
+              );
+            })}
+          </div>
+
+          {/* Stats Section */}
+          <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { value: "100%", label: "Free to Use", icon: CheckCircle2 },
+              { value: "AI", label: "Powered Insights", icon: Brain },
+              { value: "24/7", label: "Always Available", icon: Clock },
+              { value: "Secure", label: "Your Data Protected", icon: Shield }
+            ].map((stat, index) => {
+              const StatIcon = stat.icon;
+              return (
+                <div 
+                  key={index} 
+                  className="text-center p-6 rounded-2xl bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/10 hover:border-primary/30 transition-all duration-300 hover:scale-105 animate-fade-in"
+                  style={{ animationDelay: `${(features.length * 80) + (index * 100)}ms` }}
+                >
+                  <StatIcon className="w-8 h-8 text-primary mx-auto mb-3" />
+                  <div className="text-3xl font-bold text-primary mb-1">{stat.value}</div>
+                  <div className="text-sm text-muted-foreground">{stat.label}</div>
+                </div>
               );
             })}
           </div>
@@ -236,18 +375,30 @@ const Index = () => {
       </section>
 
       {/* Donation Section */}
-      <section className="py-20 px-6 bg-gradient-to-r from-primary/10 via-primary/5 to-background">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">Support Maternal & Infant Health</h2>
-          <p className="text-xl text-muted-foreground mb-8">
-            Your donation can save lives. Help us provide critical care for mothers and babies in need.
+      <section className="py-24 px-6 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,hsl(var(--primary)/0.15),transparent_70%)]" />
+        <div className="max-w-5xl mx-auto text-center relative">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 border border-primary/30 mb-6 animate-fade-in">
+            <Heart className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium">Make a Difference</span>
+          </div>
+          
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 animate-fade-in" style={{ animationDelay: "100ms" }}>
+            <span className="bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+              Support Women's Health Worldwide
+            </span>
+          </h2>
+          
+          <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "200ms" }}>
+            Your donation provides critical maternal healthcare, family planning resources, and life-saving support to mothers and babies in need.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" onClick={() => navigate("/donate")} className="text-lg px-8" variant="default">
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: "300ms" }}>
+            <Button size="lg" onClick={() => navigate("/donate")} className="text-lg px-10 py-6 shadow-lg hover:shadow-xl hover:scale-105 transition-all">
               <Heart className="w-5 h-5 mr-2" />
               Donate Now
             </Button>
-            <Button size="lg" onClick={() => navigate("/donate")} className="text-lg px-8" variant="outline">
+            <Button size="lg" onClick={() => navigate("/donate")} variant="outline" className="text-lg px-10 py-6 border-2 hover:scale-105 transition-all">
               View Campaigns
             </Button>
           </div>
@@ -255,15 +406,28 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-6 bg-primary/5">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Start Your Journey?</h2>
-          <p className="text-xl text-muted-foreground mb-8">
-            Join thousands of families who trust LEA for their health management.
+      <section className="py-24 px-6 bg-gradient-to-br from-primary/5 via-accent/5 to-background relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl" />
+        
+        <div className="max-w-5xl mx-auto text-center relative">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 animate-fade-in">
+            <span className="bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
+              Ready to Take Control of Your Health?
+            </span>
+          </h2>
+          
+          <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "100ms" }}>
+            Join thousands of women who trust LEA for cycle tracking, family planning, pregnancy monitoring, and infant care.
           </p>
-          <Button size="lg" onClick={() => navigate("/auth")} className="text-lg px-8">
-            Create Your Free Account
-          </Button>
+          
+          <div className="animate-fade-in" style={{ animationDelay: "200ms" }}>
+            <Button size="lg" onClick={() => navigate("/auth")} className="text-lg px-12 py-7 shadow-2xl hover:shadow-3xl hover:scale-110 transition-all">
+              <Sparkles className="w-5 h-5 mr-2" />
+              Create Your Free Account
+            </Button>
+            <p className="text-sm text-muted-foreground mt-4">No credit card required • Free forever • Get started in 30 seconds</p>
+          </div>
         </div>
       </section>
 
