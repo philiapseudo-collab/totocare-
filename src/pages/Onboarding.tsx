@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Baby, Heart, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/queryKeys';
 
 type JourneyType = 'pregnant' | 'infant' | 'family_planning';
 
@@ -15,6 +17,7 @@ export default function Onboarding() {
   const { user } = useAuth();
   const { t } = useAppTranslation();
   const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleJourneySelect = async (journey: JourneyType) => {
     if (!user) return;
@@ -44,10 +47,15 @@ export default function Onboarding() {
 
       if (error) throw error;
 
+      // Invalidate profile query to refetch with new data
+      await queryClient.invalidateQueries({ queryKey: queryKeys.profile(user.id) });
+
       toast.success('Welcome to your personalized dashboard!');
       
-      // Navigate AFTER successful database update
-      navigate('/');
+      // Small delay to ensure cache is updated
+      setTimeout(() => {
+        navigate('/');
+      }, 100);
     } catch (error) {
       console.error('Error setting journey:', error);
       toast.error('Failed to set up your journey. Please try again.');
