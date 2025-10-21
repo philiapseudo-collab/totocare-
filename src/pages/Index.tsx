@@ -69,9 +69,6 @@ const Index = () => {
             <Button size="lg" onClick={() => navigate("/auth")} className="text-lg px-8">
               Get Started Free
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate("/onboarding")} className="text-lg px-8">
-              Getting Started
-            </Button>
             <Button size="lg" variant="outline" onClick={() => navigate("/about")} className="text-lg px-8">
               Learn More
             </Button>
@@ -134,14 +131,9 @@ const Index = () => {
           <p className="text-xl text-muted-foreground mb-8">
             Join thousands of families who trust LEA for their health management.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" onClick={() => navigate("/auth")} className="text-lg px-8">
-              Create Your Free Account
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate("/onboarding")} className="text-lg px-8">
-              Getting Started
-            </Button>
-          </div>
+          <Button size="lg" onClick={() => navigate("/auth")} className="text-lg px-8">
+            Create Your Free Account
+          </Button>
         </div>
       </section>
 
@@ -157,7 +149,6 @@ const Index = () => {
           <div>
             <h4 className="font-semibold mb-4">Product</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="/onboarding" className="hover:text-foreground">Getting Started</a></li>
               <li><a href="/about" className="hover:text-foreground">About</a></li>
               <li><a href="/guides" className="hover:text-foreground">Guides</a></li>
               <li><a href="/faq" className="hover:text-foreground">FAQ</a></li>
