@@ -67,9 +67,6 @@ const AuthenticatedApp = () => {
   // Enable keyboard shortcuts
   useKeyboardShortcuts();
 
-  // Check if user needs onboarding
-  const needsOnboarding = profile && !(profile as any).user_journey;
-
   // Register service worker on mount
   useEffect(() => {
     registerServiceWorker().then((registration) => {
@@ -119,11 +116,6 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Redirect to onboarding if user hasn't selected a journey yet
-  if (needsOnboarding && location.pathname !== '/onboarding') {
-    return <Navigate to="/onboarding" replace />;
-  }
-
   // Redirect to profile setup only if profile is incomplete AND user is trying to access dashboard
   // Allow access to all other pages even if profile is incomplete
   if (profile && !profile.profile_completed && (location.pathname === '/' || location.pathname === '/dashboard')) {
@@ -148,17 +140,8 @@ const AuthenticatedApp = () => {
             <Breadcrumbs />
             <Suspense fallback={<PageLoader />}>
               <Routes>
-              <Route path="/" element={
-                (profile as any)?.user_journey === 'family_planning' 
-                  ? <DashboardFamilyPlanning /> 
-                  : <Dashboard />
-              } />
-              <Route path="/dashboard" element={
-                (profile as any)?.user_journey === 'family_planning' 
-                  ? <DashboardFamilyPlanning /> 
-                  : <Dashboard />
-              } />
-              <Route path="/onboarding" element={<Onboarding />} />
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/profile-setup" element={<ProfileSetup />} />
               <Route path="/profile" element={<Profile />} />
