@@ -1,12 +1,9 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppHeader } from "@/components/AppHeader";
-import { AuthProvider, useAuth } from "@/hooks/useAuth";
-import { ThemeProvider } from "@/components/ThemeProvider";
+import { useAuth } from "@/hooks/useAuth";
 import { QuickActionFAB } from "@/components/QuickActionFAB";
-import { LanguageProvider } from "@/i18n/LanguageContext";
-import { useProfile } from "./hooks/useProfile";
+import { useProfile } from "@/hooks/useProfile";
 import { useEffect, lazy, Suspense } from "react";
 import { medicationNotificationService } from "./lib/medicationNotifications";
 import { MedicationAlertModal } from "./components/MedicationAlertModal";
@@ -66,6 +63,13 @@ const AuthenticatedApp = () => {
   
   // Enable keyboard shortcuts
   useKeyboardShortcuts();
+
+  // Dev: verify mount order
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.log("[AuthenticatedApp] mounted", { path: location.pathname });
+    }
+  }, []);
 
   // Check if user needs journey selection
   const needsJourneySelection = profile && !(profile as any).user_journey;
@@ -199,17 +203,11 @@ const AuthenticatedApp = () => {
 };
 
 const App = () => (
-  <LanguageProvider>
-    <AuthProvider>
-      <ThemeProvider defaultTheme="system" storageKey="lea-maternease-ui-theme">
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <AuthenticatedApp />
-        </TooltipProvider>
-      </ThemeProvider>
-    </AuthProvider>
-  </LanguageProvider>
+  <>
+    <Toaster />
+    <Sonner />
+    <AuthenticatedApp />
+  </>
 );
 
 export default App;
