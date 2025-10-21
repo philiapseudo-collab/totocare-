@@ -113,16 +113,15 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Hero Section */}
       <section className="relative min-h-[500px] md:h-[700px] flex items-center justify-center overflow-hidden py-12 md:py-0">
         <div 
           className="absolute inset-0 bg-cover bg-center z-0"
           style={{ backgroundImage: `url(${heroImage})` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/90 to-background/95" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/80" />
-          <div className="absolute inset-0 bg-primary/5" />
+          <div className="absolute inset-0 bg-gradient-to-br from-background/85 via-background/70 to-background/85" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-background/60" />
         </div>
         
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center">
