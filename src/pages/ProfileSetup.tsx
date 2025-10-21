@@ -13,6 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { ArrowRight, ArrowLeft, Check, Baby, Calendar, User, Activity } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Dynamic steps based on journey
 const getStepsForJourney = (journey: string | null) => {
@@ -37,6 +38,7 @@ export default function ProfileSetup() {
   const { profile, loading: profileLoading } = useProfile();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [calculatedData, setCalculatedData] = useState<any>(null);
@@ -288,12 +290,18 @@ export default function ProfileSetup() {
         if (infantError) throw infantError;
       }
 
+      // Invalidate profile query to refresh the cache
+      await queryClient.invalidateQueries({ queryKey: ['profile'] });
+
       toast({
         title: "Profile completed!",
         description: "Your profile has been set up successfully.",
       });
 
-      navigate("/dashboard", { replace: true });
+      // Small delay to ensure state updates
+      setTimeout(() => {
+        navigate("/dashboard", { replace: true });
+      }, 100);
     } catch (error: any) {
       toast({
         title: "Error",
