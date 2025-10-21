@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from './useAuth';
+import { useAuth } from '@/hooks/useAuth';
 import { differenceInMonths, differenceInWeeks } from 'date-fns';
 
 interface VaccinationRecommendation {
