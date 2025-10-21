@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { ArrowRight, ArrowLeft, Check, Baby, Calendar, User, Activity } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/queryKeys";
 
 // Dynamic steps based on journey
 const getStepsForJourney = (journey: string | null) => {
@@ -290,18 +291,23 @@ export default function ProfileSetup() {
         if (infantError) throw infantError;
       }
 
-      // Invalidate profile query to refresh the cache
-      await queryClient.invalidateQueries({ queryKey: ['profile'] });
+      // Invalidate and refetch profile and related queries
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['profile'] }),
+        userJourney === 'family_planning' && profile?.id
+          ? queryClient.refetchQueries({ queryKey: queryKeys.cycle.tracking(profile.id) })
+          : Promise.resolve()
+      ]);
 
       toast({
         title: "Profile completed!",
         description: "Your profile has been set up successfully.",
       });
 
-      // Small delay to ensure state updates
+      // Wait for queries to refetch before navigating
       setTimeout(() => {
         navigate("/dashboard", { replace: true });
-      }, 100);
+      }, 300);
     } catch (error: any) {
       toast({
         title: "Error",

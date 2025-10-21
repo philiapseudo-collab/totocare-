@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfile } from './useProfile';
+import { queryKeys } from '@/lib/queryKeys';
 import {
   getCurrentCycleDay,
   getCyclePhase,
@@ -42,7 +43,7 @@ export function useCycleTracking() {
 
   // Fetch all cycle records for the user
   const { data: cycles = [], isLoading } = useQuery({
-    queryKey: ['cycle-tracking', profile?.id],
+    queryKey: queryKeys.cycle.tracking(profile?.id),
     queryFn: async () => {
       if (!profile?.id) return [];
       const { data, error } = await supabase
@@ -54,7 +55,8 @@ export function useCycleTracking() {
       if (error) throw error;
       return data as CycleRecord[];
     },
-    enabled: !!profile?.id
+    enabled: !!profile?.id,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
   // Add new cycle/period entry
@@ -84,7 +86,7 @@ export function useCycleTracking() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cycle-tracking', profile?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.cycle.tracking(profile?.id) });
     }
   });
 
@@ -99,7 +101,7 @@ export function useCycleTracking() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cycle-tracking', profile?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.cycle.tracking(profile?.id) });
     }
   });
 
