@@ -13,7 +13,7 @@ export default function DashboardFamilyPlanning() {
   const { profile } = useProfile();
 
   // Fetch latest reproductive health data
-  const { data: latestCycle } = useQuery({
+  const { data: latestCycle, isLoading } = useQuery({
     queryKey: ['cycle', profile?.id],
     queryFn: async () => {
       if (!profile?.id) return null;
@@ -29,7 +29,13 @@ export default function DashboardFamilyPlanning() {
     enabled: !!profile?.id
   });
 
-  const cycleDay = latestCycle?.menstrual_cycle_day || 1;
+  // Calculate current cycle day based on last period date
+  const cycleDay = latestCycle?.record_date 
+    ? differenceInDays(new Date(), new Date(latestCycle.record_date)) + 1
+    : 1;
+
+  const cycleLength = latestCycle?.cycle_length || 28;
+
   const cyclePhase = 
     cycleDay <= 5 ? 'Menstrual' :
     cycleDay <= 13 ? 'Follicular' :
@@ -39,6 +45,22 @@ export default function DashboardFamilyPlanning() {
     cyclePhase === 'Menstrual' ? 'text-red-500' :
     cyclePhase === 'Follicular' ? 'text-green-500' :
     cyclePhase === 'Ovulation' ? 'text-purple-500' : 'text-blue-500';
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 bg-muted rounded w-1/3"></div>
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="h-32 bg-muted rounded"></div>
+            <div className="h-32 bg-muted rounded"></div>
+            <div className="h-32 bg-muted rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const quickActions = [
     { icon: Droplets, label: 'My Cycle', href: '/my-cycle', color: 'text-pink-600', bg: 'bg-pink-50 dark:bg-pink-950/20' },
@@ -88,12 +110,14 @@ export default function DashboardFamilyPlanning() {
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-bold mb-1">
-              {latestCycle?.cycle_length ? latestCycle.cycle_length - cycleDay : '?'}
+              {cycleLength - cycleDay > 0 ? cycleLength - cycleDay : 'Due today'}
             </p>
-            <p className="text-sm text-muted-foreground">days away</p>
-            {latestCycle?.cycle_length && (
+            <p className="text-sm text-muted-foreground">
+              {cycleLength - cycleDay > 0 ? 'days away' : ''}
+            </p>
+            {latestCycle?.record_date && (
               <p className="text-xs text-muted-foreground mt-2">
-                Based on {latestCycle.cycle_length}-day cycle
+                Based on {cycleLength}-day cycle
               </p>
             )}
           </CardContent>
