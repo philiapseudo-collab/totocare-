@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Heart, Baby } from "lucide-react";
+import { Heart, Baby, Users } from "lucide-react";
 import { useCampaigns } from "@/hooks/useCampaigns";
 import { DonateDialog } from "@/components/forms/DonateDialog";
 import { useAppTranslation } from "@/hooks/useAppTranslation";
@@ -104,7 +104,7 @@ const Donate = () => {
                 <span data-i18n>{t('donation.infantHealth')}</span>
               </TabsTrigger>
               <TabsTrigger value="femalehood" className="flex items-center gap-2">
-                <Heart className="w-4 h-4" />
+                <Users className="w-4 h-4" />
                 <span data-i18n>{t('donation.femalehoodHealth')}</span>
               </TabsTrigger>
             </TabsList>

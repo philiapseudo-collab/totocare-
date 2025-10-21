@@ -5,7 +5,7 @@ export interface Campaign {
   id: string;
   title: string;
   description: string;
-  category: 'maternal' | 'infant';
+  category: 'maternal' | 'infant' | 'femalehood';
   condition_type: string;
   target_amount: number;
   current_amount: number;
