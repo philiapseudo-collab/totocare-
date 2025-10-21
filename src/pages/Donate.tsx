@@ -19,7 +19,32 @@ const Donate = () => {
 
   const maternalCampaigns = campaigns.filter(c => c.category === 'maternal');
   const infantCampaigns = campaigns.filter(c => c.category === 'infant');
-  const femalehoodCampaigns = campaigns.filter(c => c.category === 'femalehood');
+  
+  // Sort femalehood campaigns in specific order
+  const femalehoodOrder = [
+    'Breast Cancer Awareness & Treatment',
+    'Cervical Cancer Screening Program',
+    'Prostate Cancer Support Fund',
+    'GBV Survivor Support Program',
+    'HIV/AIDS Prevention & Care',
+    'Reproductive Health Rights'
+  ];
+  
+  const femalehoodCampaigns = campaigns
+    .filter(c => c.category === 'femalehood')
+    .sort((a, b) => {
+      const aIndex = femalehoodOrder.indexOf(a.title);
+      const bIndex = femalehoodOrder.indexOf(b.title);
+      
+      // If both are in the order list, sort by their position
+      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+      // If only a is in the list, it comes first
+      if (aIndex !== -1) return -1;
+      // If only b is in the list, it comes first
+      if (bIndex !== -1) return 1;
+      // If neither is in the list, maintain original order
+      return 0;
+    });
 
   const handleDonate = (campaign: any) => {
     setSelectedCampaign(campaign);
