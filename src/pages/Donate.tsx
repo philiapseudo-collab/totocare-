@@ -27,10 +27,6 @@ const Donate = () => {
   };
 
   const CampaignCard = ({ campaign }: { campaign: any }) => {
-    const progress = campaign.target_amount 
-      ? (campaign.current_amount / campaign.target_amount) * 100 
-      : 0;
-
     return (
       <Card className="hover:shadow-lg transition-shadow">
         <CardHeader>
@@ -48,16 +44,12 @@ const Donate = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <div className="flex justify-between text-sm mb-2">
-              <span data-i18n className="text-muted-foreground">{t('donation.raised')}</span>
-              <span className="font-semibold">
-                KES {campaign.current_amount?.toLocaleString() || 0} {t('donation.of')} {campaign.target_amount?.toLocaleString()}
+            <div className="flex justify-between items-center">
+              <span data-i18n className="text-sm text-muted-foreground">{t('donation.raised')}</span>
+              <span className="text-2xl font-bold text-primary">
+                KES {campaign.current_amount?.toLocaleString() || 0}
               </span>
             </div>
-            <Progress value={progress} className="h-2" />
-            <p className="text-xs text-muted-foreground mt-1">
-              {progress.toFixed(1)}{t('donation.fundedPercent')}
-            </p>
           </div>
           <Button onClick={() => handleDonate(campaign)} className="w-full">
             <Heart className="w-4 h-4 mr-2" />
