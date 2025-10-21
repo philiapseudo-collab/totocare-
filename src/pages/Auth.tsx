@@ -5,7 +5,7 @@ const Auth = () => {
   const navigate = useNavigate();
 
   return (
-    <AuthForm onSuccess={() => navigate("/profile-setup")} />
+    <AuthForm onSuccess={() => navigate("/onboarding")} />
   );
 };
 
