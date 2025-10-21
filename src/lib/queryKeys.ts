@@ -69,7 +69,6 @@ export const queryKeys = {
   
   // Cycle
   cycle: {
-    tracking: (profileId?: string) => ['cycle-tracking', profileId] as const,
     data: (userId: string) => ['cycle', 'data', userId] as const,
     prediction: (userId: string) => ['cycle', 'prediction', userId] as const,
   },
