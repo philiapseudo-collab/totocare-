@@ -199,17 +199,11 @@ const AuthenticatedApp = () => {
 };
 
 const App = () => (
-  <LanguageProvider>
-    <AuthProvider>
-      <ThemeProvider defaultTheme="system" storageKey="lea-maternease-ui-theme">
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <AuthenticatedApp />
-        </TooltipProvider>
-      </ThemeProvider>
-    </AuthProvider>
-  </LanguageProvider>
+  <>
+    <Toaster />
+    <Sonner />
+    <AuthenticatedApp />
+  </>
 );
 
 export default App;

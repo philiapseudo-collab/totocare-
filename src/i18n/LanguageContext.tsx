@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState, PropsWithChildren } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState, PropsWithChildren } from "react";
 import i18n from "./config";
 
 export type Language = "en" | "sw";
