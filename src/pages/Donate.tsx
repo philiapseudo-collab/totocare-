@@ -17,7 +17,28 @@ const Donate = () => {
   const [donateDialogOpen, setDonateDialogOpen] = useState(false);
   const { t } = useAppTranslation();
 
-  const maternalCampaigns = campaigns.filter(c => c.category === 'maternal');
+  // Sort maternal campaigns with specific order
+  const maternalOrder = [
+    'Fight Postpartum Hemorrhage',
+    'Pre-eclampsia Prevention',
+    'Eclampsia Emergency Care',
+    'Safe Labor Support',
+    'Obstetric Fistula',
+    'Safe Abortion Care',
+    'Maternal Comorbidities Fund'
+  ];
+  
+  const maternalCampaigns = campaigns
+    .filter(c => c.category === 'maternal')
+    .sort((a, b) => {
+      const aIndex = maternalOrder.indexOf(a.title);
+      const bIndex = maternalOrder.indexOf(b.title);
+      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+      if (aIndex !== -1) return -1;
+      if (bIndex !== -1) return 1;
+      return 0;
+    });
+  
   const infantCampaigns = campaigns.filter(c => c.category === 'infant');
   
   // Sort femalehood campaigns in specific order
@@ -27,7 +48,10 @@ const Donate = () => {
     'Prostate Cancer Support Fund',
     'GBV Survivor Support Program',
     'HIV/AIDS Prevention & Care',
-    'Reproductive Health Rights'
+    'Reproductive Health Rights',
+    'Endometriosis',
+    'Polycystic Ovarian Syndrome (PCOS)',
+    'Mental Health'
   ];
   
   const femalehoodCampaigns = campaigns
@@ -35,14 +59,9 @@ const Donate = () => {
     .sort((a, b) => {
       const aIndex = femalehoodOrder.indexOf(a.title);
       const bIndex = femalehoodOrder.indexOf(b.title);
-      
-      // If both are in the order list, sort by their position
       if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
-      // If only a is in the list, it comes first
       if (aIndex !== -1) return -1;
-      // If only b is in the list, it comes first
       if (bIndex !== -1) return 1;
-      // If neither is in the list, maintain original order
       return 0;
     });
 
