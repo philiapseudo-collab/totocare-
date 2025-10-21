@@ -1,18 +1,22 @@
-import { TodaysChecklist } from "@/components/dashboard/TodaysChecklist";
-import { UpcomingEvents } from "@/components/dashboard/UpcomingEvents";
-import { QuickAddForm } from "@/components/dashboard/QuickAddForm";
+import { lazy, Suspense } from "react";
 import { KeyMetrics } from "@/components/dashboard/KeyMetrics";
-import { ConditionsPanel } from "@/components/dashboard/ConditionsPanel";
-import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { DueDateCountdown } from "@/components/dashboard/DueDateCountdown";
 import { DeliveryNotification } from "@/components/DeliveryNotification";
-import { AIInsightsPanel } from "@/components/dashboard/AIInsightsPanel";
-import { HealthAnalytics } from "@/components/dashboard/HealthAnalytics";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent } from "@/components/ui/card";
+import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, CheckSquare, Plus, Calendar, AlertCircle, Activity, Pill, Heart, Stethoscope, Shield } from "lucide-react";
+import { BookOpen, CheckSquare, Plus, Calendar, Pill, Heart, Stethoscope, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
+
+// Lazy load heavy components for better initial load performance
+const AIInsightsPanel = lazy(() => import("@/components/dashboard/AIInsightsPanel").then(m => ({ default: m.AIInsightsPanel })));
+const HealthAnalytics = lazy(() => import("@/components/dashboard/HealthAnalytics").then(m => ({ default: m.HealthAnalytics })));
+const RecentActivity = lazy(() => import("@/components/dashboard/RecentActivity").then(m => ({ default: m.RecentActivity })));
+const QuickAddForm = lazy(() => import("@/components/dashboard/QuickAddForm").then(m => ({ default: m.QuickAddForm })));
+const UpcomingEvents = lazy(() => import("@/components/dashboard/UpcomingEvents").then(m => ({ default: m.UpcomingEvents })));
+const ConditionsPanel = lazy(() => import("@/components/dashboard/ConditionsPanel").then(m => ({ default: m.ConditionsPanel })));
+const TodaysChecklist = lazy(() => import("@/components/dashboard/TodaysChecklist").then(m => ({ default: m.TodaysChecklist })));
 
 const Dashboard = () => {
   const isMobile = useIsMobile();
@@ -73,21 +77,31 @@ const Dashboard = () => {
       <DeliveryNotification />
       
       {/* AI Insights - Full Width */}
-      <AIInsightsPanel />
+      <Suspense fallback={<LoadingSkeleton type="card" count={1} />}>
+        <AIInsightsPanel />
+      </Suspense>
       
       {/* 3-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Left Column */}
         <div className="space-y-6">
           <KeyMetrics />
-          <HealthAnalytics />
-          <RecentActivity />
+          <Suspense fallback={<LoadingSkeleton type="card" count={1} />}>
+            <HealthAnalytics />
+          </Suspense>
+          <Suspense fallback={<LoadingSkeleton type="list" count={3} />}>
+            <RecentActivity />
+          </Suspense>
         </div>
 
         {/* Middle Column */}
         <div className="space-y-6">
-          <QuickAddForm />
-          <UpcomingEvents />
+          <Suspense fallback={<LoadingSkeleton type="card" count={1} />}>
+            <QuickAddForm />
+          </Suspense>
+          <Suspense fallback={<LoadingSkeleton type="list" count={3} />}>
+            <UpcomingEvents />
+          </Suspense>
         </div>
 
         {/* Right Column */}
@@ -170,8 +184,12 @@ const Dashboard = () => {
             </CardContent>
           </Card>
           
-          <ConditionsPanel />
-          <TodaysChecklist />
+          <Suspense fallback={<LoadingSkeleton type="card" count={1} />}>
+            <ConditionsPanel />
+          </Suspense>
+          <Suspense fallback={<LoadingSkeleton type="list" count={3} />}>
+            <TodaysChecklist />
+          </Suspense>
         </div>
       </div>
     </div>
