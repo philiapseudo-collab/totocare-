@@ -1,44 +1,90 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Heart, Calendar, FileText, Activity, Shield, Users } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Heart, Calendar, FileText, Activity, Shield, Users, AlertTriangle, Clock, BookOpen, TrendingDown, Brain, Bell, BarChart3, Baby, Pill, LineChart } from "lucide-react";
 import heroImage from "@/assets/hero-healthcare.jpg";
 
 const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const features = [
+  const problems = [
     {
-      icon: Heart,
-      title: "Comprehensive Care Tracking",
-      description: "Monitor vaccinations, appointments, and health conditions for mother and infant in one place."
+      icon: AlertTriangle,
+      title: "Fragmented Health Information",
+      description: "Medical records scattered across different facilities, making it difficult to track maternal and infant health comprehensively."
     },
     {
-      icon: Calendar,
-      title: "Smart Scheduling",
-      description: "Never miss important appointments with intelligent reminders and upcoming event tracking."
+      icon: Clock,
+      title: "Missed Appointments & Vaccinations",
+      description: "Busy schedules and lack of reminders lead to missed critical checkups, putting mother and baby at risk."
+    },
+    {
+      icon: BookOpen,
+      title: "Limited Health Education Access",
+      description: "Inadequate information about pregnancy stages, infant care, and warning signs of complications."
+    },
+    {
+      icon: TrendingDown,
+      title: "Poor Health Monitoring",
+      description: "Difficulty tracking symptoms, medications, and growth milestones without proper tools and guidance."
+    }
+  ];
+
+  const solutions = [
+    {
+      icon: Brain,
+      title: "AI-Powered Health Insights",
+      description: "Get personalized recommendations and early warning signs through intelligent symptom analysis and health tracking."
+    },
+    {
+      icon: Bell,
+      title: "Smart Reminder System",
+      description: "Never miss medications, appointments, or vaccinations with customizable notifications and pre-alerts."
+    },
+    {
+      icon: BarChart3,
+      title: "Comprehensive Analytics",
+      description: "Visualize pregnancy progress, infant growth curves, and health trends with intuitive charts and reports."
     },
     {
       icon: FileText,
-      title: "Health Journal",
-      description: "Document your journey with detailed notes, symptoms, and daily reflections."
+      title: "Centralized Health Records",
+      description: "All medical information in one secure place, accessible anytime and shareable with healthcare providers."
+    }
+  ];
+
+  const features = [
+    {
+      icon: Baby,
+      title: "Pregnancy & Infant Tracking",
+      description: "Monitor due date countdown, gestational age, trimester milestones, and infant development stages."
+    },
+    {
+      icon: Calendar,
+      title: "Appointment Management",
+      description: "Schedule and track antenatal visits, vaccinations, and follow-up appointments with intelligent reminders."
+    },
+    {
+      icon: Pill,
+      title: "Medication Adherence",
+      description: "Set custom medication schedules with multiple daily reminders and track adherence patterns over time."
     },
     {
       icon: Activity,
-      title: "Health Analytics",
-      description: "Track pregnancy progress, infant growth, and health trends with visual insights."
+      title: "Symptom Checker",
+      description: "AI-powered symptom analysis to assess severity and provide guidance on when to seek medical attention."
     },
     {
-      icon: Shield,
-      title: "Private & Secure",
-      description: "Your health data is protected with enterprise-grade security and encryption."
+      icon: LineChart,
+      title: "Growth & Health Analytics",
+      description: "Track weight, height, blood pressure, and other vital signs with visual progress charts and insights."
     },
     {
-      icon: Users,
-      title: "Family-Centered",
-      description: "Manage health records for both mother and infant with easy profile switching."
+      icon: Heart,
+      title: "Journal & Community",
+      description: "Document your journey, share experiences, and support maternal health campaigns through donations."
     }
   ];
 
@@ -76,27 +122,111 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 px-6">
+      {/* Problems Section */}
+      <section className="py-20 px-6 bg-muted/30">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Everything You Need for Maternal & Infant Care</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Comprehensive tools designed to support your family's health journey from pregnancy through early childhood.
+          <div className="text-center mb-16 animate-fade-in">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-destructive to-destructive/60 bg-clip-text text-transparent">
+              The Challenges Women Face
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Navigating maternal and infant healthcare shouldn't be complicated. Yet, millions of women struggle with these critical issues daily.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-6">
+            {problems.map((problem, index) => {
+              const Icon = problem.icon;
+              return (
+                <Card 
+                  key={index} 
+                  className="border-2 border-destructive/20 hover:border-destructive/40 transition-all duration-300 hover:shadow-lg animate-fade-in hover-scale"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <CardHeader>
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-destructive/10 rounded-lg flex items-center justify-center shrink-0">
+                        <Icon className="w-6 h-6 text-destructive" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl mb-2">{problem.title}</CardTitle>
+                        <p className="text-muted-foreground">{problem.description}</p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Solutions Section */}
+      <section className="py-20 px-6 bg-gradient-to-b from-background to-primary/5">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16 animate-fade-in">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              LEA's Smart Solutions
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              We've built powerful tools to address every challenge, giving you confidence and control over your family's health journey.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {solutions.map((solution, index) => {
+              const Icon = solution.icon;
+              return (
+                <Card 
+                  key={index} 
+                  className="border-2 border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 animate-fade-in hover-scale"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary/60 rounded-xl flex items-center justify-center shrink-0">
+                        <Icon className="w-7 h-7 text-primary-foreground" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold mb-2">{solution.title}</h3>
+                        <p className="text-muted-foreground">{solution.description}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 px-6 bg-gradient-to-b from-primary/5 to-background">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16 animate-fade-in">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Powerful Features for Complete Care
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Everything you need to track, manage, and understand maternal and infant health — all in one beautifully designed platform.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <Card key={index} className="border-2 hover:border-primary transition-colors">
+                <Card 
+                  key={index} 
+                  className="border-2 hover:border-primary transition-all duration-300 hover:shadow-lg animate-fade-in hover-scale group"
+                  style={{ animationDelay: `${index * 80}ms` }}
+                >
                   <CardContent className="p-6">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                       <Icon className="w-6 h-6 text-primary" />
                     </div>
                     <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                    <p className="text-muted-foreground">{feature.description}</p>
+                    <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
                   </CardContent>
                 </Card>
               );
