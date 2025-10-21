@@ -19,6 +19,7 @@ const Donate = () => {
 
   const maternalCampaigns = campaigns.filter(c => c.category === 'maternal');
   const infantCampaigns = campaigns.filter(c => c.category === 'infant');
+  const femalehoodCampaigns = campaigns.filter(c => c.category === 'femalehood');
 
   const handleDonate = (campaign: any) => {
     setSelectedCampaign(campaign);
@@ -39,7 +40,9 @@ const Donate = () => {
               <CardDescription>{campaign.description}</CardDescription>
             </div>
             <Badge variant="outline" className="ml-2">
-              {campaign.category === 'maternal' ? t('donation.categoryMaternal') : t('donation.categoryInfant')}
+              {campaign.category === 'maternal' ? t('donation.categoryMaternal') : 
+               campaign.category === 'infant' ? t('donation.categoryInfant') : 
+               t('donation.categoryFemalehood')}
             </Badge>
           </div>
         </CardHeader>
@@ -91,7 +94,7 @@ const Donate = () => {
       <section className="py-12 px-6">
         <div className="max-w-7xl mx-auto">
           <Tabs defaultValue="maternal" className="space-y-8">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+            <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-3">
               <TabsTrigger value="maternal" className="flex items-center gap-2">
                 <Heart className="w-4 h-4" />
                 <span data-i18n>{t('donation.maternalHealth')}</span>
@@ -99,6 +102,10 @@ const Donate = () => {
               <TabsTrigger value="infant" className="flex items-center gap-2">
                 <Baby className="w-4 h-4" />
                 <span data-i18n>{t('donation.infantHealth')}</span>
+              </TabsTrigger>
+              <TabsTrigger value="femalehood" className="flex items-center gap-2">
+                <Heart className="w-4 h-4" />
+                <span data-i18n>{t('donation.femalehoodHealth')}</span>
               </TabsTrigger>
             </TabsList>
 
@@ -125,6 +132,20 @@ const Donate = () => {
               </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {infantCampaigns.map((campaign) => (
+                  <CampaignCard key={campaign.id} campaign={campaign} />
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="femalehood" className="space-y-6">
+              <div className="text-center mb-8">
+                <h2 data-i18n className="text-3xl font-bold mb-2">{t('donation.femalehoodCampaignsTitle')}</h2>
+                <p data-i18n className="text-muted-foreground">
+                  {t('donation.femalehoodCampaignsSubtitle')}
+                </p>
+              </div>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {femalehoodCampaigns.map((campaign) => (
                   <CampaignCard key={campaign.id} campaign={campaign} />
                 ))}
               </div>
