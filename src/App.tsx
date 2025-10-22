@@ -21,11 +21,11 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 // Core pages imported directly to avoid dynamic import issues
 import Onboarding from "./pages/Onboarding";
 import Auth from "./pages/Auth";
+import Index from "./pages/Index";
+import Dashboard from "./pages/Dashboard";
+import DashboardFamilyPlanning from "./pages/DashboardFamilyPlanning";
 
 // Lazy load the rest of pages
-const Index = lazy(() => import("./pages/Index"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const DashboardFamilyPlanning = lazy(() => import("./pages/DashboardFamilyPlanning"));
 const MyCycle = lazy(() => import("./pages/MyCycle"));
 const CycleOnboarding = lazy(() => import("./pages/CycleOnboarding"));
 const CycleCalendar = lazy(() => import("./pages/CycleCalendar"));
