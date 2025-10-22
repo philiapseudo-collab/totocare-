@@ -24,15 +24,14 @@ import Auth from "./pages/Auth";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import DashboardFamilyPlanning from "./pages/DashboardFamilyPlanning";
+import Journal from "./pages/Journal";
 
 // Lazy load the rest of pages
 const MyCycle = lazy(() => import("./pages/MyCycle"));
 const CycleOnboarding = lazy(() => import("./pages/CycleOnboarding"));
 const CycleCalendar = lazy(() => import("./pages/CycleCalendar"));
-// Onboarding and Auth are imported statically above
 const Vaccinations = lazy(() => import("./pages/Vaccinations"));
 const Conditions = lazy(() => import("./pages/Conditions"));
-const Journal = lazy(() => import("./pages/Journal"));
 const Guides = lazy(() => import("./pages/Guides"));
 const Support = lazy(() => import("./pages/Support"));
 const FAQ = lazy(() => import("./pages/FAQ"));
