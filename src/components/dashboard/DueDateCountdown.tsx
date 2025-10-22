@@ -36,9 +36,12 @@ export function DueDateCountdown() {
   const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
-    const fetchPregnancyData = async () => {
-      if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
+    const fetchPregnancyData = async () => {
       try {
         // First get the user's profile
         const { data: profile } = await supabase
@@ -47,7 +50,10 @@ export function DueDateCountdown() {
           .eq('user_id', user.id)
           .single();
 
-        if (!profile) return;
+        if (!profile) {
+          setLoading(false);
+          return;
+        }
 
         // Then get the active pregnancy
         const { data: pregnancyData, error } = await supabase
@@ -59,6 +65,7 @@ export function DueDateCountdown() {
 
         if (error) {
           console.log('No active pregnancy found');
+          setLoading(false);
           return;
         }
 
@@ -86,10 +93,10 @@ export function DueDateCountdown() {
         setWeeksRemaining(weeksRem);
         setDaysRemainingInWeek(daysRem);
         setProgressPercentage((currentWeek / totalWeeks) * 100);
+        setLoading(false);
 
       } catch (error) {
         console.error('Error fetching pregnancy data:', error);
-      } finally {
         setLoading(false);
       }
     };
@@ -199,22 +206,9 @@ export function DueDateCountdown() {
     );
   }
 
-  const formatDaysRemaining = useCallback((days: number) => {
-    if (days === 0) return "Due today!";
-    if (days < 0) return "Overdue";
-    
-    const weeks = Math.floor(days / 7);
-    const remainingDays = days % 7;
-    
-    if (weeks === 0) return `${days} day${days === 1 ? '' : 's'}`;
-    if (remainingDays === 0) return `${weeks} week${weeks === 1 ? '' : 's'}`;
-    return `${weeks}w ${remainingDays}d`;
-  }, []);
-
-  const formattedDueDate = useMemo(() => {
-    if (!pregnancy) return '';
-    return new Date(pregnancy.due_date + 'T00:00:00').toLocaleDateString();
-  }, [pregnancy?.due_date]);
+  const formattedDueDate = pregnancy 
+    ? new Date(pregnancy.due_date + 'T00:00:00').toLocaleDateString()
+    : '';
 
   return (
     <Card>

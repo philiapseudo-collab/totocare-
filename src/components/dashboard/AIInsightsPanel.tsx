@@ -22,8 +22,17 @@ export function AIInsightsPanel() {
       : ["Stay hydrated throughout the day", "Track your baby's movements daily", "Get adequate rest when possible"];
   }, [language]);
 
+  // Memoize condition and event counts to avoid unnecessary refetches
+  const activeConditionCount = useMemo(() => 
+    conditions.filter(c => c.is_active).length, 
+    [conditions]
+  );
+  
+  const eventCount = useMemo(() => events.length, [events]);
+
   useEffect(() => {
     const fetchInsights = async () => {
+      setLoading(true);
       try {
         const { data, error } = await supabase.functions.invoke('health-insights', {
           body: {
@@ -46,7 +55,7 @@ export function AIInsightsPanel() {
     };
 
     fetchInsights();
-  }, [pregnancy?.current_week, conditions, events, language, fallbackInsights]);
+  }, [pregnancy?.current_week, activeConditionCount, eventCount, language, fallbackInsights]);
 
   return (
     <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
