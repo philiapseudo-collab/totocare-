@@ -1,8 +1,8 @@
+import React, { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { queryKeys } from '@/lib/queryKeys';
-import { useEffect } from 'react';
 
 export interface Profile {
   id: string;

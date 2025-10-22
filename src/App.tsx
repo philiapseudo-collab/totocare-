@@ -1,10 +1,11 @@
+import React, { useEffect, lazy, Suspense } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { AppHeader } from "@/components/AppHeader";
 import { useAuth } from "@/hooks/useAuth";
 import { QuickActionFAB } from "@/components/QuickActionFAB";
 import { useProfile } from "@/hooks/useProfile";
-import { useEffect, lazy, Suspense } from "react";
 import { medicationNotificationService } from "./lib/medicationNotifications";
 import { MedicationAlertModal } from "./components/MedicationAlertModal";
 import { registerServiceWorker } from "./lib/serviceWorkerRegistration";
@@ -16,7 +17,6 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { NetworkStatus } from "@/components/NetworkStatus";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 // Core pages imported directly to avoid dynamic import issues
 import Onboarding from "./pages/Onboarding";
