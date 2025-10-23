@@ -417,7 +417,8 @@ const Index = () => {
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-6 md:mt-8 pt-6 md:pt-8 border-t border-border text-center text-xs sm:text-sm text-muted-foreground">
-          © 2025 LEA - Maternease. All rights reserved.
+          © 2025 LEA - Maternease. All rights reserved. •{' '}
+          <a href="/admin/auth" className="hover:text-foreground transition-colors hover:underline">Admin</a>
         </div>
       </footer>
     </div>
