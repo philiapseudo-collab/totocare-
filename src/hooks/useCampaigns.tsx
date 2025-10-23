@@ -6,6 +6,7 @@ export interface Campaign {
   title: string;
   description: string;
   category: 'maternal' | 'infant' | 'femalehood';
+  classification: 'government' | 'ngo' | 'private';
   condition_type: string;
   target_amount: number;
   current_amount: number;

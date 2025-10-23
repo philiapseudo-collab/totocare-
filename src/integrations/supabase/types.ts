@@ -184,9 +184,51 @@ export type Database = {
           },
         ]
       }
+      campaign_participants: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          participation_status: string
+          registered_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          participation_status?: string
+          registered_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          participation_status?: string
+          registered_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_participants_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaigns: {
         Row: {
           category: string
+          classification: string | null
           condition_type: string
           created_at: string
           created_by: string | null
@@ -204,6 +246,7 @@ export type Database = {
         }
         Insert: {
           category: string
+          classification?: string | null
           condition_type: string
           created_at?: string
           created_by?: string | null
@@ -221,6 +264,7 @@ export type Database = {
         }
         Update: {
           category?: string
+          classification?: string | null
           condition_type?: string
           created_at?: string
           created_by?: string | null
