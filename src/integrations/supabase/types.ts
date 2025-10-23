@@ -14,6 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_id: string | null
+          changes: Json | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          admin_id?: string | null
+          changes?: Json | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string | null
+          changes?: Json | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_audit_log_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "admins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admins: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_active: boolean | null
+          last_login: string | null
+          name: string
+          password_hash: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          is_active?: boolean | null
+          last_login?: string | null
+          name: string
+          password_hash: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_active?: boolean | null
+          last_login?: string | null
+          name?: string
+          password_hash?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       antenatal_visit_schedule: {
         Row: {
           created_at: string
@@ -112,39 +189,69 @@ export type Database = {
           category: string
           condition_type: string
           created_at: string
+          created_by: string | null
           current_amount: number | null
           description: string
           id: string
+          image_url: string | null
           is_active: boolean | null
+          last_edited_by: string | null
+          status: string | null
           target_amount: number | null
           title: string
           updated_at: string
+          views_count: number | null
         }
         Insert: {
           category: string
           condition_type: string
           created_at?: string
+          created_by?: string | null
           current_amount?: number | null
           description: string
           id?: string
+          image_url?: string | null
           is_active?: boolean | null
+          last_edited_by?: string | null
+          status?: string | null
           target_amount?: number | null
           title: string
           updated_at?: string
+          views_count?: number | null
         }
         Update: {
           category?: string
           condition_type?: string
           created_at?: string
+          created_by?: string | null
           current_amount?: number | null
           description?: string
           id?: string
+          image_url?: string | null
           is_active?: boolean | null
+          last_edited_by?: string | null
+          status?: string | null
           target_amount?: number | null
           title?: string
           updated_at?: string
+          views_count?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "campaigns_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "admins"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaigns_last_edited_by_fkey"
+            columns: ["last_edited_by"]
+            isOneToOne: false
+            referencedRelation: "admins"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       clinic_visits: {
         Row: {
@@ -348,6 +455,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      failed_login_attempts: {
+        Row: {
+          attempt_count: number | null
+          email: string
+          id: number
+          last_attempt: string | null
+          locked_until: string | null
+        }
+        Insert: {
+          attempt_count?: number | null
+          email: string
+          id?: number
+          last_attempt?: string | null
+          locked_until?: string | null
+        }
+        Update: {
+          attempt_count?: number | null
+          email?: string
+          id?: number
+          last_attempt?: string | null
+          locked_until?: string | null
+        }
+        Relationships: []
       }
       growth_milestones: {
         Row: {
@@ -782,6 +913,33 @@ export type Database = {
         }
         Relationships: []
       }
+      password_reset_tokens: {
+        Row: {
+          admin_email: string
+          created_at: string | null
+          expires_at: string
+          id: number
+          token: string
+          used: boolean | null
+        }
+        Insert: {
+          admin_email: string
+          created_at?: string | null
+          expires_at: string
+          id?: number
+          token: string
+          used?: boolean | null
+        }
+        Update: {
+          admin_email?: string
+          created_at?: string | null
+          expires_at?: string
+          id?: number
+          token?: string
+          used?: boolean | null
+        }
+        Relationships: []
+      }
       pregnancies: {
         Row: {
           conception_date: string | null
@@ -1137,14 +1295,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      check_and_create_deliveries: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
-      create_infant_from_delivery: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      check_and_create_deliveries: { Args: never; Returns: Json }
+      create_infant_from_delivery: { Args: never; Returns: undefined }
       get_due_medication_reminders: {
         Args: { user_profile_id: string }
         Returns: {
@@ -1171,10 +1323,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      trigger_delivery_check: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      trigger_delivery_check: { Args: never; Returns: Json }
     }
     Enums: {
       appointment_status: "scheduled" | "completed" | "cancelled" | "no_show"
