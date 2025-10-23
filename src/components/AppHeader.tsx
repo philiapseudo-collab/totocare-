@@ -79,11 +79,6 @@ const resourceItems = [
     url: "/about",
     icon: Info,
   },
-  {
-    title: "Campaigns",
-    url: "/campaigns",
-    icon: BarChart3,
-  },
 ];
 
 export function AppHeader() {
@@ -108,10 +103,10 @@ export function AppHeader() {
       case '/faq': return 'nav.faq';
       case '/about': return 'nav.about';
       case '/profile': return 'nav.profile';
-      case '/campaigns': return 'nav.campaigns';
       default: return '';
     }
   };
+
   const isActive = (path: string) => currentPath === path;
 
   return (

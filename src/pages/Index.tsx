@@ -156,10 +156,6 @@ const Index = () => {
             <Button size="default" variant="outline" onClick={() => navigate("/about")} className="sm:text-base px-6 sm:px-10 py-4 sm:py-6 border-2 hover:scale-105 transition-all">
               Learn More
             </Button>
-            <Button size="default" onClick={() => navigate("/campaigns")} variant="secondary" className="sm:text-base px-6 sm:px-10 py-4 sm:py-6 hover:scale-105 transition-all">
-              <Heart className="w-4 h-4 mr-2" />
-              Explore Campaigns
-            </Button>
           </div>
           
           <div className="flex items-center justify-center gap-4 sm:gap-8 mt-6 md:mt-12 text-xs sm:text-sm text-muted-foreground animate-fade-in flex-wrap" style={{ animationDelay: "400ms" }}>
@@ -355,7 +351,7 @@ const Index = () => {
               <Heart className="w-4 h-4 mr-2" />
               Donate
             </Button>
-            <Button size="default" onClick={() => navigate("/campaigns")} variant="outline" className="sm:text-base px-6 sm:px-8 py-4 sm:py-5 border-2 hover:scale-105 transition-all">
+            <Button size="default" onClick={() => navigate("/donate")} variant="outline" className="sm:text-base px-6 sm:px-8 py-4 sm:py-5 border-2 hover:scale-105 transition-all">
               View Campaigns
             </Button>
           </div>
@@ -421,8 +417,7 @@ const Index = () => {
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-6 md:mt-8 pt-6 md:pt-8 border-t border-border text-center text-xs sm:text-sm text-muted-foreground">
-          © 2025 LEA - Maternease. All rights reserved. •{' '}
-          <a href="/admin/auth" className="hover:text-foreground transition-colors hover:underline">Admin</a>
+          © 2025 LEA - Maternease. All rights reserved.
         </div>
       </footer>
     </div>

@@ -11,12 +11,3 @@ verify_jwt = true
 
 [functions.check-drug-safety]
 verify_jwt = true
-
-[functions.admin-register]
-verify_jwt = false
-
-[functions.admin-login]
-verify_jwt = false
-
-[functions.admin-campaigns]
-verify_jwt = false

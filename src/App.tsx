@@ -26,11 +26,6 @@ import Dashboard from "./pages/Dashboard";
 import DashboardFamilyPlanning from "./pages/DashboardFamilyPlanning";
 import Journal from "./pages/Journal";
 
-import AdminAuth from "./pages/admin/AdminAuth";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import Campaigns from "./pages/Campaigns";
-import { AdminAuthProvider } from "./contexts/AdminAuthContext";
-
 // Lazy load the rest of pages
 const MyCycle = lazy(() => import("./pages/MyCycle"));
 const CycleOnboarding = lazy(() => import("./pages/CycleOnboarding"));
@@ -200,16 +195,11 @@ const AuthenticatedApp = () => {
 };
 
 const App = () => (
-  <AdminAuthProvider>
+  <>
     <Toaster />
     <Sonner />
-    <Routes>
-      <Route path="/admin/auth" element={<AdminAuth />} />
-      <Route path="/admin/dashboard/*" element={<AdminDashboard />} />
-      <Route path="/campaigns" element={<Campaigns />} />
-      <Route path="/*" element={<AuthenticatedApp />} />
-    </Routes>
-  </AdminAuthProvider>
+    <AuthenticatedApp />
+  </>
 );
 
 export default App;
