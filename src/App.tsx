@@ -59,9 +59,22 @@ const AuthenticatedApp = () => {
   const location = useLocation();
   const { user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
+  const [loadingTimeout, setLoadingTimeout] = React.useState(false);
   
   // Enable keyboard shortcuts
   useKeyboardShortcuts();
+
+  // Add timeout to prevent infinite loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (authLoading || profileLoading) {
+        setLoadingTimeout(true);
+        console.error('Loading timeout - forcing app to load');
+      }
+    }, 5000);
+    
+    return () => clearTimeout(timer);
+  }, [authLoading, profileLoading]);
 
   // Check if user needs journey selection
   const needsJourneySelection = profile && !(profile as any).user_journey;
@@ -88,7 +101,8 @@ const AuthenticatedApp = () => {
     }
   }, [user, profile?.id]);
 
-  if (authLoading || profileLoading) {
+  // Show loading spinner, but not forever (timeout after 5 seconds)
+  if ((authLoading || profileLoading) && !loadingTimeout) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>

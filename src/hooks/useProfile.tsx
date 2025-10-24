@@ -24,7 +24,7 @@ export const useProfile = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: profile, isLoading: profileLoading } = useQuery({
+  const { data: profile, isLoading: profileLoading, error: profileError } = useQuery({
     queryKey: queryKeys.profile(user?.id),
     queryFn: async () => {
       if (!user) return null;
@@ -33,18 +33,28 @@ export const useProfile = () => {
         .from('profiles')
         .select('id, first_name, last_name, date_of_birth, blood_group, current_weight, profile_completed, user_journey')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
-      return data as Profile;
+      if (error) {
+        console.error('Profile query error:', error);
+        throw error;
+      }
+      return data as Profile | null;
     },
     enabled: !!user,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    retry: 3, // Retry failed requests 3 times
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    retry: 1, // Only retry once to avoid long delays
+    retryDelay: 1000, // Quick retry
   });
 
-  const { data: pregnancy, isLoading: pregnancyLoading } = useQuery({
+  // Log errors for debugging
+  useEffect(() => {
+    if (profileError) {
+      console.error('Profile loading error:', profileError);
+    }
+  }, [profileError]);
+
+  const { data: pregnancy, isLoading: pregnancyLoading, error: pregnancyError } = useQuery({
     queryKey: queryKeys.pregnancies.active(profile?.id),
     queryFn: async () => {
       if (!profile?.id) return null;
@@ -56,14 +66,24 @@ export const useProfile = () => {
         .eq('status', 'pregnant')
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Pregnancy query error:', error);
+        throw error;
+      }
       return data as Pregnancy | null;
     },
     enabled: !!profile?.id,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    retry: 1, // Only retry once
+    retryDelay: 1000,
   });
+
+  // Log pregnancy errors
+  useEffect(() => {
+    if (pregnancyError) {
+      console.error('Pregnancy loading error:', pregnancyError);
+    }
+  }, [pregnancyError]);
 
   // Subscribe to realtime updates for profile changes
   useEffect(() => {
