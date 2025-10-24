@@ -92,11 +92,11 @@ export default function SymptomChecker() {
   const getSeverityColor = (level: string) => {
     switch (level) {
       case 'normal':
-        return 'border-green-200 bg-green-50';
+        return 'border-green-500/30 bg-green-500/10 dark:border-green-500/50 dark:bg-green-500/20';
       case 'monitor':
-        return 'border-yellow-200 bg-yellow-50';
+        return 'border-yellow-500/30 bg-yellow-500/10 dark:border-yellow-500/50 dark:bg-yellow-500/20';
       case 'urgent':
-        return 'border-red-200 bg-red-50';
+        return 'border-red-500/30 bg-red-500/10 dark:border-red-500/50 dark:bg-red-500/20';
       default:
         return '';
     }
